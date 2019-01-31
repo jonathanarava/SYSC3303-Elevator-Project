@@ -3,7 +3,7 @@
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
 import java.io.*;
 import java.net.*;
-public class Elevator extends Thread {
+public class Elevator implements Runnable {
 	public static final String NAMING="Elevator ";
 
 
