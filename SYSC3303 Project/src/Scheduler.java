@@ -13,6 +13,8 @@ public class Scheduler {
 									 * variable to the elevator or floor we have chosen
 									 */
 	public static final int RECEIVEPORTNUM = 23;
+	
+
 
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
@@ -23,6 +25,14 @@ public class Scheduler {
 	// public static final DOOR_CLOSE=
 
 	public static void main(String args[]){
+		
+		
+		Thread elevator = new Thread(new Elevator("one"));
+		
+		elevator.start();
+		
+		
+		
 		//getting floor numbers from parameters set
 		int createNumElevators=args[];
 		int createNumFloors=args[];
