@@ -27,6 +27,7 @@ public class Floor implements Runnable {
 														// port
 			floorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
 														// that's been received
+			
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
