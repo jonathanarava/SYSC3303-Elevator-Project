@@ -29,13 +29,13 @@ public class Elevator implements Runnable {
 		// Declare Variables for THREADS
 		DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 		DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-
+		
 		// allocate sockets, packets
 		try {
-			elevatorSendSocket = new DatagramSocket(23);// arbitrary usage of 23 for port number of Scheduler's receive
-														// port
+			elevatorSendSocket = new DatagramSocket(23); // arbitrary usage of 23 for port number of Scheduler's receive
 			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
-															// that's been received
+														// that's been received
+			
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
