@@ -1,32 +1,27 @@
+
 //only one with main method; allocates the number of Elevator and Floor objects
 //most logic for changing of states
 import java.io.*;
 import java.net.*;
+
 public class Scheduler {
 
-
 	public static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
-	public static DatagramSocket schedulerSendSocket, schedulerReceiveSocket;/*send sockets should be allocated dynamically 
-	since the ports would be variable to the elevator or floor we have chosen*/
-	public static final int RECEIVEPORTNUM=23;
+	public static DatagramSocket schedulerSendSocket,
+			schedulerReceiveSocket;/*
+									 * send sockets should be allocated dynamically since the ports would be
+									 * variable to the elevator or floor we have chosen
+									 */
+	public static final int RECEIVEPORTNUM = 23;
 
-	//request list
-	//Define Data Types for passing to and from Elevator(s) and Floor(s)
+	// request list
+	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
-	//Declare timing constants
-	//public static final TIME_PER_FLOOR=
-	//public static final DOOR_OPEN=
-	//public static final DOOR_CLOSE=
-	public int currentFloor() {
-		int floor;
-		if (floor - destFloor() < 0) {
-			floor++;
-		} else if (floor - destFloor() > 0){
-			floor--;
-		}
-		return floor;
-	}
-	
+	// Declare timing constants
+	// public static final TIME_PER_FLOOR=
+	// public static final DOOR_OPEN=
+	// public static final DOOR_CLOSE=
+
 	public static void main(String args[]){
 		//getting floor numbers from parameters set
 		int createNumElevators=args[];
