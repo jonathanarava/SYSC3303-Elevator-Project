@@ -5,7 +5,8 @@ import java.io.*;
 import java.net.*;
 public class Elevator implements Runnable {
 	public static final String NAMING="Elevator ";
-
+	
+	
 
 	public Elevator(String name){
 		super(NAMING+name);//mandatory for having it actually declared as a thread object

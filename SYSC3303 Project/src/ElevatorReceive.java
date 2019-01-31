@@ -6,10 +6,29 @@ public class ElevatorReceive {
 	//door: open, close (boolean)
 	public static boolean isRequest;
 	public static int requestFloorNumber;
-	/*ElevatorReceive(boolean request, int floorRequest){
-		isRequest=request;
-		requestFloorNumber=floorRequest;
-	}*/
+	
+	ElevatorReceive(byte[] receivedSchedule){
 
+		runElevator(receivedSchedule[1], receivedSchedule[2]);
+		//isRequest=request;
+		//requestFloorNumber=floorRequest;
+	}
+
+	public void runElevator(byte motorSpinTime, byte currentFloor ) {
+		int time = (int)motorSpinTime;
+		int button = (int)currentFloor;
+
+		while (time != 0){
+			try {
+				System.out.println(button);
+				Thread.sleep(1000);
+				time--;
+				button++;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 
 }

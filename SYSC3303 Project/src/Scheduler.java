@@ -17,7 +17,16 @@ public class Scheduler {
 	//public static final TIME_PER_FLOOR=
 	//public static final DOOR_OPEN=
 	//public static final DOOR_CLOSE=
-
+	public int currentFloor() {
+		int floor;
+		if (floor - destFloor() < 0) {
+			floor++;
+		} else if (floor - destFloor() > 0){
+			floor--;
+		}
+		return floor;
+	}
+	
 	public static void main(String args[]){
 		//getting floor numbers from parameters set
 		int createNumElevators=args[];

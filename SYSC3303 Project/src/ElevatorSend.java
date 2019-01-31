@@ -19,32 +19,8 @@ public class ElevatorSend {
 	//add get methods
 	
 
-	public int runElevator(byte x) {
-		int time = (int)x;
-		int button;
 
-		button = floor; 
-		while (time != 0){
-			try {
-				Thread.sleep(1000);
-				time--;
-				button++;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return button;
-	}
-	
-	public int currentFloor() {
-		if (floor - destFloor() < 0) {
-			floor++;
-		} else if (floor - destFloor() > 0){
-			floor--;
-		}
-		return floor;
-	}
-	
+
 	public int destFloor() {
 		System.out.println("Enter floor number: ");
 		Scanner destination = new Scanner(System.in);
@@ -59,7 +35,6 @@ public class ElevatorSend {
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
-		requestElevator.write((byte)currentFloor());
 		requestElevator.write((byte)destFloor());
 		requestElevator.write(0);
 		return requestElevator.toByteArray();
