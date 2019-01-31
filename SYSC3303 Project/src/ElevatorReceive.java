@@ -7,7 +7,11 @@ public class ElevatorReceive {
 	public static boolean isRequest;
 	public static int requestFloorNumber;
 	
-	byte state = 0x01;
+	private static byte hold = 0x00;
+	private static byte up = 0x01;
+	private static byte down = 0x02;
+
+	
 	
 	ElevatorReceive(byte[] receivedSchedule){
 		runElevator(receivedSchedule[1], receivedSchedule[2], receivedSchedule[3]);
@@ -20,13 +24,13 @@ public class ElevatorReceive {
 		int time = (int)motorSpinTime;
 		int button = (int)currentFloor;
 
-		if(motorDirection == 1 || motorDirection == 2) {
+		if(motorDirection == up || motorDirection == down) {
 			while (time != 0){
 				try {
 					System.out.println(button);
 					Thread.sleep(1000);
 					time--;
-					if(motorDirection == 1) {
+					if(motorDirection == up) {
 						button++;
 					} else {
 						button--;
@@ -35,7 +39,7 @@ public class ElevatorReceive {
 					e.printStackTrace();
 				}
 			} 
-		}else if (motorDirection ==0) {
+		}else if (motorDirection == hold) {
 			
 		}
 	}
