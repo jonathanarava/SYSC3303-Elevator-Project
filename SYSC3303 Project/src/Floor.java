@@ -2,10 +2,10 @@
 //no logic beyond changing the status of requests, arrival sensor, and display
 import java.io.*;
 import java.net.*;
-public class Floor extends Thread{
-	public static final String NAMING="Floor ";
+public class Floor implements Runnable{
+	public static String NAMING;
 	public Floor(String name) {
-		super(NAMING+name);//mandatory for having it actually declared as a thread object
+		NAMING = name;//mandatory for having it actually declared as a thread object
 		//use a numbering scheme for the naming
 
 
