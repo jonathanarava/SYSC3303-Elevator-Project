@@ -22,18 +22,18 @@ public class ElevatorReceive {
 
 	public void runElevator(byte motorDirection, byte motorSpinTime, byte currentFloor ) {
 		int time = (int)motorSpinTime;
-		int button = (int)currentFloor;
+		int floorDisplay = (int)currentFloor;
 
 		if(motorDirection == up || motorDirection == down) {
 			while (time != 0){
 				try {
-					System.out.println(button);
+					System.out.println(floorDisplay);
 					Thread.sleep(1000);
 					time--;
 					if(motorDirection == up) {
-						button++;
+						floorDisplay++;
 					} else {
-						button--;
+						floorDisplay--;
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -46,9 +46,9 @@ public class ElevatorReceive {
 	
 	public void openCloseDoor(byte door) {
 		if (door == 1) {
-			System.out.println("doors are open");
+			System.out.println("Doors are open.");
 		} else if (door == 0) {
-			System.out.println("doors are closing");
+			System.out.println("Doors are closing...");
 		}
 	}
 }
