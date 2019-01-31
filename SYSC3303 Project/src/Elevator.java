@@ -4,12 +4,12 @@
 import java.io.*;
 import java.net.*;
 public class Elevator implements Runnable {
-	public static final String NAMING="Elevator ";
+	public static String NAMING;
 	
 	
 
 	public Elevator(String name){
-		super(NAMING+name);//mandatory for having it actually declared as a thread object
+		NAMING = name;//mandatory for having it actually declared as a thread object
 		//use a numbering scheme for the naming
 
 
