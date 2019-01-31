@@ -10,27 +10,22 @@ public class ElevatorSend {
 	public static int requestFloorNumber;
 	public static int floor;
 
-	public ElevatorSend(boolean request, int floorRequest, boolean sensor) {
-		isRequest = request;
-		requestFloorNumber = floorRequest;
-		arriveSensor = sensor;
+	public ElevatorSend() {
+		System.out.println("Enter floor number: ");
+		Scanner destination = new Scanner(System.in);
+		int floorRequest = destination.nextInt();
+		// destination.close();
+		responsePacket(floorRequest);
 	}
 	// add get methods
 
-	public int destFloor() {
-		System.out.println("Enter floor number: ");
-		Scanner destination = new Scanner(System.in);
-		int n = destination.nextInt();
-		// destination.close();
-		return n;
-	}
 
-	public byte[] responsePacket() {
+	public byte[] responsePacket(int floorRequest) {
 
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
-		requestElevator.write((byte) destFloor());
+		requestElevator.write((byte) floorRequest);
 		requestElevator.write(0);
 		return requestElevator.toByteArray();
 

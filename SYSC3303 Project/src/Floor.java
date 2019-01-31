@@ -1,8 +1,11 @@
 
-// no main method
+//no main method
 //no logic beyond changing the status of requests, arrival sensor, and display
 import java.io.*;
 import java.net.*;
+
+//class Floor:has direction buttons and Floor display
+
 
 public class Floor implements Runnable {
 	public static String NAMING;
