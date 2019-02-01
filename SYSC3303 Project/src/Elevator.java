@@ -8,6 +8,9 @@ import java.util.Scanner;
 public class Elevator implements Runnable {
 	public static String NAMING;
 	public static int floorRequest;
+	private static byte hold = 0x00;
+	private static byte up = 0x01;
+	private static byte down = 0x02;
 
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
@@ -64,6 +67,42 @@ public class Elevator implements Runnable {
 		return requestElevator.toByteArray();
 
 	}
+	
+	public void openCloseDoor(byte door) {
+		boolean doorStatus;
+		if (door == 1) {
+			System.out.println("Doors are open.");
+		} else {
+			System.out.println("Doors are closed.");
+		}
+	}
+	
+	public void runElevator(byte motorDirection, byte motorSpinTime, byte currentFloor ) {
+		int time = (int)motorSpinTime;
+		int floorDisplay = (int)currentFloor;
+
+		if(motorDirection == up || motorDirection == down) {
+			while (time != 0){
+				try {
+					System.out.println(floorDisplay);
+					Thread.sleep(1000);
+					time--;
+					if(motorDirection == up) {
+						floorDisplay++;
+					} else {
+						floorDisplay--;
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} 
+		}else if (motorDirection == hold) {
+			openCloseDoor(1);
+		}
+	}
+	
+	
+	
 
 	public void run() {
 		byte[] requestElevator= new byte[3];
@@ -85,6 +124,24 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 				System.exit(1);
 			}
+			
+			byte data[] = new byte[4];
+			elevatorReceivePacket = new DatagramPacket(data, data.length);
+			
+			System.out.println("elevator_subsystem: Waiting for Packet.\n");
+
+			try {
+				// Block until a datagram packet is received from receiveSocket.
+				System.out.println("Waiting...\n"); // so we know we're waiting
+				elevatorReceiveSocket.receive(elevatorReceivePacket);
+			} catch (IOException e) {
+				System.out.print("IO Exception: likely:");
+				System.out.println("Receive Socket Timed Out.\n" + e);
+				e.printStackTrace();
+				System.exit(1);
+			}
+			runElevator(data[1], data[2], data[3]);
+			openCloseDoor(data[4]);
 
 			// send packet for scheduler to know the port this elevator is allocated
 			// sendPacket = new DatagramPacket(data,
