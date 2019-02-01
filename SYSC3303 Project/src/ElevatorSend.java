@@ -5,19 +5,13 @@ public class ElevatorSend {
 	// request: yes or no (boolean)
 	// floor number request (integer)
 	// sensor data: boolean (yes, no)
-	public static boolean isRequest;
-	public static boolean arriveSensor;
-	public static int requestFloorNumber;
-	public static int floor;
+	
+	//public static boolean isRequest;
+	//public static boolean arriveSensor;
+	//public static int requestFloorNumber;
+	public static int floorRequest;
 
 	public ElevatorSend() {
-		System.out.println("Enter floor number: ");
-		
-		@SuppressWarnings("resource")
-		Scanner destination = new Scanner(System.in);
-		int floorRequest = destination.nextInt();
-		// destination.close();
-		responsePacket(floorRequest);
 	}
 	// add get methods
 
@@ -33,6 +27,11 @@ public class ElevatorSend {
 
 	}
 	
+	public int lengthOfByteArray() {
+		int len = responsePacket(floorRequest).length;
+		return len;
+		
+	}
 	/*public static void main(String args[]){
 		ElevatorSend e = new ElevatorSend();
 		System.out.println(e);

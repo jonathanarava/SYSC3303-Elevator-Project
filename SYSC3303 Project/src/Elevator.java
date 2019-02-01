@@ -3,10 +3,12 @@
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 public class Elevator implements Runnable {
 	public static String NAMING;
-	
+	public static int floorRequest;
+	public static byte[] requestElevator= new byte[3];
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -40,15 +42,23 @@ public class Elevator implements Runnable {
 	}
 
 	public void run() {
-		Elevator elevator1 = new Elevator("1");
+		
 		while (true) {
+		Elevator elevator1 = new Elevator("1");
+		System.out.println("Enter floor number: ");
+			
+		@SuppressWarnings("resource")
+		Scanner destination = new Scanner(System.in);
+		floorRequest = destination.nextInt();
+		// destination.close();
+		
 		ElevatorSend request = new ElevatorSend();
+		requestElevator = request.responsePacket(floorRequest);
+		int length = request.lengthOfByteArray();
 		
 		// allocate sockets, packets
 			try {
-				elevatorSendPacket = new DatagramPacket(request, request.length, InetAddress.getLocalHost(), 23);
-				
-				
+				elevatorSendPacket = new DatagramPacket(requestElevator, length, InetAddress.getLocalHost(), 23);
 			}catch (UnknownHostException e) {
 				e.printStackTrace();
 				System.exit(1);
