@@ -8,10 +8,6 @@ import org.junit.jupiter.api.Test;
 
 class ElevatorTest {
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
 	}
@@ -26,6 +22,7 @@ class ElevatorTest {
 
 	@Test
 	void test() {
+		
 		fail("Not yet implemented");
 	}
 
