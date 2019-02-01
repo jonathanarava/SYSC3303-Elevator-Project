@@ -4,10 +4,12 @@
 import java.io.*;
 import java.net.*;
 
-//class Floor:has direction buttons and Floor display
-
+/*
+ * class Floor:has direction buttons and Floor display
+ */
 public class Floor implements Runnable {
 	
+	public int elevatorLocation;
 	public static String NAMING;
 	DatagramPacket floorSendPacket, floorReceivePacket;
 	DatagramSocket floorSendSocket, floorReceiveSocket;
@@ -18,18 +20,19 @@ public class Floor implements Runnable {
 		
 		try {
 			floorSendSocket = new DatagramSocket(23);
-			floorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
-															// that's been received
+			floorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
 		}
-
 	}
 	
+	
+	/* Gets an elevator request as an int(up or down)
+	 * @returns a byte[] array that can be then used to send to the Schedular
+	 */
 	public byte[] responsePacket(int elevatorRequest) {
-
-		// creates the byte array according to the required format
+		// creates the byte array according to the required format in this case 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
 		requestElevator.write(elevatorRequest);
