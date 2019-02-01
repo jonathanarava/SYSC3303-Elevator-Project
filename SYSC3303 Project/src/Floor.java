@@ -7,18 +7,41 @@ import java.net.*;
 //class Floor:has direction buttons and Floor display
 
 public class Floor implements Runnable {
+	
 	public static String NAMING;
+	DatagramPacket floorSendPacket, floorReceivePacket;
+	DatagramSocket floorSendSocket, floorReceiveSocket;
 
 	public Floor(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
+		
+		try {
+			floorSendSocket = new DatagramSocket(23);
+			floorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
+															// that's been received
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
+
+	}
+	
+	public byte[] responsePacket(int elevatorRequest) {
+
+		// creates the byte array according to the required format
+		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
+		requestElevator.write(0);
+		requestElevator.write(elevatorRequest);
+		requestElevator.write(0);
+		return requestElevator.toByteArray();
 
 	}
 
 	public void run() {
 		// Declare Variables for THREADS
-		DatagramPacket floorSendPacket, floorReceivePacket;
-		DatagramSocket floorSendSocket, floorReceiveSocket;
+		
+
 
 		// allocate sockets, packets
 		try {
