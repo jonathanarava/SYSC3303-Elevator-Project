@@ -130,7 +130,7 @@ public class Elevator implements Runnable {
 			elevatorReceivePacket = new DatagramPacket(data, data.length);
 			
 			System.out.println("elevator_subsystem: Waiting for Packet.\n");
-
+			
 			try {
 				// Block until a datagram packet is received from receiveSocket.
 				System.out.println("Waiting...\n"); // so we know we're waiting
