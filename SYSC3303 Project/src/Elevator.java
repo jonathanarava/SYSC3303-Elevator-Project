@@ -12,6 +12,7 @@ public class Elevator implements Runnable {
 	private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
+	private static int sensor;
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -44,19 +45,6 @@ public class Elevator implements Runnable {
 		 */
 	}
 
-	public void sensor() {
-		try {
-			int i = 4;
-			while (i != 0) {
-				System.out.format("Seconds until elevator door closes: %d second \n", i);
-				i--;
-				Thread.sleep(1000);
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public byte[] responsePacket(int floorRequest) {
 
 		// creates the byte array according to the required format
@@ -69,35 +57,43 @@ public class Elevator implements Runnable {
 	}
 	
 	public void openCloseDoor(byte door) {
-		boolean doorStatus;
+
 		if (door == 1) {
 			System.out.println("Doors are open.");
+			try {
+				int i = 4;
+				while (i != 0) {
+					System.out.format("Seconds until elevator door closes: %d second \n", i);
+					i--;
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println("Doors are closed.");
 		}
 	}
 	
-	public void runElevator(byte motorDirection, byte motorSpinTime, byte currentFloor ) {
+	public void runElevator(byte motorDirection, byte motorSpinTime) {
 		int time = (int)motorSpinTime;
-		int floorDisplay = (int)currentFloor;
 
 		if(motorDirection == up || motorDirection == down) {
 			while (time != 0){
 				try {
-					System.out.println(floorDisplay);
+					System.out.println(sensor);
 					Thread.sleep(1000);
 					time--;
 					if(motorDirection == up) {
-						floorDisplay++;
+						sensor++;
 					} else {
-						floorDisplay--;
+						sensor--;
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			} 
 		}else if (motorDirection == hold) {
-			openCloseDoor(1);
 		}
 	}
 	
@@ -141,8 +137,10 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			runElevator(data[1], data[2], data[3]);
-			openCloseDoor(data[4]);
+			
+			runElevator(data[1], data[2]);
+			openCloseDoor(data[3]);
+			sensor = (int) data[4];
 
 			// send packet for scheduler to know the port this elevator is allocated
 			// sendPacket = new DatagramPacket(data,
