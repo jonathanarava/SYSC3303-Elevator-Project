@@ -1,5 +1,5 @@
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.Assert.assertEquals;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
-//import static org.assertj.core.api.Assertions.*;
 
 class ElevatorTest {
 	
@@ -34,14 +33,20 @@ class ElevatorTest {
 
 	  @Before
 	  public void initializeElevator(){
-	    elevator = new Elevator("0");
+	    elevator = new Elevator("one");
 	  }
 
 	  @Test
-	  public void testAddingDestination(){
-		  
-	    elevator.addNewDestinatoin(TENTH_FLOOR);
-	    assertEquals(TENTH_FLOOR, elevator.nextDestionation());
+	  public void TestCurrentFloor(){
+		int value = elevator.currentFloor(3);
+	    assertEquals(value, 3);
+	  }
+	  
+	  @Test
+	  public void testResponsePacket(){
+		  floorRequest = 2;
+		  elevator.responsePacket(floorRequest);
+		
 	  }
 
 	  /*@Test
