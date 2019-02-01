@@ -1,3 +1,4 @@
+
 //no main method
 //Output: floor request, 
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
@@ -12,22 +13,21 @@ public class Elevator implements Runnable {
 	private static byte up = 0x01;
 	private static byte down = 0x02;
 
-
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
-		
+
 		try {
 			elevatorSendSocket = new DatagramSocket(23);
 			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
-														// that's been received
+															// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -43,12 +43,12 @@ public class Elevator implements Runnable {
 		 * accordingly
 		 */
 	}
-	
+
 	public void sensor() {
 		try {
-			int i=4;
-			while(i != 0){
-				System.out.format("Seconds till door closes %d second \n", i);
+			int i = 4;
+			while (i != 0) {
+				System.out.format("Seconds until elevator door closes: %d second \n", i);
 				i--;
 				Thread.sleep(1000);
 			}
@@ -56,7 +56,7 @@ public class Elevator implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public byte[] responsePacket(int floorRequest) {
 
 		// creates the byte array according to the required format
@@ -105,22 +105,23 @@ public class Elevator implements Runnable {
 	
 
 	public void run() {
-		byte[] requestElevator= new byte[3];
+		byte[] requestElevator = new byte[3];
 		while (true) {
-			
+
 			System.out.println("Enter floor number: ");
 
 			Scanner destination = new Scanner(System.in);
 			int floorRequest = destination.nextInt();
 			destination.close();
-			
+
 			requestElevator = responsePacket(floorRequest);
 			int lengthOfByteArray = responsePacket(floorRequest).length;
 
 			// allocate sockets, packets
 			try {
-				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(), 23);
-			}catch (UnknownHostException e) {
+				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
+						23);
+			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
