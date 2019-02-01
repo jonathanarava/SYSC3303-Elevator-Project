@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import org.junit.Test;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 
 
@@ -32,7 +32,7 @@ class ElevatorTest {
 
 	  private Elevator elevator;
 
-	  @Before
+	  @BeforeAll
 	  public void initializeElevator(){
 	    elevator = new Elevator("one");
 	  }
