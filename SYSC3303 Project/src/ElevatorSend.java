@@ -12,6 +12,8 @@ public class ElevatorSend {
 
 	public ElevatorSend() {
 		System.out.println("Enter floor number: ");
+		
+		@SuppressWarnings("resource")
 		Scanner destination = new Scanner(System.in);
 		int floorRequest = destination.nextInt();
 		// destination.close();
@@ -30,5 +32,10 @@ public class ElevatorSend {
 		return requestElevator.toByteArray();
 
 	}
+	
+	/*public static void main(String args[]){
+		ElevatorSend e = new ElevatorSend();
+		System.out.println(e);
+	}*/ // test
 
 }

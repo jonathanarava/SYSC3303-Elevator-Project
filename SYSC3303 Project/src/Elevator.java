@@ -6,9 +6,24 @@ import java.net.*;
 
 public class Elevator implements Runnable {
 	public static String NAMING;
+	
+
+	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
+	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
+		
+		try {
+			elevatorSendSocket = new DatagramSocket(23);
+			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
+														// that's been received
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
+		
+		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
 		// allocate sockets, packets
@@ -25,24 +40,24 @@ public class Elevator implements Runnable {
 	}
 
 	public void run() {
-
-		DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-		DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
+		Elevator elevator1 = new Elevator("1");
+		while (true) {
+		ElevatorSend request = new ElevatorSend();
 		
 		// allocate sockets, packets
-		try {
-			elevatorSendSocket = new DatagramSocket(23); // arbitrary usage of 23 for port number of Scheduler's receive
-			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
-														// that's been received
-			
-		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
-			se.printStackTrace();
-			System.exit(1);
-		}
+			try {
+				elevatorSendPacket = new DatagramPacket(request, request.length, InetAddress.getLocalHost(), 23);
+				
+				
+			}catch (UnknownHostException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 
 		// send packet for scheduler to know the port this elevator is allocated
 		// sendPacket = new DatagramPacket(data,
 		// receivePacket.getLength(),receivePacket.getAddress(),
 		// receivePacket.getPort());
+		}
 	}
 }
