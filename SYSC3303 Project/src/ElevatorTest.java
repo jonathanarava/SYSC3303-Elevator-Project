@@ -40,9 +40,7 @@ class ElevatorTest {
 	  @Test
 	  public void TestCurrentFloor(){
 		//elevator = new Elevator("one");
-		  
-		int value = elevator.currentFloor(3);
-	    assertEquals(value, 3);
+	    assertEquals(3, elevator.currentFloor(3));
 	  }
 	  
 	  @Test
