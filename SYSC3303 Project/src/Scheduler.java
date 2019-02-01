@@ -13,8 +13,6 @@ public class Scheduler {
 									 * variable to the elevator or floor we have chosen
 									 */
 	public static final int RECEIVEPORTNUM = 23;
-	
-
 
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
