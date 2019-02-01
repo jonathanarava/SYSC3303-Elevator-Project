@@ -29,4 +29,14 @@ class FloorTest {
 		fail("Not yet implemented.");
 	}
 
+	@Test
+	public void testRun() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Test
+	public void testResponsePacket() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
+
 }
