@@ -10,7 +10,7 @@ public class Elevator implements Runnable {
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
-//hello
+
 		// allocate sockets, packets
 		/*
 		 * try { //ClientRWSocket = new DatagramSocket(23);//initialize ClientRWSocket
