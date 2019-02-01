@@ -1,5 +1,6 @@
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -7,17 +8,17 @@ import java.net.DatagramSocket;
 import org.junit.Test;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
 
 
 class ElevatorTest {
 	
 	public static String NAMING;
 	public static int floorRequest;
-	private static byte hold = 0x00;
+	/*private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
 	private static int sensor = 1;
@@ -27,7 +28,7 @@ class ElevatorTest {
 
 	  public static final int TENTH_FLOOR = 10;
 	  public static final int SECOND_FLOOR = 2;
-	  public static final int BASEMENT_TWO = -2;
+	  public static final int BASEMENT_TWO = -2;*/
 
 	  private Elevator elevator;
 
@@ -38,6 +39,8 @@ class ElevatorTest {
 
 	  @Test
 	  public void TestCurrentFloor(){
+		//elevator = new Elevator("one");
+		  
 		int value = elevator.currentFloor(3);
 	    assertEquals(value, 3);
 	  }
@@ -46,8 +49,20 @@ class ElevatorTest {
 	  public void testResponsePacket(){
 		  floorRequest = 2;
 		  elevator.responsePacket(floorRequest);
-		
+	  
 	  }
+	  
+	  @Test
+		void test() {
+			fail("Not yet implemented.");
+	  }
+
+	  @Test
+	  public void testRun() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	  }
+
+		
 
 	  /*@Test
 	  public void checkCurrentFloor(){
