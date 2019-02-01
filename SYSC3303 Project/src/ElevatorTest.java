@@ -34,8 +34,8 @@ class ElevatorTest {
 
 	  private Elevator elevator;
 
-	  @BeforeAll
-	  public void initializeElevator(){
+	  @Test
+	  public void testinitializeElevator(){
 	    elevator = new Elevator("one");
 	  }
 
@@ -69,6 +69,26 @@ class ElevatorTest {
 	  public void testRun() throws Exception {
 		throw new RuntimeException("not yet implemented");
 	  }
+
+	@Test
+	public void testElevator() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Test
+	public void testOpenCloseDoor() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Test
+	public void testCurrentFloor() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Test
+	public void testRunElevator() throws Exception {
+		throw new RuntimeException("not yet implemented");
+	}
 
 		
 
