@@ -55,7 +55,7 @@ public class Elevator implements Runnable {
 		return requestElevator.toByteArray();
 
 	}
-	
+
 	public void openCloseDoor(byte door) {
 
 		if (door == 1) {
@@ -74,17 +74,17 @@ public class Elevator implements Runnable {
 			System.out.println("Doors are closed.");
 		}
 	}
-	
-	public void runElevator(byte motorDirection, byte motorSpinTime) {
-		int time = (int)motorSpinTime;
 
-		if(motorDirection == up || motorDirection == down) {
-			while (time != 0){
+	public void runElevator(byte motorDirection, byte motorSpinTime) {
+		int time = (int) motorSpinTime;
+
+		if (motorDirection == up || motorDirection == down) {
+			while (time != 0) {
 				try {
 					System.out.println(sensor);
 					Thread.sleep(1000);
 					time--;
-					if(motorDirection == up) {
+					if (motorDirection == up) {
 						sensor++;
 					} else {
 						sensor--;
@@ -92,22 +92,26 @@ public class Elevator implements Runnable {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			} 
-		}else if (motorDirection == hold) {
+			}
+		} else if (motorDirection == hold) {
 		}
 	}
-	
-	
-	
 
 	public void run() {
 		byte[] requestElevator = new byte[3];
 		while (true) {
 
+			/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
+
 			System.out.println("Enter floor number: ");
 
 			Scanner destination = new Scanner(System.in);
-			int floorRequest = destination.nextInt();
+			int floorRequest = 0;
+			if (destination.nextInt() != 0) {
+				floorRequest = destination.nextInt();
+			} else {
+				
+			}
 			destination.close();
 
 			requestElevator = responsePacket(floorRequest);
@@ -121,15 +125,19 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			
-			byte data[] = new byte[4];
+
+			/*
+			 * SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door,
+			 * 0)
+			 */
+
+			byte data[] = new byte[6];
 			elevatorReceivePacket = new DatagramPacket(data, data.length);
-			
+
 			System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 			try {
 				// Block until a datagram packet is received from receiveSocket.
-				System.out.println("Waiting...\n"); // so we know we're waiting
 				elevatorReceiveSocket.receive(elevatorReceivePacket);
 			} catch (IOException e) {
 				System.out.print("IO Exception: likely:");
@@ -137,7 +145,7 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			
+
 			runElevator(data[1], data[2]);
 			openCloseDoor(data[3]);
 			sensor = (int) data[4];
