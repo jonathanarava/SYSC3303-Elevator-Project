@@ -104,7 +104,7 @@ public class Elevator implements Runnable {
 				}
 			}
 		} else if (motorDirection == hold) {
-			floor =currentFloor(sensor);
+			floor = currentFloor(sensor);
 		}
 		return floor;
 	}
@@ -139,7 +139,7 @@ public class Elevator implements Runnable {
 			}
 
 			
-							/* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
+/* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
 
 
 
