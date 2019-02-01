@@ -16,12 +16,14 @@ class ElevatorTest {
 	 }
 	 
 	@Test
-	void TestElevatorUpDown() {
+	void TestElevatorSendPacket() {
 		//Elevator elevator1 = new Elevator("1");
 		
-		//boolean up = elevator1.
-		
+		//
 	}
+	
+	@Test 
+	//Senor Testing
 	
 	
 	void test() {
