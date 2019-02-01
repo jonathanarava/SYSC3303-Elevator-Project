@@ -12,7 +12,7 @@ public class Elevator implements Runnable {
 	private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
-	private static int sensor;
+	private static int sensor = 1;
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -51,6 +51,7 @@ public class Elevator implements Runnable {
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
 		requestElevator.write((byte) floorRequest);
+		requestElevator.write((byte) currentFloor(sensor));
 		requestElevator.write(0);
 		return requestElevator.toByteArray();
 
@@ -74,10 +75,17 @@ public class Elevator implements Runnable {
 			System.out.println("Doors are closed.");
 		}
 	}
+	
+	public int currentFloor(int floorSensor) {
+		int currentFloor = floorSensor;
+		return currentFloor;
+	}
+	
 
-	public void runElevator(byte motorDirection, byte motorSpinTime) {
+	public int runElevator(byte motorDirection, byte motorSpinTime) {
 		int time = (int) motorSpinTime;
 
+		int floor = 0;
 		if (motorDirection == up || motorDirection == down) {
 			while (time != 0) {
 				try {
@@ -86,31 +94,35 @@ public class Elevator implements Runnable {
 					time--;
 					if (motorDirection == up) {
 						sensor++;
+						floor =currentFloor(sensor);
 					} else {
 						sensor--;
+						floor = currentFloor(sensor);
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		} else if (motorDirection == hold) {
+			floor =currentFloor(sensor);
 		}
+		return floor;
 	}
 
 	public void run() {
 		byte[] requestElevator = new byte[3];
 		while (true) {
 
-			/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
+										/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
 			System.out.println("Enter floor number: ");
 
 			Scanner destination = new Scanner(System.in);
-			int floorRequest = 0;
+			int floorRequest;
 			if (destination.nextInt() != 0) {
 				floorRequest = destination.nextInt();
 			} else {
-				
+				floorRequest=0;
 			}
 			destination.close();
 
@@ -126,12 +138,12 @@ public class Elevator implements Runnable {
 				System.exit(1);
 			}
 
-			/*
-			 * SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door,
-			 * 0)
-			 */
+			
+							/* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
 
-			byte data[] = new byte[6];
+
+
+			byte data[] = new byte[5];
 			elevatorReceivePacket = new DatagramPacket(data, data.length);
 
 			System.out.println("elevator_subsystem: Waiting for Packet.\n");
@@ -148,7 +160,6 @@ public class Elevator implements Runnable {
 
 			runElevator(data[1], data[2]);
 			openCloseDoor(data[3]);
-			sensor = (int) data[4];
 
 			// send packet for scheduler to know the port this elevator is allocated
 			// sendPacket = new DatagramPacket(data,
