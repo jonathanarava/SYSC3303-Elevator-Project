@@ -49,13 +49,20 @@ public class Elevator implements Runnable {
 
 			@SuppressWarnings("resource")
 			Scanner destination = new Scanner(System.in);
-			floorRequest = destination.nextInt();
+			
 			// destination.close();
 
+			Scanner input = new Scanner(System.in);
+			int floorRequest = destination.nextInt();
+			while ( true )
+			{
+				
+				if( !s.equals("\\n") ) 
+					break;
+			}
 			ElevatorSend request = new ElevatorSend();
 			requestElevator = request.responsePacket(floorRequest);
 			int length = request.lengthOfByteArray();
-			request.sensor();
 
 			// allocate sockets, packets
 			try {

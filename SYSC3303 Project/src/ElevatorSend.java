@@ -12,6 +12,7 @@ public class ElevatorSend {
 	public static int floorRequest;
 
 	public ElevatorSend() {
+		sensor();
 	}
 	// add get methods
 
@@ -35,7 +36,12 @@ public class ElevatorSend {
 	
 	public void sensor() {
 		try {
-			Thread.sleep(4000);
+			int i=4;
+			while(i != 0){
+				System.out.format("Seconds till door closes %d second \n", i);
+				i--;
+				Thread.sleep(1000);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
