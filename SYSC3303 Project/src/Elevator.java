@@ -1,4 +1,3 @@
-
 //no main method
 //Output: floor request, 
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
@@ -11,7 +10,7 @@ public class Elevator implements Runnable {
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
-
+//hello
 		// allocate sockets, packets
 		/*
 		 * try { //ClientRWSocket = new DatagramSocket(23);//initialize ClientRWSocket
@@ -26,7 +25,7 @@ public class Elevator implements Runnable {
 	}
 
 	public void run() {
-		// Declare Variables for THREADS
+
 		DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 		DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 		
