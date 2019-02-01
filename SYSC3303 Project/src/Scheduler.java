@@ -34,8 +34,8 @@ public class Scheduler {
 		
 		
 		//getting floor numbers from parameters set
-		int createNumElevators=args[];
-		int createNumFloors=args[];
+		int createNumElevators = args[];
+		int createNumFloors = args[];
 		/*or from defined constants
 	    int createNumElevators=____VARNAME;
 	    int createNumFloors=____VARNAME;
