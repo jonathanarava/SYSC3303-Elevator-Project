@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,10 +19,11 @@ class ElevatorTest {
 	
 	public static String NAMING;
 	public static int floorRequest;
+	private static int sensor = 1;
 	/*private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
-	private static int sensor = 1;
+	
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -46,8 +48,16 @@ class ElevatorTest {
 	  @Test
 	  public void testResponsePacket(){
 		  floorRequest = 2;
-		  elevator.responsePacket(floorRequest);
-	  
+		  elevator.responsePacket(floorRequest) ;
+		  byte [] testarray = new byte[4];
+		  testarray[0]=0;
+		  testarray[1]=2;
+		  testarray[2]=0;
+		  testarray[3]=0;
+		  
+		  
+		  Assert.assertArrayEquals("Okay", testarray, elevator.responsePacket(floorRequest));
+		  
 	  }
 	  
 	  @Test
