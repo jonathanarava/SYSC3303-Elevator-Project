@@ -6,7 +6,6 @@ import java.net.*;
 
 //class Floor:has direction buttons and Floor display
 
-
 public class Floor implements Runnable {
 	public static String NAMING;
 
@@ -30,7 +29,7 @@ public class Floor implements Runnable {
 														// port
 			floorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
 														// that's been received
-			
+
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
