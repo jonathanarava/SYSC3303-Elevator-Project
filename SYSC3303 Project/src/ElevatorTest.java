@@ -1,4 +1,5 @@
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -36,14 +37,14 @@ class ElevatorTest {
 	@Test
 	public void testResponsePacket() {
 		floorRequest = 2;
-		elevator.responsePacket(floorRequest);
+		//elevator.responsePacket(floorRequest);
 		byte[] testarray = new byte[4];
 		testarray[0] = 0;
 		testarray[1] = 2;
 		testarray[2] = 0;
 		testarray[3] = 0;
 
-		Assert.assertArrayEquals("Okay", testarray, elevator.responsePacket(floorRequest));
+		assertArrayEquals(testarray, elevator.responsePacket(floorRequest));
 
 	}
 
