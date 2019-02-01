@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Elevator implements Runnable {
 	public static String NAMING;
 	public static int floorRequest;
-	public static byte[] requestElevator= new byte[3];
+
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -40,33 +40,47 @@ public class Elevator implements Runnable {
 		 * accordingly
 		 */
 	}
+	
+	public void sensor() {
+		try {
+			int i=4;
+			while(i != 0){
+				System.out.format("Seconds till door closes %d second \n", i);
+				i--;
+				Thread.sleep(1000);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public byte[] responsePacket(int floorRequest) {
+
+		// creates the byte array according to the required format
+		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
+		requestElevator.write(0);
+		requestElevator.write((byte) floorRequest);
+		requestElevator.write(0);
+		return requestElevator.toByteArray();
+
+	}
 
 	public void run() {
-
+		byte[] requestElevator= new byte[3];
 		while (true) {
-			Elevator elevator1 = new Elevator("1");
+			
 			System.out.println("Enter floor number: ");
 
-			@SuppressWarnings("resource")
 			Scanner destination = new Scanner(System.in);
-			
-			// destination.close();
-
-			Scanner input = new Scanner(System.in);
 			int floorRequest = destination.nextInt();
-			while ( true )
-			{
-				
-				if( !s.equals("\\n") ) 
-					break;
-			}
-			ElevatorSend request = new ElevatorSend();
-			requestElevator = request.responsePacket(floorRequest);
-			int length = request.lengthOfByteArray();
+			destination.close();
+			
+			requestElevator = responsePacket(floorRequest);
+			int lengthOfByteArray = responsePacket(floorRequest).length;
 
 			// allocate sockets, packets
 			try {
-				elevatorSendPacket = new DatagramPacket(requestElevator, length, InetAddress.getLocalHost(), 23);
+				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(), 23);
 			}catch (UnknownHostException e) {
 				e.printStackTrace();
 				System.exit(1);
