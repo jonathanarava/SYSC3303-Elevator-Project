@@ -12,7 +12,11 @@ class ElevatorTest extends Elevator {
 
 	public ElevatorTest(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
+		mockScheduler();
+		TestElevatorSendPacket();
+		TestDoorOpen();
+		TestRunELevator();
+
 	}
 
 	//Mock Scheduler
@@ -30,15 +34,23 @@ class ElevatorTest extends Elevator {
 	 }
 	 
 	@Test
+	
+	public void ElevatorCreated() {
+		Elevator elevator1 = new Elevator("1");
+		
+		assertEquals(elevator1, elevator1);
+	}
+	@Test
 	void TestElevatorSendPacket() {
 		//Elevator elevator1 = new Elevator("1");
-		
+		Assert.assertEquals(1, 1);
 		//
 	}
 	
 	@Test
 	void TestDoorOpen() {
 		Elevator elevator1 = null;
+		
 		elevator1.openCloseDoor((byte)1);
 		
 	}
@@ -50,8 +62,7 @@ class ElevatorTest extends Elevator {
 	
 	
 	void test() {
-		
-		
+
 		fail("Not yet implemented");
 	}
 
