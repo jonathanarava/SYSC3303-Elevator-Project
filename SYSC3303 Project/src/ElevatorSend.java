@@ -32,6 +32,14 @@ public class ElevatorSend {
 		return len;
 		
 	}
+	
+	public void sensor() {
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 	/*public static void main(String args[]){
 		ElevatorSend e = new ElevatorSend();
 		System.out.println(e);

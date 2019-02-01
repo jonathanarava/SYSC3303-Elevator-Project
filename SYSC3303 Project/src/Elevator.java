@@ -42,21 +42,22 @@ public class Elevator implements Runnable {
 	}
 
 	public void run() {
-		
+
 		while (true) {
-		Elevator elevator1 = new Elevator("1");
-		System.out.println("Enter floor number: ");
-			
-		@SuppressWarnings("resource")
-		Scanner destination = new Scanner(System.in);
-		floorRequest = destination.nextInt();
-		// destination.close();
-		
-		ElevatorSend request = new ElevatorSend();
-		requestElevator = request.responsePacket(floorRequest);
-		int length = request.lengthOfByteArray();
-		
-		// allocate sockets, packets
+			Elevator elevator1 = new Elevator("1");
+			System.out.println("Enter floor number: ");
+
+			@SuppressWarnings("resource")
+			Scanner destination = new Scanner(System.in);
+			floorRequest = destination.nextInt();
+			// destination.close();
+
+			ElevatorSend request = new ElevatorSend();
+			requestElevator = request.responsePacket(floorRequest);
+			int length = request.lengthOfByteArray();
+			request.sensor();
+
+			// allocate sockets, packets
 			try {
 				elevatorSendPacket = new DatagramPacket(requestElevator, length, InetAddress.getLocalHost(), 23);
 			}catch (UnknownHostException e) {
@@ -64,10 +65,10 @@ public class Elevator implements Runnable {
 				System.exit(1);
 			}
 
-		// send packet for scheduler to know the port this elevator is allocated
-		// sendPacket = new DatagramPacket(data,
-		// receivePacket.getLength(),receivePacket.getAddress(),
-		// receivePacket.getPort());
+			// send packet for scheduler to know the port this elevator is allocated
+			// sendPacket = new DatagramPacket(data,
+			// receivePacket.getLength(),receivePacket.getAddress(),
+			// receivePacket.getPort());
 		}
 	}
 }
