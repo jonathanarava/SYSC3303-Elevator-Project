@@ -52,25 +52,12 @@ public class Scheduler {
 		int elevatorHighDownRequest[]=new int [createNumElevators];//the floor that the elevator will go up to once down requests have been fulfilled
 		int elevatorProximity[]=new int [createNumElevators];//the distance between the next request and the current floor the elevator is on
 		int elevatorNumStops[]=new int [createNumElevators];//number of stops that each elevator has, 
-		//int elevator
+		
 		//temporary sorting algorithm variables
-		//int floorStatus, floorRequest;
-		//floorStatus: which floor the elevator is on
-		//floorRequest:
-		//elevator: request from elevator (floor that it needs to stop at)
-		//floor: request from floor 
-
-		//linked list for requests, up direction
-		//individiaul list for each elevator as well as total
+		
+		//linked list for requests, up direction; individiaul list for each elevator as well as total
 		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
 		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
-
-
-
-		//receive, elevator(status and requests) or floor(requests only)
-		//Floor:
-		//check if lists are empty then any can be allocated to fulfill the request, lowest number elevator fulfills 
-		//check proximity
 
 
 		//allocation of Datagram Sockets
@@ -87,9 +74,6 @@ public class Scheduler {
 		byte data[] = new byte[100];
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		//System.out.println("Server: Waiting for Packet.\n");
-
-
-
 
 		//creation of Elevator and Floor thread objects and start them
 		for (int i=0;i<createNumElevators; i++) {
@@ -270,100 +254,133 @@ public class Scheduler {
 
 					}
 
-					}
-					//update floor number and direction displays for elevator and all floors
 				}
-				else {//elevator sent a request//ONLY FOR A SINGLE ELEVATOR RIGHT NOW
-					//check availability and either allocate to a moving elevator, initiate the movement of another, or add to request linked list if none available (or wrong direction)
+				//update floor number and direction displays for elevator and all floors
+			}
+			else {//elevator sent a request//ONLY FOR A SINGLE ELEVATOR RIGHT NOW
+				//check availability and either allocate to a moving elevator, initiate the movement of another, or add to request linked list if none available (or wrong direction)
 
-					//CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
-					if (elevatorStatus!=__) {//elevator is not in hold mode, currently moving 
-						//check direction
-						if(elevatorStatus==__) {//elevator is going up
-							if (elevatorLocation<stopRequest) {//we haven't reached that floor yet and can still stop in time
-								if(elevatorStopUp[packetElementIndex].contains(stopRequest)) {//check if the request is already in the linked list (duplicate) if so then do nothing, else add it
-									//do nothing, don't want duplicates 
-								}
-								else {
-									elevatorStopUp[packetElementIndex].add(stopRequest);//add to the stopsUp linkedlist for the current elevator
-								}
+				//CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
+				if (elevatorStatus!=__) {//elevator is not in hold mode, currently moving 
+					//check direction
+					if(elevatorStatus==__) {//elevator is going up
+						if (elevatorLocation<stopRequest) {//we haven't reached that floor yet and can still stop in time
+							if(elevatorStopUp[packetElementIndex].contains(stopRequest)) {//check if the request is already in the linked list (duplicate) if so then do nothing, else add it
+								//do nothing, don't want duplicates 
 							}
-							else {//the stop has already been missed 
-								elevatorStopDown[packetElementIndex].add(stopRequest);
-								//add it to the stopDown linked list
+							else {
+								elevatorStopUp[packetElementIndex].add(stopRequest);//add to the stopsUp linkedlist for the current elevator
 							}
 						}
-						else {//elevator is going down
-							if (elevatorLocation>stopRequest) {//we haven't reached that floor yet and can still stop in time
-								if(elevatorStopDown[packetElementIndex].contains(stopRequest)) {//check if the request is already in the linked list (duplicate) if so then do nothing, else add it
-									//do nothing, don't want duplicates 
-								}
-								else {
-									elevatorStopDown[packetElementIndex].add(stopRequest);//add to the stopsDown linkedlist for the current elevator
-								}
-
+						else {//the stop has already been missed 
+							elevatorStopDown[packetElementIndex].add(stopRequest);
+							//add it to the stopDown linked list
+						}
+					}
+					else {//elevator is going down
+						if (elevatorLocation>stopRequest) {//we haven't reached that floor yet and can still stop in time
+							if(elevatorStopDown[packetElementIndex].contains(stopRequest)) {//check if the request is already in the linked list (duplicate) if so then do nothing, else add it
+								//do nothing, don't want duplicates 
 							}
-							else {//the stop has already been missed 
-								elevatorStopUp[packetElementIndex].add(stopRequest);
-								//add it to the stopDown linked list
+							else {
+								elevatorStopDown[packetElementIndex].add(stopRequest);//add to the stopsDown linkedlist for the current elevator
+							}
+
+						}
+						else {//the stop has already been missed 
+							elevatorStopUp[packetElementIndex].add(stopRequest);
+							//add it to the stopDown linked list
+						}
+					}
+				}
+				else {//currently in hold mode, we can fulfill that request immediately
+					//can assume no stops or requests exist, don't need to check for duplicates
+					if (elevatorLocation<stopRequest) {//we are below the destination floor, we need to go up
+						elevatorStopUp[packetElementIndex].add(stopRequest)
+						//create and send sendPacket to start the motor
+					}
+					else{//we are above the destination floor, we need to go down
+						elevatorStopDown[packetElementIndex].add(stopRequest)
+						//create and send sendPacket to start the motor
+					} 
+
+				}
+			}
+		}
+		else {//request is from floor (FOR SINGLE ELEVATOR ONLY)
+			//RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN DIRECTION (UP/DOWN)
+			if (elevatorStatus!=__) {//not in hold
+				if(elevatorStatus==__) {//elevator is going up
+					if (floorRequestDirection==elevatorStatus) {//floor is requesting to go up also
+						if(packetElementIndex>elevatorLocation) {//still time
+							if (elevatorStopsUp.contains(packetElementIndex)) {
+								//already have that stop requested, don't want to duplicate
+							}
+							else{
+								elevatorStopsUp.add(packetElementIndex)//add to stops list
+							}
+						}
+						else {//missed
+							if (elevatorRequestsUp.contains(packetElementIndex)) {
+								//already have that stop requested, don't want to duplicate
+							}
+							else {
+								elevetorRequestsUp.add(packetElementIndex);//add the floor to requests
 							}
 						}
 					}
-					else {//currently in hold mode, we can fulfill that request immediately
-						if (elevatorLocation<stopRequest) {//we are below the destination floor, we need to go up
-							elevatorStopUp[packetElementIndex].add(stopRequest)
-							//create and send sendPacket to start the motor
+					else {//eleveator is currently fulfilling down stops
+						if (elevatorRequestsUp.contains(packetElementIndex)) {
+							//already have that stop requested, don't want to duplicate
 						}
-						else{//we are above the destination floor, we need to go down
-							elevatorStopDown[packetElementIndex].add(stopRequest)
-							//create and send sendPacket to start the motor
-						} 
-
+						else {
+							elevetorRequestsUp.add(packetElementIndex);//add the floor to requests
+						}
+					}
+				}
+				else {//elevator is going down
+					if (floorRequestDirection==elevatorStatus) {//floor is requesting to go Down also
+						if(packetElementIndex<elevatorLocation) {//still time
+							if (elevatorStopsDown.contains(packetElementIndex)) {
+								//already have that stop requested, don't want to duplicate
+							}
+							else{
+								elevatorStopsDown.add(packetElementIndex)//add to stops list
+							}
+						}
+						else {//missed
+							if (elevatorRequestsDown.contains(packetElementIndex)) {
+								//already have that stop requested, don't want to duplicate
+							}
+							else {
+								elevetorRequestsDown.add(packetElementIndex);//add the floor to requests
+							}
+						}
+					}
+					else {//eleveator is currently fulfilling Up stops
+						if (elevatorRequestsDown.contains(packetElementIndex)) {
+							//already have that stop requested, don't want to duplicate
+						}
+						else {
+							elevetorRequestsDown.add(packetElementIndex);//add the floor to requests
+						}
 					}
 				}
 			}
-			else {//request is from floor (FOR SINGLE ELEVATOR ONLY)
-				if (elevatorStatus!=__) {//not in hold
-					if(elevatorStatus==__) {//going up
-						
-						if (floorRequestDirection==elevatorStatus) {//same direction
-							//check floor's request (direction)
-							if (floorRequest==__) {//going up
-								if (elevatorLocation) {
-								}
-								else {
-								}
-							}
-							else {//going down
-							}
-							//check if the floor has been missed
-							
-						}
-						if(packetElementIndex>elevatorLocation) {//still time
-							elevatorStopsUp.add(packetElementIndex)//add to stops list
-							//create and send sendPacket for motor to go u
-						}
-						else {
-							
-						}
-					}
-					else {//going down
-						
-					}
-					//check if elevator is in the same direction
-					//if yes then check if the elevator can stop on that floor in time
-						//if yes, check for duplicates and add to stopList, 
-						//if not (already gone past), add to requests
-					//else check for duplicates and add to stops in the other direction
+			else {//holding, can fulfill immediately
+				//can assume no stops or requests exist, don't need to check for duplicates
+				//if above
+				if (packetElementIndex>elevatorLocation) {//the floor requesting is above the elevator's current location
+					elevatorRequestDown.add(packetElementIndex);
+					//create and send sendPacket to start motor in Down direction
 				}
-				else {//holding, can fulfill immediately
-					//if above
-					
-					//if below
-					
+
+				else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the elevator's current location
+					elevatorRequestUp.add(packetElementIndex);
+					//create and send sendPacket to start motor in Up direction
 				}
-				
 			}
 		}
 	}
 }
+
