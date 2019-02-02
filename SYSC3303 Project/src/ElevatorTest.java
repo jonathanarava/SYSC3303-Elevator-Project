@@ -31,6 +31,8 @@ class ElevatorTest {
 	@Test
 	public void testinitializeElevator() {
 		elevator = new Elevator("one");
+		assertNotEqual(elevator,null);
+		
 		
 	}
 
@@ -39,7 +41,6 @@ class ElevatorTest {
 	public void testResponsePacket() {
 		Elevator elevator=new Elevator();
 		floorRequest = 2;
-		//elevator.responsePacket(floorRequest);
 		byte[] testarray = new byte[4];
 		testarray[0] = 0;
 		testarray[1] = 2;
