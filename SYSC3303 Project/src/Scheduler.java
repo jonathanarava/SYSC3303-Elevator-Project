@@ -123,23 +123,26 @@ public class Scheduler {
 		//int elevatorCurrentFloor[]=new int[createNumElevators];
 		//int elevatorStatus[]=new int[createNumElevators];//each elevator is either holding(0), going up(1), or going down(2)
 		//int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of the next stop for that elevator
-		int elevatorUpRequestFloor[]=new int [createNumElevators];//the floor that the elevator will go down to once the requests going down have been met to then go up again
-		int elevatorDownRequestFloor[]=new int [createNumElevators];//the floor that the elevator will go up to once down requests have been fulfilled
+		int elevatorUpRequestFloor[]   = new int [createNumElevators];//the floor that the elevator will go down to once the requests going down have been met to then go up again
+		int elevatorDownRequestFloor[] = new int [createNumElevators];//the floor that the elevator will go up to once down requests have been fulfilled
 		//int elevatorProximity[]=new int [createNumElevators];//the distance between the next request and the current floor the elevator is on
 		//int elevatorNumStops[]=new int [createNumElevators];//number of stops that each elevator has, 
 		//int elevator
 
 		//temporary sorting algorithm variables
 		int floorRequestDirection;//the floor is requesting to go up or down
-		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
-		linkedlist elevatorRequests[]= new linkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
+				//linked list for requests, up direction; individiaul list for each elevator as well as total
+				/*
+				 * for some reason these are duplicated from above,
+				 */
+				//LinkedList elevatorRequestsUp[]= new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
+				//LinkedList elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
+		LinkedList elevatorRequests[]= new LinkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
+		LinkedList elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
 		//int nextStop[]=new int[createNumElevators];//the next stop for each elevator; if unallocated (in hold) then set as -1
 		//variable declarations for replying/ creating send packet
 		byte[] packetAddress=schedulerReceivePacket.getAddress();
-		byte [] packetPort=schedulerReceivePacket.getPort();
+		byte[] packetPort=schedulerReceivePacket.getPort();
 
 		//variable definitions used to unpack/ coordinate/ allocate actions
 		byte [] packetData=schedulerReceivePacket.getData();
