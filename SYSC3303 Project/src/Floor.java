@@ -3,6 +3,8 @@
 //no logic beyond changing the status of requests, arrival sensor, and display
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /*
@@ -110,7 +112,15 @@ public class Floor implements Runnable {
 			Scanner reader = new Scanner(input);
 			reader.useDelimiter("[\n]");
 			while (reader.hasNext()){
-				text = reader.next();  
+				int i=0;
+				if (i<=1) {
+					i++;
+				} else if (i>2) {
+					text = reader.next(); 
+					List<String> strings = new ArrayList<String>();
+					strings.add(text);
+				}
+				 
 			}
 		}catch(Exception e) {
 			
