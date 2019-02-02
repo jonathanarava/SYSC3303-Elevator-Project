@@ -30,7 +30,7 @@ class ElevatorTest {
 	private Elevator elevator;
 
 	@Test
-	public void testinitializeElevator() {
+	public void testInitializeElevator() {
 		elevator = new Elevator("one");
 		assertNotNull(elevator);
 		
@@ -54,15 +54,11 @@ class ElevatorTest {
 	}
 
 
-	@Test
+	@Test	// Test for run() method
 	public void testRun() throws Exception {
 		throw new RuntimeException("not yet implemented");
 	}
 
-	@Test
-	public void testElevator() throws Exception {
-		throw new RuntimeException("not yet implemented");
-	}
 
 	@Test
 	public void testOpenCloseDoor() throws Exception {

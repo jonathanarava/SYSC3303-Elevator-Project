@@ -17,7 +17,7 @@ public class Elevator implements Runnable {
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	public Elevator() {}
+	public Elevator() {}  // empty constructor used for JUnit Testing
 	
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
@@ -119,7 +119,7 @@ public class Elevator implements Runnable {
 		byte[] requestElevator = new byte[3];
 		while (true) {
 
-										/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
+/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
 			System.out.println("Enter floor number: ");
 
