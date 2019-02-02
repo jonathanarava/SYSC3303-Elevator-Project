@@ -35,7 +35,7 @@ public class Scheduler {
 		int floorPortNumbers[]=new int[createNumFloors];
 
 		//addresses of the created threads
-		int elevatorAddresses[]=new int[createNumElevators];
+		InetAddress elevatorAddresses[]=new InetAddress[createNumElevators];
 		int floorAddresses[]=new int[createNumFloors];
 
 		//arrays to keep track of the number of elevators, eliminates naming confusion
@@ -59,7 +59,7 @@ public class Scheduler {
 		//temporary sorting algorithm variables
 		
 		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
+		LinkedList elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
 		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
 
 
@@ -95,7 +95,7 @@ public class Scheduler {
 				System.exit(1);
 			}
 			elevatorPortNumbers[i]=schedulerReceivePacket.getPort();
-			elevatorAddresses[i]=scheduleReceivePacket.getAddress();
+			elevatorAddresses[i]=schedulerReceivePacket.getAddress();
 			elevatorCurrentFloor[i]=0;//the elevators are created and initialized at the ground floor(0)
 			elevatorStatus[i]=0;//elevators created and initialized to the hold state
 
