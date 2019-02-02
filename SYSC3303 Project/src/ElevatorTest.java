@@ -93,6 +93,14 @@ class ElevatorTest {
 		System.out.println(elevator.fileReader(s) + "\n\n");
 
 	}*/
+	
+	/*@Test
+	public void testElevatorRequestFromFile() throws Exception {
+		Elevator elevator=new Elevator();
+		String s = "14:05:15:0 2 up 4";
+		System.out.println(elevator.elevatorRequestFromFile(s) + "\n\n");
+
+	}*/
 
 	@Test
 	public void testRunElevator() throws Exception {

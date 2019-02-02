@@ -26,6 +26,7 @@ public class Floor implements Runnable {
 	DatagramPacket floorSendPacket, floorReceivePacket;
 	DatagramSocket floorSendSocket, floorReceiveSocket;
 	
+	String elevatorRequest = "";
 	
 	/*
 	 * Blank constructor so Elevator Class can access Input information
@@ -102,10 +103,10 @@ public class Floor implements Runnable {
 	}
 	
 	
-	public String fileReader(String s) {
+	public String fileReader(String fullFile) {
 		String text = "";
 		try {
-			FileReader input = new FileReader(s);
+			FileReader input = new FileReader(fullFile);
 			Scanner reader = new Scanner(input);
 			reader.useDelimiter("[\n]");
 			while (reader.hasNext()){
@@ -115,6 +116,14 @@ public class Floor implements Runnable {
 			
 		}
 		return text;
+	}
+	
+	public String elevatorRequestFromFile(String request) {
+		String[] req = request.split(" ");
+		elevatorRequest = req[3];
+		
+		return elevatorRequest;
+		
 	}
 	
 	
