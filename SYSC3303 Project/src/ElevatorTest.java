@@ -73,6 +73,9 @@ class ElevatorTest {
 		Elevator elevator=new Elevator();
 		String expected= "Doors are closed.";
 		assertEquals(expected, elevator.openCloseDoor((byte)0));
+		String expected1= "Doors are open.";
+		assertEquals(expected1, elevator.openCloseDoor((byte)0));
+		
 	}
 
 	@Test
