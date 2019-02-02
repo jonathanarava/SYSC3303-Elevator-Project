@@ -151,9 +151,23 @@ public class Scheduler {
 				//if no currently allocatable elevators then add to requests linked list
 			//elevator: 
 			
-			//checksender()
+			byte [] packetData=schedulerReceivePacket.getData();
+			byte[] packetAddress=schedulerReceivePacket.getData();
+			byte [] packetPort=schedulerReceivePacket.getData();
+			int packetElementIndex=schedulerReceivePacket[___];//index to find/ retrieve specific element from our array of elevators and floors
+			//should have been the name given to threads' constructor at creation
+			//
+			int packetSentFrom=schedulerReceivePacket[___];//elevator, floor, or other(testing/ error)
+			//0=? 1=? 2=?
+			int packetIsStatus=schedulerReceivePacket[___];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
+			//
+			
+			
+			//checkSender(&elevatorElementNum, &floorElementNum, address);//sets either the elevator or floor number to the one that matches the address of the sender
+			
 			for (int k=0;k<createNumElevators)
-			if (Sender==ELEVATOR) {
+			//if (Sender==ELEVATOR) {
+			if (schedulerReceivePacket.getData()[___]==___) {
 				//elevatorNum=__;//which elevator it is in 
 				//status or request
 				if (schedulerReceivePacket.getData()[___]==___) {//status
@@ -196,4 +210,23 @@ public class Scheduler {
 			if schedulerReceivePacket.getAddress
 		}
 	}
+	//not needed if included in the byte array formatting in the packet data
+		/*int k=0; 
+		for (k=0;k<setCreate)*/
+		//use binarySeach method of Array Class?
+		try {
+			elevatorElementNum=binarySearch(elevatorAddresses, address);
+		}
+		catch (NullPointerException e) {
+			//not in elevatorAddresses
+			//not an elevator
+		}
+		try {
+			floorElementNum=binarySearch(floorAddresses, address);
+		}
+		catch (NullPointerException e) {
+			//not in floorAddresses
+			//not a floor
+		}
+	}*/
 }
