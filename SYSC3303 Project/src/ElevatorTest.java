@@ -1,6 +1,7 @@
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.DatagramPacket;
@@ -31,7 +32,7 @@ class ElevatorTest {
 	@Test
 	public void testinitializeElevator() {
 		elevator = new Elevator("one");
-		assertNotEqual(elevator,null);
+		assertNotNull(elevator);
 		
 		
 	}
