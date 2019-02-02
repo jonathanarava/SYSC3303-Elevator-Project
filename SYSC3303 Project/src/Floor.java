@@ -209,7 +209,7 @@ public class Floor implements Runnable {
 
 			openCloseDoor(data[1]);
 	}
-	//
+	
 	}
 
 }

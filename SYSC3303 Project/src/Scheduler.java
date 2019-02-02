@@ -102,7 +102,7 @@ public class Scheduler {
 
 		}
 		for (int j=0;j<createNumFloors; j++) {
-			floorArray[j]=new Floor(Integer.toString(j));
+			floorArray[j] = new Floor(j);
 			floorArray[j].start();
 			//define the port number of the started floor thread into the array
 			try {// Block until a datagram packet is received from receiveSocket.        
