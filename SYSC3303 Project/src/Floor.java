@@ -51,6 +51,32 @@ public class Floor implements Runnable {
 	}
 	
 	
+	/*
+	 * Opens and closes the doors in the floor by printing a message of what is happening
+	 */
+	public String openCloseDoor(byte door) {
+		String msg;
+		if (door == 1) {
+			msg = "Doors are open.";
+			System.out.println(msg);
+			try {
+				int i = 4;
+				while (i != 0) {
+					System.out.format("Seconds until elevator door closes: %d second \n", i);
+					i--;
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			msg = "Doors are closed."; 
+			System.out.println(msg);
+		}
+		return msg;
+	}
+	
+	
 	/* Gets an elevator request as an int(up or down)
 	 * @returns a byte[] array that can be then used to send to the Schedular
 	 */
@@ -63,10 +89,11 @@ public class Floor implements Runnable {
 			requestElevator.write(0);
 			requestElevator.write(whoamI);
 			requestElevator.write(0);
-			try {
-				requestElevator.write(up_or_down.getBytes());
-			} catch (IOException e) {
-				e.printStackTrace();
+			if(up_or_down.equalsIgnoreCase("up")) {
+				requestElevator.write(1);
+			}
+			else if(up_or_down.equalsIgnoreCase("down")) {
+				requestElevator.write(0);
 			}
 			requestElevator.write(0);
 			return requestElevator.toByteArray();
@@ -82,12 +109,13 @@ public class Floor implements Runnable {
 	public void run() {
 		while (true) {
 
-										/* FLOOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
+										/* FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, up_or_down, 0) */
 			//requestElevator = responsePacket(floorRequest);
-			byte[] requestElevator = responsePacket();
+			byte[] requestElevator = new byte[7]; 
+			requestElevator = responsePacket();
 			int lengthOfByteArray = requestElevator.length;
 
-			// allocate sockets, packets
+			// allocate packets
 			if(requestElevator != null) {
 				try {
 					floorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
@@ -97,20 +125,16 @@ public class Floor implements Runnable {
 					System.exit(1);
 				}
 			}
-
 			
-/* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
+							/* SCHEDULER --> FLOOR (0, open OR close door, 0)	 */
+			byte data[] = new byte[3];
+			floorReceivePacket = new DatagramPacket(data, data.length);
 
-
-
-			byte data[] = new byte[5];
-			elevatorReceivePacket = new DatagramPacket(data, data.length);
-
-			System.out.println("elevator_subsystem: Waiting for Packet.\n");
+			System.out.println("floor_subsystem: Waiting for Packet.\n");
 			
 			try {
 				// Block until a datagram packet is received from receiveSocket.
-				elevatorReceiveSocket.receive(elevatorReceivePacket);
+				floorReceiveSocket.receive(floorReceivePacket);
 			} catch (IOException e) {
 				System.out.print("IO Exception: likely:");
 				System.out.println("Receive Socket Timed Out.\n" + e);
@@ -118,7 +142,6 @@ public class Floor implements Runnable {
 				System.exit(1);
 			}
 
-			runElevator(data[1], data[2]);
 			openCloseDoor(data[3]);
 
 			// send packet for scheduler to know the port this elevator is allocated
