@@ -17,6 +17,8 @@ public class Elevator implements Runnable {
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
+	public Elevator() {}
+	
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 
@@ -45,7 +47,7 @@ public class Elevator implements Runnable {
 		 */
 	}
 
-	public byte[] responsePacket(int floorRequest) {
+	public  byte[] responsePacket(int floorRequest) {
 
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();

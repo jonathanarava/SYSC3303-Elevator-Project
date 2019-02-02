@@ -31,11 +31,13 @@ class ElevatorTest {
 	@Test
 	public void testinitializeElevator() {
 		elevator = new Elevator("one");
+		
 	}
 
 
 	@Test
 	public void testResponsePacket() {
+		Elevator elevator=new Elevator();
 		floorRequest = 2;
 		//elevator.responsePacket(floorRequest);
 		byte[] testarray = new byte[4];
@@ -70,6 +72,7 @@ class ElevatorTest {
 
 	@Test
 	public void testCurrentFloor() {
+		Elevator elevator=new Elevator();
 		// elevator = new Elevator("one");
 		assertEquals(3, elevator.currentFloor(3));
 	}
