@@ -141,8 +141,8 @@ public class Scheduler {
 		LinkedList elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
 		//int nextStop[]=new int[createNumElevators];//the next stop for each elevator; if unallocated (in hold) then set as -1
 		//variable declarations for replying/ creating send packet
-		byte[] packetAddress=schedulerReceivePacket.getAddress();
-		byte[] packetPort=schedulerReceivePacket.getPort();
+		byte[] packetAddress = schedulerReceivePacket.getAddress();
+		byte[] packetPort = schedulerReceivePacket.getPort();
 
 		//variable definitions used to unpack/ coordinate/ allocate actions
 		byte [] packetData=schedulerReceivePacket.getData();
