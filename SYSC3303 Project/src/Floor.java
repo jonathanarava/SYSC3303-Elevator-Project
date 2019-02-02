@@ -142,13 +142,7 @@ public class Floor implements Runnable {
 				System.exit(1);
 			}
 
-			openCloseDoor(data[3]);
-
-			// send packet for scheduler to know the port this elevator is allocated
-			// sendPacket = new DatagramPacket(data,
-			// receivePacket.getLength(),receivePacket.getAddress(),
-			// receivePacket.getPort());
-		// send packet for scheduler to know the port this elevator is allocated
+			openCloseDoor(data[1]);
 	}
 	//
 	}
