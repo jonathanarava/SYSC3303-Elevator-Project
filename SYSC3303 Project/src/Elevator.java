@@ -92,15 +92,17 @@ public class Elevator implements Runnable {
 
 		int floor = 0;
 		if (motorDirection == up || motorDirection == down) {
-			while (time != 0) {
+			while (time != 1) {
 				try {
-					System.out.println(sensor);
+					System.out.println(sensor); // sensor = current floor
 					Thread.sleep(1000);
 					time--;
 					if (motorDirection == up) {
+						System.out.println("Elevator going up");
 						sensor++;
 						floor =currentFloor(sensor);
 					} else {
+						System.out.println("Elevator going down");
 						sensor--;
 						floor = currentFloor(sensor);
 					}
