@@ -80,7 +80,7 @@ class ElevatorTest {
 	public void testCurrentFloor() {
 		Elevator elevator=new Elevator();
 		// elevator = new Elevator("one");
-		assertEquals(3, elevator.currentFloor(3));
+		assertEquals(2, elevator.currentFloor(2));
 	}
 
 	@Test
@@ -89,9 +89,14 @@ class ElevatorTest {
 		elevator.currentFloor(2);
 		//Elevator going up
 		//System.out.println(elevator.runElevator((byte) 1,(byte) 4));
-		assertEquals(9, elevator.runElevator((byte) 1,(byte) 4, 5));
+		assertEquals(6, elevator.runElevator((byte) 1,(byte) 4));
 		//Elevator going down
 		//assertEquals(3, elevator.runElevator((byte) 2,(byte) 4));
+		System.out.println("current floor: " + elevator.sensor + "\n\n");
+		
+		assertEquals(10, elevator.runElevator((byte) 1,(byte) 4));
+		System.out.println("current floor: " + elevator.sensor);
+		
 		System.out.println("------------------End of testRunElevator()-------------------\n ");
 		
 	}

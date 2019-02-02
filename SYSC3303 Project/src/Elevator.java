@@ -12,7 +12,7 @@ public class Elevator implements Runnable {
 	private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
-	private static int sensor = 1;
+	protected int sensor;            // this variable keeps track of the current floor of the elevator
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
@@ -81,13 +81,13 @@ public class Elevator implements Runnable {
 		return msg;
 	}
 	
-	public int currentFloor(int floorSensor) {
-		int currentFloor = floorSensor;
-		return currentFloor;
+	public int currentFloor(int floorSensor) {  // method to initialize where the elevator starts
+		sensor = floorSensor;
+		return sensor;
 	}
 	
-	public int runElevator(byte motorDirection, byte motorSpinTime, int currentFloor) {
-		sensor = currentFloor;				 //sensor is at current floor
+	public int runElevator(byte motorDirection, byte motorSpinTime/*, int currentFloor*/) {
+		//sensor = currentFloor;				 //sensor is at current floor
         	int time = (int) motorSpinTime;
 		if (motorDirection == up || motorDirection == down) {
 			while (time > 0){
