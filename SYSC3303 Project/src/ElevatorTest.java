@@ -65,13 +65,14 @@ class ElevatorTest {
 
 	@Test
 	public void testOpenCloseDoor() throws Exception {
-		Elevator elevator=new Elevator();
+		Elevator elevator1=new Elevator();
 		//Test for Doors closed
 		String expected= "Doors are closed.";
-		assertEquals(expected, elevator.openCloseDoor((byte)0));
+		assertEquals(expected, elevator1.openCloseDoor((byte)0));
 		//Test for Doors open
 		String expected1= "Doors are open.";
-		assertEquals(expected1, elevator.openCloseDoor((byte)1));
+		assertEquals(expected1, elevator1.openCloseDoor((byte)1));
+		System.out.println("------------------End of testOpenCloseDoor()---------------------\n ");
 		
 	}
 
@@ -84,7 +85,13 @@ class ElevatorTest {
 
 	@Test
 	public void testRunElevator() throws Exception {
-		throw new RuntimeException("not yet implemented");
+		Elevator elevator=new Elevator();
+		//Elevator going up
+		assertEquals(4, elevator.runElevator((byte) 1,(byte) 4));
+		//Elevator going down
+		//assertEquals(3, elevator.runElevator((byte) 2,(byte) 4));
+		System.out.println("------------------End of testRunElevator()-------------------\n ");
+		
 	}
 
 
