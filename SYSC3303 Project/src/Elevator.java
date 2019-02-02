@@ -59,10 +59,11 @@ public class Elevator implements Runnable {
 
 	}
 
-	public void openCloseDoor(byte door) {
-
+	public String openCloseDoor(byte door) {
+		String msg;
 		if (door == 1) {
-			System.out.println("Doors are open.");
+			msg = "Doors are open.";
+			System.out.println(msg);
 			try {
 				int i = 4;
 				while (i != 0) {
@@ -74,8 +75,10 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("Doors are closed.");
+			msg = "Doors are closed."; 
+			System.out.println(msg);
 		}
+		return msg;
 	}
 	
 	public int currentFloor(int floorSensor) {

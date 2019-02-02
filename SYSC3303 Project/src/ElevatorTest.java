@@ -71,8 +71,8 @@ class ElevatorTest {
 	@Test
 	public void testOpenCloseDoor() throws Exception {
 		Elevator elevator=new Elevator();
-		byte expected=0;
-		assertEquals(expected, 0);
+		String expected= "Doors are closed.";
+		assertEquals(expected, elevator.openCloseDoor((byte)0));
 	}
 
 	@Test
