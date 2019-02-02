@@ -3,7 +3,6 @@
 //most logic for changing of states
 import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
 
 public class Scheduler {
 
@@ -42,10 +41,10 @@ public class Scheduler {
 		//arrays to keep track of the number of elevators, eliminates naming confusion
 		Elevator elevatorArray[]=new Elevator[createNumElevators];
 		//Thread Elevator elevatorArray[]=new Elevator[createNumElevators];
-		Floor floorArray[]=new Floor[createNumFloors];
-		
-		//
-		Thread threadArray[]= new Thread[createNumFloors + createNumElevators];
+		Floor floorArray[]=new Floor[createNumFloors];		
+		//Thread array to keep track of the threads being run
+		Thread elevatorThreadArray[]= new Thread[createNumElevators];
+		Thread floorThreadArray[] = new Thread[createNumFloors];
 
 
 		//scheduling algorithm variable declaration
@@ -60,16 +59,16 @@ public class Scheduler {
 		//temporary sorting algorithm variables
 		
 		//linked list for requests, up direction; individiaul list for each elevator as well as total
-	    LinkedList elevatorRequestsUp[] = new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
-		LinkedList elevatorStopsUp[]    = new LinkedList[createNumElevators];//linked list for stops needed 
+		LinkedList elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
+		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
 
 
 		//allocation of Datagram Sockets
 		//allocate receive socket
 		//send socket allocated dynamically for specific port of current elevator or floor 
 		try {
-			schedulerReceiveSocket=new DatagramSocket(23);//arbitrary usage of 23 for port number of Scheduler's receive port
-		} catch (SocketException se) {//if DatagramSocket creation fails an exception is thrown
+			schedulerReceiveSocket=new DatagramSocket(23); //arbitrary usage of 23 for port number of Scheduler's receive port
+		} catch (SocketException se) { //if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
 		}
@@ -82,8 +81,8 @@ public class Scheduler {
 		//creation of Elevator and Floor thread objects and start them
 		for (int i=0;i<createNumElevators; i++) {
 			elevatorArray[i]=new Elevator(Integer.toString(i));
-			threadArray[i] = new Thread(elevatorArray[i]);
-			threadArray[i].start();	//We need to create a Thread Array with the runnable classes inside of it and start that. So the runnables will be inside threadArray[]
+			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
+			elevatorThreadArray[i].start();	//We need to create a Thread Array with the runnable classes inside of it and start that. So the runnables will be inside threadArray[]
 			// Block until a datagram packet is received from receiveSocket.
 			try {        
 				//System.out.println("Waiting..."); // so we know we're waiting
@@ -102,12 +101,13 @@ public class Scheduler {
 
 		}
 		for (int j=0;j<createNumFloors; j++) {
-			floorArray[j] = new Floor(j);
-			floorArray[j].start();
+			floorArray[j]=new Floor(j);
+			floorThreadArray[j] = new Thread(floorArray[j]);
+			floorThreadArray[j].start();
 			//define the port number of the started floor thread into the array
 			try {// Block until a datagram packet is received from receiveSocket.        
 				//System.out.println("Waiting..."); // so we know we're waiting
-				schedulerReceiveSocket.receive(schedulerReceivePacket)
+				schedulerReceiveSocket.receive(schedulerReceivePacket);
 			} 
 			catch (IOException e) {
 				System.out.print("IO Exception: likely:");
