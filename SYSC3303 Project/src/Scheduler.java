@@ -3,6 +3,7 @@
 //most logic for changing of states
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
 
 public class Scheduler {
 
@@ -59,8 +60,8 @@ public class Scheduler {
 		//temporary sorting algorithm variables
 		
 		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		LinkedList elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
-		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
+		LinkedList elevatorRequestsUp[]= new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
+		LinkedList elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
 
 
 		//allocation of Datagram Sockets
