@@ -12,6 +12,8 @@ import java.util.Scanner;
  */
 public class Floor implements Runnable {
 	
+	public 
+	
 	/* Real-time Input Information: In the next iteration these will be provided 
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an Int(1-4)
 	 * Which direction the Button was pressed in a String(Up or Down)
@@ -21,6 +23,8 @@ public class Floor implements Runnable {
 	public int whoamI = 2;
 	public String up_or_down = "up";
 	public int wheredoIwanttogo = 4;
+	
+	
 	
 	public int sendPort_num;
 	public int elevatorLocation;
@@ -105,17 +109,22 @@ public class Floor implements Runnable {
 	}
 	
 	
+	/*
+	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are discarded(due to the formatting given in project requirements)
+	 * Takes the input information and creates a list of Strings that will have the real time inputs as a string. 
+	 * 
+	 */
 	public String fileReader(String fullFile) {
 		String text = "";
+		int i=0;
 		try {
 			FileReader input = new FileReader(fullFile);
 			Scanner reader = new Scanner(input);
 			reader.useDelimiter("[\n]");
 			while (reader.hasNext()){
-				int i=0;
 				if (i<=1) {
 					i++;
-				} else if (i>2) {
+				} else if (i>=2) {
 					text = reader.next(); 
 					List<String> strings = new ArrayList<String>();
 					strings.add(text);
