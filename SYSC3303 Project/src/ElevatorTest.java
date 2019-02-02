@@ -81,7 +81,18 @@ class ElevatorTest {
 		Elevator elevator=new Elevator();
 		// elevator = new Elevator("one");
 		assertEquals(2, elevator.currentFloor(2));
+		
+		
+		
 	}
+	
+	/*@Test
+	public void testFileReader() throws Exception {
+		Elevator elevator=new Elevator();
+		String s = "C:/Users/brianranjanphilip.LABS.000/Desktop/testfile.txt";
+		System.out.println(elevator.fileReader(s) + "\n\n");
+
+	}*/
 
 	@Test
 	public void testRunElevator() throws Exception {

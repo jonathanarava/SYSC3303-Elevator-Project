@@ -102,6 +102,22 @@ public class Floor implements Runnable {
 	}
 	
 	
+	public String fileReader(String s) {
+		String text = "";
+		try {
+			FileReader input = new FileReader(s);
+			Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
+			while (reader.hasNext()){
+				text = reader.next();  
+			}
+		}catch(Exception e) {
+			
+		}
+		return text;
+	}
+	
+	
 	/*
 	 * (Runnable method for Floor Class)
 	 * @see java.lang.Runnable#run()

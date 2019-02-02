@@ -115,6 +115,9 @@ public class Elevator implements Runnable {
 		return currentFloor(sensor);    //returns and updates the final current of the floor - in this case destination floor
 	}
 	
+	
+
+	
 	public void run() {
 		byte[] requestElevator = new byte[3];
 		while (true) {
