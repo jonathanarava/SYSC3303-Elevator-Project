@@ -123,8 +123,8 @@ public class Scheduler {
 		//int elevatorCurrentFloor[]=new int[createNumElevators];
 		//int elevatorStatus[]=new int[createNumElevators];//each elevator is either holding(0), going up(1), or going down(2)
 		//int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of the next stop for that elevator
-		int elevatorUpRequestFloor[]=new int [createNumElevators];//the floor that the elevator will go down to once the requests going down have been met to then go up again
-		int elevatorDownRequestFloor[]=new int [createNumElevators];//the floor that the elevator will go up to once down requests have been fulfilled
+		int elevatorUpRequestFloor[]   = new int [createNumElevators];//the floor that the elevator will go down to once the requests going down have been met to then go up again
+		int elevatorDownRequestFloor[] = new int [createNumElevators];//the floor that the elevator will go up to once down requests have been fulfilled
 		//int elevatorProximity[]=new int [createNumElevators];//the distance between the next request and the current floor the elevator is on
 		//int elevatorNumStops[]=new int [createNumElevators];//number of stops that each elevator has, 
 		//int elevator
