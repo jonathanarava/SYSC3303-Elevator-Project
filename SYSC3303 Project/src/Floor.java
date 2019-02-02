@@ -11,8 +11,7 @@ import java.util.Scanner;
  * class Floor:has direction buttons and Floor display
  */
 public class Floor implements Runnable {
-	
-	public 
+	 
 	
 	/* Real-time Input Information: In the next iteration these will be provided 
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an Int(1-4)
@@ -24,7 +23,9 @@ public class Floor implements Runnable {
 	public String up_or_down = "up";
 	public int wheredoIwanttogo = 4;
 	
-	
+	//This String List will contain ALL of the real time input information that is Given to the system. 
+	//List index 
+	public List<String> realTime_Input;
 	
 	public int sendPort_num;
 	public int elevatorLocation;
@@ -151,6 +152,26 @@ public class Floor implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
+		//fileReader(String fullFile);
+		//elevatorRequestFromFile(String request);
+		Floor floor1 = new Floor(1);
+		Floor floor2 = new Floor(2);
+		Floor floor3 = new Floor(3);
+		Floor floor4 = new Floor(4);
+		
+		/* {inside while
+		 * if statement
+		 * if(whoamI == (number of floor)){
+		 * 	returns a byte[]: floor(number of floor).create a packet to schedular(); 
+		 * }
+		 * 
+		 * floor(number of floor).send the byte[] from above if statement to schedular;
+		 * 
+		 * 
+		 * 
+		 * 
+		 */
+		
 		while (true) {
 
 										/* FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, up_or_down, 0) */
