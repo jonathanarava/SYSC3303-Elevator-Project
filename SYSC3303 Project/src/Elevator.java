@@ -88,6 +88,15 @@ public class Elevator implements Runnable {
 	
 
 	public int runElevator(byte motorDirection, byte motorSpinTime, int currentFloor) {
+		
+		if(motorDirection == (byte) 0) {
+			motorSpinTime = 
+		}
+		
+		if(motorDirection == (byte) 2) {
+			motorSpinTime
+		}
+		
 		int time = Math.abs((int) motorSpinTime -currentFloor);
 		
 		System.out.println((int) motorSpinTime);
