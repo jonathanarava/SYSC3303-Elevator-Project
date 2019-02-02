@@ -50,13 +50,8 @@ class ElevatorTest {
 		testarray[3] = 0;	// write 0
 		
 		assertArrayEquals(testarray, elevator.responsePacket(floorRequest));
-
 	}
 
-	@Test
-	void test() {
-		fail("Not yet implemented.");
-	}
 
 	@Test
 	public void testRun() throws Exception {
@@ -71,10 +66,12 @@ class ElevatorTest {
 	@Test
 	public void testOpenCloseDoor() throws Exception {
 		Elevator elevator=new Elevator();
+		//Test for Doors closed
 		String expected= "Doors are closed.";
 		assertEquals(expected, elevator.openCloseDoor((byte)0));
+		//Test for Doors open
 		String expected1= "Doors are open.";
-		assertEquals(expected1, elevator.openCloseDoor((byte)0));
+		assertEquals(expected1, elevator.openCloseDoor((byte)1));
 		
 	}
 
@@ -90,30 +87,5 @@ class ElevatorTest {
 		throw new RuntimeException("not yet implemented");
 	}
 
-	/*
-	 * @Test public void checkCurrentFloor(){ // Move to floor 2 elevator.moveUp();
-	 * elevator.moveUp(); assertEquals(SECOND_FLOOR, elevator.currentFloor()); }
-	 * 
-	 * @Test public void checkMoveDown(){ elevator.moveDown(); elevator.moveDown();
-	 * assertEquals(BASEMENT_TWO, elevator.currentFloor()); }
-	 * 
-	 * @Test public void checkDirectionUp(){
-	 * elevator.addNewDestinatoin(SECOND_FLOOR);
-	 * assertEquals(ElevatorDirection.ELEVATOR_UP, elevator.direction()); }
-	 * 
-	 * @Test public void checkDirectionDown(){
-	 * elevator.addNewDestinatoin(BASEMENT_TWO);
-	 * assertEquals(ElevatorDirection.ELEVATOR_DOWN, elevator.direction()); }
-	 * 
-	 * @Test public void checkDirectionHold(){
-	 * assertEquals(ElevatorDirection.ELEVATOR_HOLD, elevator.direction()); }
-	 * 
-	 * @Test public void checkStatusEmpty(){
-	 * assertEquals(ElevatorStatus.ELEVATOR_EMPTY, elevator.status()); }
-	 * 
-	 * @Test public void checkStatusOccupied(){
-	 * elevator.addNewDestinatoin(TENTH_FLOOR);
-	 * assertEquals(ElevatorStatus.ELEVATOR_OCCUPIED, elevator.status()); }
-	 */
 
 }
