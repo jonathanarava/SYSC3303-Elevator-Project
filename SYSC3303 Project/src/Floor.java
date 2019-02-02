@@ -114,27 +114,27 @@ public class Floor implements Runnable {
 	 * Takes the input information and creates a list of Strings that will have the real time inputs as a string. 
 	 * 
 	 */
-	public String fileReader(String fullFile) {
+	public void fileReader(String fullFile) {
 		String text = "";
 		int i=0;
+		List<String> strings = new ArrayList<String>();
 		try {
 			FileReader input = new FileReader(fullFile);
 			Scanner reader = new Scanner(input);
 			reader.useDelimiter("[\n]");
+			
 			while (reader.hasNext()){
+				text = reader.next();
 				if (i<=1) {
 					i++;
 				} else if (i>=2) {
-					text = reader.next(); 
-					List<String> strings = new ArrayList<String>();
 					strings.add(text);
 				}
 				 
 			}
 		}catch(Exception e) {
-			
+			e.printStackTrace();
 		}
-		return text;
 	}
 	
 	public String elevatorRequestFromFile(String request) {
