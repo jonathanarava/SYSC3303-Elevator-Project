@@ -35,7 +35,7 @@ public class Floor implements Runnable {
 	
 	
 	/*
-	 * 
+	 * Constructor so Floors can be initialized in a way that can be runnable in the scheduler
 	 */
 	public Floor(int name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
@@ -78,7 +78,7 @@ public class Floor implements Runnable {
 	
 	
 	/* Gets an elevator request as an int(up or down)
-	 * @returns a byte[] array that can be then used to send to the Schedular
+	 * @returns a byte[] array that can be then used to send to the Scheduler
 	 */
 	public byte[] responsePacket() {
 		// creates the byte array according to the required format in this case 00000000-DATABYTE-00000000
