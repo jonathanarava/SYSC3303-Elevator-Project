@@ -41,7 +41,7 @@ class ElevatorTest {
 	@Test
 	public void testResponsePacket() {
 		Elevator elevator=new Elevator();
-		
+		elevator.currentFloor(1);
 		floorRequest = 2;
 		byte[] testarray = new byte[4];
 		testarray[0] = 0;	// write 0
@@ -50,6 +50,7 @@ class ElevatorTest {
 		testarray[3] = 0;	// write 0
 		
 		assertArrayEquals(testarray, elevator.responsePacket(floorRequest));
+		System.out.println("------------------End of testResponsePacket()---------------------\n ");
 	}
 
 
