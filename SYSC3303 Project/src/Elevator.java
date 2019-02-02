@@ -86,23 +86,9 @@ public class Elevator implements Runnable {
 		return currentFloor;
 	}
 	
-
 	public int runElevator(byte motorDirection, byte motorSpinTime, int currentFloor) {
-		
-		if(motorDirection == (byte) 0) {
-			motorSpinTime = 
-		}
-		
-		if(motorDirection == (byte) 2) {
-			motorSpinTime
-		}
-		
-		int time = Math.abs((int) motorSpinTime -currentFloor);
-		
-		System.out.println((int) motorSpinTime);
-		System.out.println(currentFloor);
-		System.out.println(time);
-		sensor = currentFloor;
+		sensor = currentFloor;				 //sensor is at current floor
+        	int time = (int) motorSpinTime;
 		if (motorDirection == up || motorDirection == down) {
 			while (time > 0){
 				try {
@@ -111,27 +97,24 @@ public class Elevator implements Runnable {
 					time--;
 					if (motorDirection == up) {
 						System.out.println("Elevator going up");
-						sensor++;
-						currentFloor(sensor);
-						//floor =currentFloor(sensor);
-					} else {
+						sensor++;               //increment the floor
+						currentFloor(sensor);   //updates the current floor
+					} else if (motorDirection == down) {
 						System.out.println("Elevator going down");
-						sensor--;
-						currentFloor(sensor);
-						//floor = currentFloor(sensor);
+						sensor--;               //decrements the floor
+						currentFloor(sensor);   //updates the current floor
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		} else if (motorDirection == hold) {
-			currentFloor(sensor);
-			//floor = currentFloor(sensor);
+			currentFloor(sensor);       //updates current floor - in this case nothing changes
 		}
-		System.out.println(sensor);
-		return currentFloor(sensor);
+		System.out.println(sensor);     //prints out the current floor - in this case destination floor
+		return currentFloor(sensor);    //returns and updates the final current of the floor - in this case destination floor
 	}
-
+	
 	public void run() {
 		byte[] requestElevator = new byte[3];
 		while (true) {
