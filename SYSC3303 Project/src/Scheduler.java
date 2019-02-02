@@ -3,7 +3,7 @@
 //most logic for changing of states
 import java.io.*;
 import java.net.*;
-
+import java.util.LinkedList;
 public class Scheduler {
 
 	public static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
@@ -17,8 +17,8 @@ public class Scheduler {
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
 	// Declare timing constants
-	public static final TIME_PER_FLOOR=1;//time for the elevator to travel per floor
-	public static final DOOR_OPEN=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
+	public static final int TIME_PER_FLOOR=1;//time for the elevator to travel per floor
+	public static final int DOOR_OPEN=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
 
 	public static void main(String args[]){//2 arguments: args[0] is the number of Elevators in the system and 
 		//for iteration 1 there will only be 1 elevator
@@ -56,8 +56,8 @@ public class Scheduler {
 		//temporary sorting algorithm variables
 		
 		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
-		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
+		LinkedList elevatorRequestsUp[]= new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
+		LinkedList elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
 
 
 		//allocation of Datagram Sockets
@@ -102,7 +102,7 @@ public class Scheduler {
 			//define the port number of the started floor thread into the array
 			try {// Block until a datagram packet is received from receiveSocket.        
 				//System.out.println("Waiting..."); // so we know we're waiting
-				schedulerReceiveSocket.receive(schedulerReceivePacket)
+				schedulerReceiveSocket.receive(schedulerReceivePacket);
 			} 
 			catch (IOException e) {
 				System.out.print("IO Exception: likely:");
@@ -126,10 +126,10 @@ public class Scheduler {
 		//temporary sorting algorithm variables
 		int floorRequestDirection;//the floor is requesting to go up or down
 		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
-		linkedlist elevatorRequests[]= new linkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
+		LinkedList elevatorRequestsUp[]= new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
+		LinkedList elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
+		LinkedList elevatorRequests[]= new LinkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
+		LinkedList elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
 		//int nextStop[]=new int[createNumElevators];//the next stop for each elevator; if unallocated (in hold) then set as -1
 		//variable declarations for replying/ creating send packet
 		byte[] packetAddress=schedulerReceivePacket.getAddress();
@@ -269,7 +269,7 @@ public class Scheduler {
 								//do nothing, don't want duplicates 
 							}
 							else {
-								elevatorStopUp[packetElementIndex].add(stopRequest);//add to the stopsUp linkedlist for the current elevator
+								elevatorStopUp[packetElementIndex].add(stopRequest);//add to the stopsUp LinkedList for the current elevator
 							}
 						}
 						else {//the stop has already been missed 
@@ -283,7 +283,7 @@ public class Scheduler {
 								//do nothing, don't want duplicates 
 							}
 							else {
-								elevatorStopDown[packetElementIndex].add(stopRequest);//add to the stopsDown linkedlist for the current elevator
+								elevatorStopDown[packetElementIndex].add(stopRequest);//add to the stopsDown LinkedList for the current elevator
 							}
 
 						}
