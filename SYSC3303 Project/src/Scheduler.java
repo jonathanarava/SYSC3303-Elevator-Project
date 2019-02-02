@@ -131,15 +131,18 @@ public class Scheduler {
 
 		//temporary sorting algorithm variables
 		int floorRequestDirection;//the floor is requesting to go up or down
-		//linked list for requests, up direction; individiaul list for each elevator as well as total
-		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
-		linkedlist elevatorRequests[]= new linkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
-		linkedlist elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
+				//linked list for requests, up direction; individiaul list for each elevator as well as total
+				/*
+				 * for some reason these are duplicated from above,
+				 */
+				//LinkedList elevatorRequestsUp[]= new LinkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor)
+				//LinkedList elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed in the up direction
+		LinkedList elevatorRequests[]= new LinkedList[createNumElevators];//requests to go down from floors which aren't currently allocated to an elevator (in use past the floor)
+		LinkedList elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
 		//int nextStop[]=new int[createNumElevators];//the next stop for each elevator; if unallocated (in hold) then set as -1
 		//variable declarations for replying/ creating send packet
 		byte[] packetAddress=schedulerReceivePacket.getAddress();
-		byte [] packetPort=schedulerReceivePacket.getPort();
+		byte[] packetPort=schedulerReceivePacket.getPort();
 
 		//variable definitions used to unpack/ coordinate/ allocate actions
 		byte [] packetData=schedulerReceivePacket.getData();
