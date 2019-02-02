@@ -43,6 +43,8 @@ public class Scheduler {
 		//Thread Elevator elevatorArray[]=new Elevator[createNumElevators];
 		Floor floorArray[]=new Floor[createNumFloors];
 
+		
+		//scheduling alogrithm variable declaration
 		int elevatorCurrentFloor[]=new int[createNumElevators];
 		int elevatorStatus[]=new int[createNumElevators];//each elevator is either holding(0), going up(1), or going down(2)
 		int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of the next stop for that elevator
@@ -51,10 +53,17 @@ public class Scheduler {
 		int elevatorProximity[]=new int [createNumElevators];//the distance between the next request and the current floor the elevator is on
 		int elevatorNumStops[]=new int [createNumElevators];//number of stops that each elevator has, 
 		//int elevator
+		//temporary sorting algorithm variables
+		int floorStatus, floorRequest;
+		//floorStatus: which floor the elevator is on
+		//floorRequest:
+			//elevator: request from elevator (floor that it needs to stop at)
+			//floor: request from floor 
 
 		//linked list for requests, up direction
 		//individiaul list for each elevator as well as total
-		linkedlist elevatorStops[]
+		linkedlist elevatorRequestsUp[]= new linkedList[createNumElevators];//requests to go up from floors which aren't currently allocated to an elevator (in use past the floor or in the wrong direction)
+		linkedlist elevatorStopsUp[]=new LinkedList[createNumElevators];//linked list for stops needed 
 
 
 
@@ -125,5 +134,66 @@ public class Scheduler {
 		//update elevator(s) and floor(s)
 		//use threads for object creation? can allow for argument based input for number of elevators and floors
 
+		while(true) {
+			try {// Block until a datagram packet is received from receiveSocket.        
+				//System.out.println("Waiting..."); // so we know we're waiting
+				schedulerReceiveSocket.receive(schedulerReceivePacket)
+			} 
+			catch (IOException e) {
+				System.out.print("IO Exception: likely:");
+				System.out.println("Receive Socket Timed Out.\n" + e);
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+			//check whether the packet was from an elevator (requests and status) or a floor(request)
+			//floor: allocate to an appropriate elevator (same direction, fastest response time, least load)
+				//if no currently allocatable elevators then add to requests linked list
+			//elevator: 
+			
+			//checksender()
+			for (int k=0;k<createNumElevators)
+			if (Sender==ELEVATOR) {
+				//elevatorNum=__;//which elevator it is in 
+				//status or request
+				if (schedulerReceivePacket.getData()[___]==___) {//status
+
+					
+					floorStatus=schedulerReceivePacket.getData()[___];
+					//compare floor number with next stop of the elevator (==nextStop variable)
+					if (floorStatus==
+						//if equal, stop the elevator, open the doors (closes automatically after preallocated duration)
+							//check if there are more stops
+								//yes (stop list is empty)
+									//set new nextStop value
+									//start motor in direction
+								//no
+									
+						//update floor number and direction displays for elevator and all floors
+				}
+				else {//request
+					//ONLY FOR A SINGLE ELEVATOR RIGHT NOW
+					//check motor status
+						//same direction: 
+							//check if more immediate than current nextStop 
+								//yes
+									//move current nextStop back to stop list
+									//set as nextStop
+								//no
+									//add to stop list
+						//opposite direction:
+							//add to stop list
+						//hold:
+							//set as next stop
+							//start motor in that direction
+				}
+			}
+			else {//floor
+				//check availability and either allocate to a moving elevator, initiate the movement of another, or add to request linked list if none available (or wrong direction)
+				
+				
+			}
+			if schedulerReceivePacket.getAddress
+		}
 	}
 }
