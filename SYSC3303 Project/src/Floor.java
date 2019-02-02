@@ -174,7 +174,7 @@ public class Floor implements Runnable {
 		
 		while (true) {
 
-										/* FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, up_or_down, 0) */
+		/* FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, up_or_down, 0) */
 			//requestElevator = responsePacket(floorRequest);
 			byte[] requestElevator = new byte[7]; 
 			requestElevator = responsePacket();
