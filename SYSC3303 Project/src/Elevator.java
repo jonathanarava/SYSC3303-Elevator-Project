@@ -87,12 +87,15 @@ public class Elevator implements Runnable {
 	}
 	
 
-	public int runElevator(byte motorDirection, byte motorSpinTime) {
-		int time = (int) motorSpinTime;
-
-		int floor = 0;
+	public int runElevator(byte motorDirection, byte motorSpinTime, int currentFloor) {
+		int time = Math.abs((int) motorSpinTime -currentFloor);
+		
+		System.out.println((int) motorSpinTime);
+		System.out.println(currentFloor);
+		System.out.println(time);
+		sensor = currentFloor;
 		if (motorDirection == up || motorDirection == down) {
-			while (time != 1) {
+			while (time > 0){
 				try {
 					System.out.println(sensor); // sensor = current floor
 					Thread.sleep(1000);
@@ -100,20 +103,24 @@ public class Elevator implements Runnable {
 					if (motorDirection == up) {
 						System.out.println("Elevator going up");
 						sensor++;
-						floor =currentFloor(sensor);
+						currentFloor(sensor);
+						//floor =currentFloor(sensor);
 					} else {
 						System.out.println("Elevator going down");
 						sensor--;
-						floor = currentFloor(sensor);
+						currentFloor(sensor);
+						//floor = currentFloor(sensor);
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		} else if (motorDirection == hold) {
-			floor = currentFloor(sensor);
+			currentFloor(sensor);
+			//floor = currentFloor(sensor);
 		}
-		return floor;
+		System.out.println(sensor);
+		return currentFloor(sensor);
 	}
 
 	public void run() {
@@ -165,7 +172,7 @@ public class Elevator implements Runnable {
 				System.exit(1);
 			}
 
-			runElevator(data[1], data[2]);
+//			runElevator(data[1], data[2]);
 			openCloseDoor(data[3]);
 
 			// send packet for scheduler to know the port this elevator is allocated

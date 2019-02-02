@@ -86,8 +86,10 @@ class ElevatorTest {
 	@Test
 	public void testRunElevator() throws Exception {
 		Elevator elevator=new Elevator();
+		elevator.currentFloor(2);
 		//Elevator going up
-		assertEquals(4, elevator.runElevator((byte) 1,(byte) 4));
+		//System.out.println(elevator.runElevator((byte) 1,(byte) 4));
+		assertEquals(9, elevator.runElevator((byte) 1,(byte) 4, 5));
 		//Elevator going down
 		//assertEquals(3, elevator.runElevator((byte) 2,(byte) 4));
 		System.out.println("------------------End of testRunElevator()-------------------\n ");
