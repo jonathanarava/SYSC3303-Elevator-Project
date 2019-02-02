@@ -40,13 +40,14 @@ class ElevatorTest {
 	@Test
 	public void testResponsePacket() {
 		Elevator elevator=new Elevator();
+		
 		floorRequest = 2;
 		byte[] testarray = new byte[4];
-		testarray[0] = 0;
-		testarray[1] = 2;
-		testarray[2] = 0;
-		testarray[3] = 0;
-
+		testarray[0] = 0;	// write 0
+		testarray[1] = 2;	// floorRequest = 2
+		testarray[2] = 1;	// sensor = 1
+		testarray[3] = 0;	// write 0
+		
 		assertArrayEquals(testarray, elevator.responsePacket(floorRequest));
 
 	}
