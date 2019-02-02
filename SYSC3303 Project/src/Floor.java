@@ -78,7 +78,7 @@ public class Floor implements Runnable {
 				e.printStackTrace();
 			}
 		} else {
-			msg = "Doors are closed."; 
+			msg = "Doors are closed.";
 			System.out.println(msg);
 		}
 		return msg;

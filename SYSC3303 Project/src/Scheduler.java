@@ -17,8 +17,8 @@ public class Scheduler {
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
 	// Declare timing constants
-	public static final TIME_PER_FLOOR=1;//time for the elevator to travel per floor
-	public static final DOOR_OPEN=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
+	public static final float TIME_PER_FLOOR=1;//time for the elevator to travel per floor
+	public static final float DOOR_OPEN=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
 
 	public static void main(String args[]){//2 arguments: args[0] is the number of Elevators in the system and 
 		//for iteration 1 there will only be 1 elevator
@@ -42,9 +42,12 @@ public class Scheduler {
 		Elevator elevatorArray[]=new Elevator[createNumElevators];
 		//Thread Elevator elevatorArray[]=new Elevator[createNumElevators];
 		Floor floorArray[]=new Floor[createNumFloors];
+		
+		//
+		Thread threadArray[]= new Thread[createNumFloors + createNumElevators];
 
 
-		//scheduling alogrithm variable declaration
+		//scheduling algorithm variable declaration
 		int elevatorCurrentFloor[]=new int[createNumElevators];
 		int elevatorStatus[]=new int[createNumElevators];//each elevator is either holding(0), going up(1), or going down(2)
 		int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of the next stop for that elevator
@@ -78,11 +81,12 @@ public class Scheduler {
 		//creation of Elevator and Floor thread objects and start them
 		for (int i=0;i<createNumElevators; i++) {
 			elevatorArray[i]=new Elevator(Integer.toString(i));
-			elevatorArray[i].start();
+			threadArray[i] = new Thread(elevatorArray[i]);
+			threadArray[i].start();	//We need to create a Thread Array with the runnable classes inside of it and start that. So the runnables will be inside threadArray[]
 			// Block until a datagram packet is received from receiveSocket.
 			try {        
 				//System.out.println("Waiting..."); // so we know we're waiting
-				schedulerReceiveSocket.receive(schedulerReceivePacket)
+				schedulerReceiveSocket.receive(schedulerReceivePacket);
 			} 
 			catch (IOException e) {
 				System.out.print("IO Exception: likely:");
@@ -113,7 +117,7 @@ public class Scheduler {
 			floorPortNumbers[j]=schedulerReceivePacket.getPort();
 		}
 
-		//scheduling alogrithm variable declaration
+		//scheduling algorithm variable declaration
 		int elevatorCurrentFloor[]=new int[createNumElevators];
 		int elevatorStatus[]=new int[createNumElevators];//each elevator is either holding(0), going up(1), or going down(2)
 		int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of the next stop for that elevator
