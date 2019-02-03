@@ -19,7 +19,16 @@ public class Scheduler {
 	public int floorRequest;
 	public int currentFloor;
 
-	public Scheduler() {}
+	public Scheduler() {
+		try {
+			schedulerSocetSendElevator = new DatagramSocket();
+			schedulerSocketReceiveElevator = new DatagramSocket(369);// can be any available port, Scheduler will reply to the port
+															// that's been received
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
+	}
 
 	public void breakDown(byte[] x) {
 		
@@ -60,14 +69,19 @@ public class Scheduler {
 		
 		decodingRequest(parseThroughData);
 
-		byte [] responseByteArray = responsePacket();
+		byte [] responseByteArray = new byte[4];
+		responseByteArray[0]=0;
+		responseByteArray[1]=1;
+		responseByteArray[2]=1;
+		responseByteArray[3]=0;
+		/*byte [] responseByteArray = responsePacket();
 		if(elevatorID == 1) {
 			while(floorRequest != 0) {
-				floorRequest--;
+				floorRequest--;*/
 				schedulerSendPacket = new DatagramPacket(responseByteArray, schedulerReceivePacket.getLength(),
 						schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
-			}
-		}
+			//}
+		//}
 		
 		// or (as we should be sending back the same thing)
 		// System.out.println(received); 
@@ -75,13 +89,14 @@ public class Scheduler {
 		// Send the datagram packet to the client via the send socket. 
 		try {
 			schedulerSocetSendElevator.send(schedulerSendPacket);
+			System.out.println("Sent");
 		} catch (IOException e) {
 			System.out.print("hi");
 			e.printStackTrace();
 			System.exit(1);
 		}
 
-		System.out.println(data);
+		//System.out.println();
 	}
 	
 	public void decodingRequest(byte[] data) {
@@ -129,14 +144,7 @@ public class Scheduler {
 		
 		Scheduler packet = new Scheduler();
 		for(;;) {
-		try {
-			schedulerSocetSendElevator = new DatagramSocket();
-			schedulerSocketReceiveElevator = new DatagramSocket(369);// can be any available port, Scheduler will reply to the port
-															// that's been received
-		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
-			se.printStackTrace();
-			System.exit(1);
-		}
+	
 		
 		packet.receivedPacket();
 		//Thread.sleep(1000);

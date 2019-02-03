@@ -38,6 +38,7 @@ public class Elevator implements Runnable {
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
+		requestElevator.write(1);
 		requestElevator.write((byte) floorRequest);
 		requestElevator.write((byte) currentFloor(sensor));
 		requestElevator.write(0);
