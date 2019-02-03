@@ -23,7 +23,6 @@ public class Scheduler {
 
 	public static void main(String args[]){//2 arguments: args[0] is the number of Elevators in the system and 
 		//for iteration 1 there will only be 1 elevator
-
 		//getting floor numbers from parameters set
 		int createNumElevators = Integer.parseInt(args[0]);//The number of Elevators in the system is passed via argument[0]
 		int createNumFloors = Integer.parseInt(args[1]);//The number of Floors in the system is passed via argument[0]
@@ -68,7 +67,8 @@ public class Scheduler {
 		//allocate receive socket
 		//send socket allocated dynamically for specific port of current elevator or floor 
 		try {
-			schedulerReceiveSocket=new DatagramSocket(23); //arbitrary usage of 23 for port number of Scheduler's receive port
+			schedulerReceiveSocket=new DatagramSocket(369); //arbitrary usage of 23 for port number of Scheduler's receive port
+			System.out.println("made a socket");
 		} catch (SocketException se) { //if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
@@ -80,14 +80,24 @@ public class Scheduler {
 		//System.out.println("Server: Waiting for Packet.\n");
 
 		//creation of Elevator and Floor thread objects and start them
+		
+		System.out.println("Reached here");
 		for (int i=0;i<createNumElevators; i++) {
 			elevatorArray[i]=new Elevator(Integer.toString(i));
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
-			elevatorThreadArray[i].start();	//We need to create a Thread Array with the runnable classes inside of it and start that. So the runnables will be inside threadArray[]
+			//elevatorThreadArray[i].start();	//We need to create a Thread Array with the runnable classes inside of it and start that. So the runnables will be inside threadArray[]
 			// Block until a datagram packet is received from receiveSocket.
+			
+			elevatorPortNumbers[i]=schedulerReceivePacket.getPort();
+			elevatorAddresses[i]=schedulerReceivePacket.getAddress();
+			elevatorCurrentFloor[i]=0;//the elevators are created and initialized at the ground floor(0)
+			elevatorStatus[i]=0;//elevators created and initialized to the hold state
+		}
+			elevatorThreadArray[0].start();
 			try {        
-				//System.out.println("Waiting..."); // so we know we're waiting
+				System.out.println("Waiting...\n"); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket);
+				System.out.println("Got it");
 			} 
 			catch (IOException e) {
 				System.out.print("IO Exception: likely:");
@@ -95,12 +105,11 @@ public class Scheduler {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			elevatorPortNumbers[i]=schedulerReceivePacket.getPort();
-			elevatorAddresses[i]=schedulerReceivePacket.getAddress();
-			elevatorCurrentFloor[i]=0;//the elevators are created and initialized at the ground floor(0)
-			elevatorStatus[i]=0;//elevators created and initialized to the hold state
+			
+		
+			
 
-		}
+		
 		for (int j=0;j<createNumFloors; j++) {
 			floorArray[j]=new Floor(j);
 			floorThreadArray[j] = new Thread(floorArray[j]);
@@ -141,8 +150,9 @@ public class Scheduler {
 		LinkedList elevatorStopsDown[]=new LinkedList[createNumElevators];//linked list for stops needed in the down direction 
 		//int nextStop[]=new int[createNumElevators];//the next stop for each elevator; if unallocated (in hold) then set as -1
 		//variable declarations for replying/ creating send packet
-		byte[] packetAddress = schedulerReceivePacket.getAddress();
-		byte[] packetPort = schedulerReceivePacket.getPort();
+		byte[] packetAddress = schedulerReceivePacket.getAddress().getAddress();
+		/*
+		byte[] packetPort = (byte)schedulerReceivePacket.getPort();
 
 		//variable definitions used to unpack/ coordinate/ allocate actions
 		byte [] packetData=schedulerReceivePacket.getData();
@@ -156,8 +166,12 @@ public class Scheduler {
 		//
 		int elevatorLocation=packetData[__];//where the elevator is currently located (sensor information sent from elevator as status update)
 		int stopRequest=packetData[___]; //a request to stop at a given floor (from elevator or floor)
+*/
+		//while(true) {
 
-		while(true) {
+		//}
+
+			/*
 			try {// Block until a datagram packet is received from receiveSocket.        
 				//System.out.println("Waiting..."); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket)
@@ -315,7 +329,7 @@ public class Scheduler {
 
 				}
 			}
-		}
+		
 		else {//request is from floor (FOR SINGLE ELEVATOR ONLY)
 			//RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN DIRECTION (UP/DOWN)
 			if (elevatorStatus!=__) {//not in hold
@@ -391,5 +405,9 @@ public class Scheduler {
 			}
 		}
 	}
+	*/	
+	}	
 }
+		
+
 
