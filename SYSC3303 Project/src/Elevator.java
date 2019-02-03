@@ -23,7 +23,7 @@ public class Elevator implements Runnable {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 
 		try {
-			elevatorSendSocket = new DatagramSocket(23);
+			elevatorSendSocket = new DatagramSocket();
 			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
 															// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
@@ -117,38 +117,47 @@ public class Elevator implements Runnable {
 	
 	public void run() {
 		byte[] requestElevator = new byte[3];
+		
 		while (true) {
 
 										/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
-			System.out.println("Enter floor number: ");
+			//System.out.println("Enter floor number: ");
 
-			Scanner destination = new Scanner(System.in);
-			int floorRequest;
-			if (destination.nextInt() != 0) {
-				floorRequest = destination.nextInt();
-			} else {
-				floorRequest=0;
-			}
-			destination.close();
+			//Scanner destination = new Scanner(System.in);
+			//int floorRequest;
+			//if (destination.nextInt() != 0) {
+			//floorRequest = destination.nextInt();
+			//} else {
+				floorRequest=2;
+			//}
+			//destination.close();
 
 			requestElevator = responsePacket(floorRequest);
 			int lengthOfByteArray = responsePacket(floorRequest).length;
 
 			// allocate sockets, packets
 			try {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
-						23);
+						369);
+				System.out.print("I've sent\n");
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
-
+		}
+		
 			
 /* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
 
 
-
+/*
 			byte data[] = new byte[5];
 			elevatorReceivePacket = new DatagramPacket(data, data.length);
 
@@ -171,6 +180,8 @@ public class Elevator implements Runnable {
 			// sendPacket = new DatagramPacket(data,
 			// receivePacket.getLength(),receivePacket.getAddress(),
 			// receivePacket.getPort());
-		}
+		//}
+		 */
 	}
 }
+
