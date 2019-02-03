@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,7 +10,7 @@ public class ElevatorIntermediate {
 	static DatagramSocket elevatorSendSocket;
 	static DatagramSocket elevatorReceiveSocket;
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws IOException{
 		
 		try {
 			elevatorSendSocket = new DatagramSocket();
@@ -58,6 +59,12 @@ public class ElevatorIntermediate {
 					e.printStackTrace();
 					System.exit(1);
 					}
+				try {
+					elevatorSendSocket.send(elevatorSendPacket);
+			      } catch (UnknownHostException e) {
+			         e.printStackTrace();
+			         System.exit(1);
+			      }
 			}
 			else {};
 		}
