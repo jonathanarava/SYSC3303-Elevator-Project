@@ -13,23 +13,9 @@ public class Elevator implements Runnable {
 	private static byte up = 0x01;
 	private static byte down = 0x02;
 	protected int sensor;            // this variable keeps track of the current floor of the elevator
-
-	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-
-	public Elevator() {}
 	
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
-
-		try {
-			elevatorSendSocket = new DatagramSocket();
-			elevatorReceiveSocket = new DatagramSocket();// can be any available port, Scheduler will reply to the port
-															// that's been received
-		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
-			se.printStackTrace();
-			System.exit(1);
-		}
 
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
@@ -115,43 +101,29 @@ public class Elevator implements Runnable {
 		return currentFloor(sensor);    //returns and updates the final current of the floor - in this case destination floor
 	}
 	
-	public void run() {
-		byte[] requestElevator = new byte[3];
-		
-		while (true) {
-
-										/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-			//System.out.println("Enter floor number: ");
-
-			//Scanner destination = new Scanner(System.in);
-			//int floorRequest;
-			//if (destination.nextInt() != 0) {
-			//floorRequest = destination.nextInt();
-			//} else {
-				floorRequest=2;
-			//}
-			//destination.close();
-
-			requestElevator = responsePacket(floorRequest);
-			int lengthOfByteArray = responsePacket(floorRequest).length;
-
-			// allocate sockets, packets
-			try {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
-						369);
-				System.out.print("I've sent\n");
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+	
+	//sets Current location of elevator through this setter
+	public void setSensor(int currentSensor) {
+			sensor = currentSensor;
 		}
+	
+	
+	public void run() {
+		System.out.println("Enter floor number: ");
+
+				Scanner destination = new Scanner(System.in);
+				@SuppressWarnings("unused")
+				int floorRequest;
+				if (destination.nextInt() != 0) {
+				floorRequest = destination.nextInt();
+				} else {
+				
+				}
+				destination.close();
+	}
+	
+	
+	
 		
 			
 /* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
@@ -182,6 +154,5 @@ public class Elevator implements Runnable {
 			// receivePacket.getPort());
 		//}
 		 */
-	}
 }
 
