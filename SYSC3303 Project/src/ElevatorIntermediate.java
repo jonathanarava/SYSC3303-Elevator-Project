@@ -51,12 +51,6 @@ public class ElevatorIntermediate {
 				
 				// allocate sockets, packets
 				try {
-					try {
-							Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 					elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
 							369);
 					System.out.print("I've sent\n");

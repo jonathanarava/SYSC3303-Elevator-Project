@@ -34,7 +34,8 @@ public class Scheduler {
 
 		// Block until a datagram packet is received from receiveSocket.
 		try {   
-				schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
+			System.out.println("waiting");	
+			schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
 				System.out.println("Received it");
 				System.out.println(data.toString());
 
@@ -129,8 +130,8 @@ public class Scheduler {
 		Scheduler packet = new Scheduler();
 		for(;;) {
 		try {
-			schedulerSocetSendElevator = new DatagramSocket(23);
-			//schedulerSocketReceiveElevator = new DatagramSocket();// can be any available port, Scheduler will reply to the port
+			schedulerSocetSendElevator = new DatagramSocket(369);
+			schedulerSocketReceiveElevator = new DatagramSocket();// can be any available port, Scheduler will reply to the port
 															// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();

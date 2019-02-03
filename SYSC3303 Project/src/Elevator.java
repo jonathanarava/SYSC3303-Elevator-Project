@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class Elevator implements Runnable {
 	public static String NAMING;
-	public static int floorRequest;
+	public int floorRequest;
 	private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
@@ -109,17 +109,16 @@ public class Elevator implements Runnable {
 	
 	
 	public void run() {
-		System.out.println("Enter floor number: ");
-
-				Scanner destination = new Scanner(System.in);
-				@SuppressWarnings("unused")
-				int floorRequest;
-				if (destination.nextInt() != 0) {
-				floorRequest = destination.nextInt();
-				} else {
+		//System.out.println("Enter floor number: ");
+		floorRequest = 2;
+				//Scanner destination = new Scanner(System.in);
 				
-				}
-				destination.close();
+				//if (destination.nextInt() != 0) {
+				//floorRequest = destination.nextInt();
+				//} else {
+				
+				//}
+				//destination.close();
 	}
 	
 	
