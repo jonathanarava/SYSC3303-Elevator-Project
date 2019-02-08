@@ -20,9 +20,10 @@ public class Elevator extends Thread {
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 	public Elevator() {}
 	
-	public Elevator(String name, Object object) {
+	public Elevator(String name, Object object, int initiateFloor) {
 		this.name = name;// mandatory for having it actually declared as a thread object
 		this.object = object;
+		sensor = initiateFloor;
 
 		try {
 			elevatorSendSocket = new DatagramSocket();
@@ -88,21 +89,22 @@ public class Elevator extends Thread {
 	
 	public int runElevator(byte motorDirection, byte motorSpinTime/*, int currentFloor*/) {
 		//sensor = currentFloor;				 //sensor is at current floor
-        	int time = (int) motorSpinTime;
+		int sensorIncrement;
+        int time = (int) motorSpinTime;
 		if (motorDirection == up || motorDirection == down) {
 			while (time > 0){
 				try {
-					System.out.println(sensor); // sensor = current floor
+					System.out.println("current floor: " + sensor); // sensor = current floor
 					Thread.sleep(1000);
 					time--;
 					if (motorDirection == up) {
 						System.out.println("Elevator going up");
-						sensor++;               //increment the floor
-						currentFloor(sensor);   //updates the current floor
+						sensorIncrement=sensor++;               //increment the floor
+						currentFloor(sensorIncrement);   //updates the current floor
 					} else if (motorDirection == down) {
 						System.out.println("Elevator going down");
-						sensor--;               //decrements the floor
-						currentFloor(sensor);   //updates the current floor
+						sensorIncrement = sensor--;               //decrements the floor
+						currentFloor(sensorIncrement);   //updates the current floor
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -147,7 +149,7 @@ public class Elevator extends Thread {
 			
 			elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
 					23);
-			System.out.println("sent");
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -155,6 +157,7 @@ public class Elevator extends Thread {
 		
 		try {
 			elevatorSendSocket.send(elevatorSendPacket);
+			System.out.println("sent");
 	      } 
 		catch (IOException e) {
 	         e.printStackTrace();

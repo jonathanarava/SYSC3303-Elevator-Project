@@ -47,8 +47,8 @@ public class Scheduler {
 		// Block until a datagram packet is received from receiveSocket.
 		try {   
 					//System.out.println("waiting");	
-					schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
-					System.out.print("Received request from elevator: ");
+			schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
+			System.out.print("Received request from elevator: ");
 					//object.wait();		
 			
 			System.out.println(Arrays.toString(data));
@@ -81,13 +81,13 @@ public class Scheduler {
 		responseByteArray[2]=1;
 		responseByteArray[3]=0;*/
 		if(elevatorID == 1) {
-			while(floorRequest != 0) {
+			//while(floorRequest != 0) {
 				floorRequest--;
 				responseByteArray = responsePacket();
 				System.out.println(Arrays.toString(responseByteArray));
 				schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 						schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
-			}
+			//}
 		}
 		
 		// or (as we should be sending back the same thing)
@@ -119,14 +119,14 @@ public class Scheduler {
 		requestElevator.write(0);
 		
 		if((currentFloor - floorRequest) <0) {
-			requestElevator.write(1);
+			requestElevator.write(1);		//downwards
 			requestElevator.write(0);
 		} else if((currentFloor - floorRequest) >0) {
-			requestElevator.write(2);
+			requestElevator.write(2);		//upwards
 			requestElevator.write(0);
 		} else {
 			requestElevator.write(0);    //motorDirection
-			requestElevator.write(0); 	//open or Close
+			requestElevator.write(1); 	//open or Close
 		}
 		
 		if((currentFloor-floorRequest) != 0) {
@@ -134,7 +134,7 @@ public class Scheduler {
 		} else {
 			requestElevator.write(0);    //MotorSpin Time
 		}
-		
+		 // 0,2,0,1,0
 		
 		return requestElevator.toByteArray();
 
@@ -148,8 +148,8 @@ public class Scheduler {
 	public static void main(String args[]) throws InterruptedException {
 		
 		Scheduler packet = new Scheduler();
-		Elevator e = new Elevator("1", object);
-		e.currentFloor(1);
+		Elevator e = new Elevator("1", object, 1);
+		
 		for(;;) {
 		Thread t1 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
 			public void run() {
