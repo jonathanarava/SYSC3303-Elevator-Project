@@ -10,7 +10,7 @@ import java.util.Scanner;
 /*
  * class Floor:has direction buttons and Floor display
  */
-public class Floor implements Runnable {
+public class Floor implements Runnable{
 	 
 	
 	/* Real-time Input Information: In the next iteration these will be provided 
@@ -29,23 +29,16 @@ public class Floor implements Runnable {
 	
 	public int sendPort_num;
 	public int elevatorLocation;
-	public static int NAMING;
+	public static String NAMING;
 	DatagramPacket floorSendPacket, floorReceivePacket;
 	DatagramSocket floorSendSocket, floorReceiveSocket;
 	
 	String elevatorRequest = "";
 	
 	/*
-	 * Blank constructor so Elevator Class can access Input information
-	 * This will be changed for final iteration 
-	 */
-	public Floor() {}
-	
-	
-	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the scheduler
 	 */
-	public Floor(int name) {
+	public Floor(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
 		sendPort_num = name + 22;
