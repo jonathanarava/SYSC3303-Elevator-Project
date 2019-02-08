@@ -4,7 +4,6 @@
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
 import java.io.*;
 import java.net.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
@@ -122,7 +121,7 @@ public class Elevator extends Thread {
 		}
 	
 	public synchronized void sendPacket() throws InterruptedException {
-		byte[] requestElevator = new byte[5];
+		byte[] requestElevator = new byte[3];
 		
 		/* ELEVATOR --> SCHEDULER (0, elevator id, FloorRequest, cuurentFloor, 0) */
 
@@ -139,13 +138,14 @@ public class Elevator extends Thread {
 
 		requestElevator = responsePacket(floorRequest);
 		//System.out.println(requestElevator.toString());
+		int lengthOfByteArray = responsePacket(floorRequest).length;
 
 		//synchronized(object) {
 		// allocate sockets, packets
 		//object.wait();
 		try {
 			
-			elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
+			elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
 					23);
 			System.out.println("sent");
 		} catch (UnknownHostException e) {
@@ -174,8 +174,6 @@ public class Elevator extends Thread {
 					try {
 						// Block until a datagram packet is received from receiveSocket.
 						elevatorSendSocket.receive(elevatorReceivePacket);
-						System.out.print("Received from scheduler: ");
-						System.out.println(Arrays.toString(data));
 					} catch (IOException e) {
 						System.out.print("IO Exception: likely:");
 						System.out.println("Receive Socket Timed Out.\n" + e);
