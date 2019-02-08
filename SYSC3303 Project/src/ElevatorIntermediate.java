@@ -104,8 +104,8 @@ public class ElevatorIntermediate {
 		elevatorArray=new Elevator[createNumElevators];
 		elevatorThreadArray= new Thread[createNumElevators];
 		
-		//Lets create a socket for the elevator Indermediate class to communicate
-		//with the schedular. All the elevator threads will use this.
+		//Lets create a socket for the elevator Intermediate class to communicate
+		//with the scheduler. All the elevator threads will use this.
 		
 		
 		//allocate receive packet
