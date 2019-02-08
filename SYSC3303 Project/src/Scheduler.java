@@ -7,14 +7,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 public class Scheduler {
 	
 	public static DatagramSocket schedulerSocetSendElevator, schedulerSocketReceiveElevator;
 	public static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	
-	public static Object object = new Object();
 	//public boolean isListen;
 	
 	public int elevatorID;
@@ -24,7 +22,7 @@ public class Scheduler {
 	public Scheduler() {
 		try {
 			schedulerSocetSendElevator = new DatagramSocket();
-			schedulerSocketReceiveElevator = new DatagramSocket(23);// can be any available port, Scheduler will reply to the port
+			schedulerSocketReceiveElevator = new DatagramSocket(369);// can be any available port, Scheduler will reply to the port
 															// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
@@ -36,24 +34,22 @@ public class Scheduler {
 		
 	}
 
-	public synchronized void receivedPacket() throws InterruptedException  {
+	public void receivedPacket() throws InterruptedException  {
 
 		byte data[] = new byte[4];
 
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		//System.out.println("Server: Waiting for Packet.\n");
-		
-		//synchronized(object) {
+
 		// Block until a datagram packet is received from receiveSocket.
 		try {   
-					//System.out.println("waiting");	
-					schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
-					System.out.println("Received it");
-					//object.wait();		
-			
-			System.out.println(Arrays.toString(data));
-			//schedulerSocketReceiveElevator.close();
-			//schedulerSocetSendElevator.close()
+			System.out.println("waiting");	
+			schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
+				System.out.println("Received it");
+				System.out.println(data.toString());
+
+				//schedulerSocketReceiveElevator.close();
+				//schedulerSocetSendElevator.close()
 		
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
@@ -63,7 +59,7 @@ public class Scheduler {
 		}	
 		
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e ) {
 			e.printStackTrace();
 			System.exit(1);
@@ -78,10 +74,10 @@ public class Scheduler {
 		responseByteArray[1]=1;
 		responseByteArray[2]=1;
 		responseByteArray[3]=0;
-		/*if(elevatorID == 1) {
-			while(floorRequest != 0) {*/
-				floorRequest--;
-				//byte [] responseByteArray = responsePacket();
+		/*byte [] responseByteArray = responsePacket();
+		if(elevatorID == 1) {
+			while(floorRequest != 0) {
+				floorRequest--;*/
 				schedulerSendPacket = new DatagramPacket(responseByteArray, schedulerReceivePacket.getLength(),
 						schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
 			//}
@@ -94,12 +90,14 @@ public class Scheduler {
 		try {
 			schedulerSocetSendElevator.send(schedulerSendPacket);
 			System.out.println("Sent");
-		} catch (IOException e) {;
+		} catch (IOException e) {
+			System.out.print("hi");
 			e.printStackTrace();
 			System.exit(1);
 		}
-	}
+
 		//System.out.println();
+	}
 	
 	public void decodingRequest(byte[] data) {
 		
@@ -145,37 +143,10 @@ public class Scheduler {
 	public static void main(String args[]) throws InterruptedException {
 		
 		Scheduler packet = new Scheduler();
-		Elevator e = new Elevator("1", object);
 		for(;;) {
-		Thread t1 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				try {
-					e.sendPacket();
-					e.receivePacket();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-
-			}
-			});
+	
 		
-		Thread t2 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				try {
-					packet.receivedPacket();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			});
-		t1.start();
-		t2.start();
-		
-		t1.join();
-		t2.join();
+		packet.receivedPacket();
 		//Thread.sleep(1000);
 		//packet.stopListening();
 

@@ -88,9 +88,8 @@ public class ElevatorIntermediate {
 			}
 			else {};
 	}
-}
 	
-	/*public static void main(String args[]) throws IOException{//2 arguments: args[0] is the number of Elevators in the system and 
+	public static void main(String args[]) throws IOException{//2 arguments: args[0] is the number of Elevators in the system and 
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
 		//for iteration 1 there will only be 1 elevator
 		//getting floor numbers from parameters set
@@ -122,7 +121,7 @@ public class ElevatorIntermediate {
 		while(true) {
 		elevatorHandler.packetHandler();
 		}
-		 ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) 
+		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
 		//System.out.println("Enter floor number: ");
 
@@ -137,4 +136,3 @@ public class ElevatorIntermediate {
 		
 		}
 }
-*/

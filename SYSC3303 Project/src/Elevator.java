@@ -6,29 +6,22 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
-public class Elevator extends Thread {
-	public String name;
+public class Elevator implements Runnable {
+	public static String NAMING;
 	public int floorRequest;
 	private static byte hold = 0x00;
 	private static byte up = 0x01;
 	private static byte down = 0x02;
 	protected int sensor;            // this variable keeps track of the current floor of the elevator
 	
-	public Object object = new Object();
+	
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 	public Elevator() {}
 	
-	public Elevator(String name, Object object) {
-		this.name = name;// mandatory for having it actually declared as a thread object
-		this.object = object;
+	public Elevator(String name) {
+		NAMING = name;// mandatory for having it actually declared as a thread object
 
-		try {
-			elevatorSendSocket = new DatagramSocket();
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -50,7 +43,7 @@ public class Elevator extends Thread {
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
-		requestElevator.write(Byte.valueOf(name));						// elevator id
+		requestElevator.write(1);
 		requestElevator.write((byte) floorRequest);
 		requestElevator.write((byte) currentFloor(sensor));
 		requestElevator.write(0);
@@ -120,31 +113,42 @@ public class Elevator extends Thread {
 			sensor = currentSensor;
 		}
 	
-	public synchronized void sendPacket() throws InterruptedException {
+	
+	public void run() {
+		//System.out.println("Enter floor number: ");
+		//floorRequest = 2;
+				//Scanner destination = new Scanner(System.in);
+				
+				//if (destination.nextInt() != 0) {
+				//floorRequest = destination.nextInt();
+				//} else {
+				
+				//}
+				//destination.close();	
+		
 		byte[] requestElevator = new byte[3];
 		
-		/* ELEVATOR --> SCHEDULER (0, elevator id, FloorRequest, cuurentFloor, 0) */
+		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
-		System.out.print("Enter floor number: ");
+
+		 
 		Scanner destination = new Scanner(System.in);
 		int floorRequest=2;
 		int value = destination.nextInt();
+		
 		if ( value != 0) {
 			floorRequest = value;
 		} else {
-			destination.close();
+			floorRequest=0;
 		}
-
+		destination.close();
 
 		requestElevator = responsePacket(floorRequest);
-		//System.out.println(requestElevator.toString());
+		System.out.println(requestElevator.toString());
 		int lengthOfByteArray = responsePacket(floorRequest).length;
 
-		//synchronized(object) {
 		// allocate sockets, packets
-		//object.wait();
 		try {
-			
 			elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
 					23);
 			System.out.println("sent");
@@ -160,61 +164,37 @@ public class Elevator extends Thread {
 	         e.printStackTrace();
 	         System.exit(1);
 	      }
-		//}
-	}
-	
-	public synchronized void receivePacket() {
-		//SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 
-
-					byte data[] = new byte[5];
-					elevatorReceivePacket = new DatagramPacket(data, data.length);
-
-					System.out.println("elevator_subsystem: Waiting for Packet.\n");
-					
-					try {
-						// Block until a datagram packet is received from receiveSocket.
-						elevatorSendSocket.receive(elevatorReceivePacket);
-					} catch (IOException e) {
-						System.out.print("IO Exception: likely:");
-						System.out.println("Receive Socket Timed Out.\n" + e);
-						e.printStackTrace();
-						System.exit(1);
-					}
-
-					runElevator(data[1], data[2]);
-					openCloseDoor(data[3]);
-
-					// send packet for scheduler to know the port this elevator is allocated
-					// sendPacket = new DatagramPacket(data,
-					// receivePacket.getLength(),receivePacket.getAddress(),
-					// receivePacket.getPort());
-				//}
-	}
-	
-	
-	public void run() {
-		//System.out.println("Enter floor number: ");
-		//floorRequest = 2;
-				//Scanner destination = new Scanner(System.in);
-				
-				//if (destination.nextInt() != 0) {
-				//floorRequest = destination.nextInt();
-				//} else {
-				
-				//}
-				//destination.close();	
 		
-		try {
-			sendPacket();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		receivePacket();
 		
 		//destination.close();
-			 
+			//SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 
+
+
+
+			byte data[] = new byte[5];
+			elevatorReceivePacket = new DatagramPacket(data, data.length);
+
+			System.out.println("elevator_subsystem: Waiting for Packet.\n");
+			
+			try {
+				// Block until a datagram packet is received from receiveSocket.
+				elevatorReceiveSocket.receive(elevatorReceivePacket);
+			} catch (IOException e) {
+				System.out.print("IO Exception: likely:");
+				System.out.println("Receive Socket Timed Out.\n" + e);
+				e.printStackTrace();
+				System.exit(1);
+			}
+
+//			runElevator(data[1], data[2]);
+			openCloseDoor(data[3]);
+
+			// send packet for scheduler to know the port this elevator is allocated
+			// sendPacket = new DatagramPacket(data,
+			// receivePacket.getLength(),receivePacket.getAddress(),
+			// receivePacket.getPort());
+		//}
+		 
 	}
 }
 
