@@ -14,11 +14,6 @@ public class Elevator implements Runnable {
 	private static byte down = 0x02;
 	protected int sensor;            // this variable keeps track of the current floor of the elevator
 	
-	
-	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-	public Elevator() {}
-	
 	public Elevator(String name) {
 		NAMING = name;// mandatory for having it actually declared as a thread object
 
@@ -116,7 +111,7 @@ public class Elevator implements Runnable {
 	
 	public void run() {
 		//System.out.println("Enter floor number: ");
-		//floorRequest = 2;
+		floorRequest = 2;
 				//Scanner destination = new Scanner(System.in);
 				
 				//if (destination.nextInt() != 0) {
@@ -124,53 +119,17 @@ public class Elevator implements Runnable {
 				//} else {
 				
 				//}
-				//destination.close();	
+				//destination.close();
+	}
+	
+	
+	
 		
-		byte[] requestElevator = new byte[3];
-		
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
+			
+/* SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 */
 
 
-		 
-		Scanner destination = new Scanner(System.in);
-		int floorRequest=2;
-		int value = destination.nextInt();
-		
-		if ( value != 0) {
-			floorRequest = value;
-		} else {
-			floorRequest=0;
-		}
-		destination.close();
-
-		requestElevator = responsePacket(floorRequest);
-		System.out.println(requestElevator.toString());
-		int lengthOfByteArray = responsePacket(floorRequest).length;
-
-		// allocate sockets, packets
-		try {
-			elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
-					23);
-			System.out.println("sent");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		try {
-			elevatorSendSocket.send(elevatorSendPacket);
-	      } 
-		catch (IOException e) {
-	         e.printStackTrace();
-	         System.exit(1);
-	      }
-		
-		
-		//destination.close();
-			//SCHEDULER --> ELEVATOR (0,motorDirection, motorSpinTime, open OR close door, 0)	 
-
-
-
+/*
 			byte data[] = new byte[5];
 			elevatorReceivePacket = new DatagramPacket(data, data.length);
 
@@ -194,7 +153,6 @@ public class Elevator implements Runnable {
 			// receivePacket.getLength(),receivePacket.getAddress(),
 			// receivePacket.getPort());
 		//}
-		 
-	}
+		 */
 }
 
