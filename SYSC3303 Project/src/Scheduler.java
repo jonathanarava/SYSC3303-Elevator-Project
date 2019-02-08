@@ -38,7 +38,7 @@ public class Scheduler {
 
 	public synchronized void receivedPacket() throws InterruptedException  {
 
-		byte data[] = new byte[4];
+		byte data[] = new byte[5];
 
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		//System.out.println("Server: Waiting for Packet.\n");
@@ -48,7 +48,7 @@ public class Scheduler {
 		try {   
 					//System.out.println("waiting");	
 					schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
-					System.out.println("Received it");
+					System.out.print("Received request from elevator: ");
 					//object.wait();		
 			
 			System.out.println(Arrays.toString(data));
@@ -69,23 +69,26 @@ public class Scheduler {
 			System.exit(1);
 		}
 		
-		byte[] parseThroughData = new byte[4];
+		//byte[] parseThroughData = new byte[4];
 		
-		decodingRequest(parseThroughData);
+		elevatorID = data[1];
+		floorRequest = data[2];
+		currentFloor = data[3];
 
-		byte [] responseByteArray = new byte[4];
-		responseByteArray[0]=0;
+		byte [] responseByteArray = new byte[5];
+		/*responseByteArray[0]=0;
 		responseByteArray[1]=1;
 		responseByteArray[2]=1;
-		responseByteArray[3]=0;
-		/*if(elevatorID == 1) {
-			while(floorRequest != 0) {*/
+		responseByteArray[3]=0;*/
+		if(elevatorID == 1) {
+			while(floorRequest != 0) {
 				floorRequest--;
-				//byte [] responseByteArray = responsePacket();
-				schedulerSendPacket = new DatagramPacket(responseByteArray, schedulerReceivePacket.getLength(),
+				responseByteArray = responsePacket();
+				System.out.println(Arrays.toString(responseByteArray));
+				schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 						schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
-			//}
-		//}
+			}
+		}
 		
 		// or (as we should be sending back the same thing)
 		// System.out.println(received); 
@@ -146,6 +149,7 @@ public class Scheduler {
 		
 		Scheduler packet = new Scheduler();
 		Elevator e = new Elevator("1", object);
+		e.currentFloor(1);
 		for(;;) {
 		Thread t1 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
 			public void run() {
