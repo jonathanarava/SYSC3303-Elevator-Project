@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class ElevatorIntermediate {
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
@@ -38,7 +39,7 @@ public class ElevatorIntermediate {
 	}
 	
 	public void packetHandler() {
-		byte[] requestElevator = new byte[3];
+		byte[] requestElevator = new byte[7];
 		
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
@@ -52,42 +53,57 @@ public class ElevatorIntermediate {
 		
 		//}
 		//destination.close();
-		if(elevatorArray[0].floorRequest==2) {
-			requestElevator = elevatorArray[0].responsePacket(elevatorArray[0].floorRequest);
-			int lengthOfByteArray = elevatorArray[0].responsePacket(elevatorArray[0].floorRequest).length;
-			
-			// allocate sockets, packets
-			try {
-				elevatorSendPacket = new DatagramPacket(requestElevator, lengthOfByteArray, InetAddress.getLocalHost(),
-						369);
-				System.out.print("I've sent\n");
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				System.exit(1);
-				}
-			try {
-				elevatorSendSocket.send(elevatorSendPacket);
-		      } 
-			catch (IOException e) {
-		         e.printStackTrace();
-		         System.exit(1);
-		      }
-			
-			try {        
-				System.out.println("Waiting...\n"); // so we know we're waiting
-				elevatorSendSocket.receive(schedulerReceivePacket);
-				System.out.println("Got it");
-			}
-			
-			catch (IOException e) {
-				System.out.print("IO Exception: likely:");
-				System.out.println("Receive Socket Timed Out.\n" + e);
-				e.printStackTrace();
-				System.exit(1);
-			}
+		requestElevator = elevatorArray[0].responsePacketRequest(1);//elevatorArray[0].floorRequest);
+
+		// allocate sockets, packets
+		try {
+			System.out.print("Sending to scheduler: " + Arrays.toString(requestElevator));
+			elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
+					369);
+			System.out.print("I've sent\n");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
-		else {};
+		try {
+			elevatorSendSocket.send(elevatorSendPacket);
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}			
 	}
+	
+	public synchronized void receivePacket() {
+		//SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door, 0)	 
+
+		byte data[] = new byte[5];
+		elevatorReceivePacket = new DatagramPacket(data, data.length);
+
+		System.out.println("elevator_subsystem: Waiting for Packet.\n");
+
+		try {
+			// Block until a datagram packet is received from receiveSocket.
+			elevatorSendSocket.receive(elevatorReceivePacket);
+			System.out.print("Received from scheduler: ");
+			System.out.println(Arrays.toString(data));
+		} catch (IOException e) {
+			System.out.print("IO Exception: likely:");
+			System.out.println("Receive Socket Timed Out.\n" + e);
+			e.printStackTrace();
+			System.exit(1);
+		}
+
+		elevatorArray[0].runElevator(data[1]);
+		elevatorArray[0].openCloseDoor(data[2]);
+
+		// send packet for scheduler to know the port this elevator is allocated
+		// sendPacket = new DatagramPacket(data,
+		// receivePacket.getLength(),receivePacket.getAddress(),
+		// receivePacket.getPort());
+		//}
+	}
+
 	
 	public static void main(String args[]) throws IOException{//2 arguments: args[0] is the number of Elevators in the system and 
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
@@ -115,13 +131,14 @@ public class ElevatorIntermediate {
 		
 		//go for the argument passed into Elevator Intermediate, create an array for elevators, 
 		for(int i=0; i<createNumElevators; i++) {
-			elevatorArray[i]=new Elevator(Integer.toString(i));
+			elevatorArray[i]=new Elevator(i+1,1);
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
 		
 		while(true) {
 		elevatorHandler.packetHandler();
+		elevatorHandler.receivePacket();
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 

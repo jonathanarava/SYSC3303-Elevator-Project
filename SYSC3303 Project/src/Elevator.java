@@ -8,21 +8,19 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
-	public String name;
-	public int floorRequest;
+	public int name;
+	public int floorRequest = 8; 
 	private static byte hold = 0x00;
 	private static byte up = 0x02;
 	private static byte down = 0x01;
 	protected int sensor;            // this variable keeps track of the current floor of the elevator
 
-	public Object object = new Object();
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 	public Elevator() {}
 
-	public Elevator(String name, Object object, int initiateFloor) {
+	public Elevator(int name, int initiateFloor) {
 		this.name = name;// mandatory for having it actually declared as a thread object
-		this.object = object;
 		sensor = initiateFloor;
 
 		try {
@@ -55,7 +53,7 @@ public class Elevator extends Thread {
 		
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(21);					// elevator
-		requestElevator.write(Byte.valueOf(name));	// elevator id
+		requestElevator.write(name);	// elevator id
 		
 		//request/ update
 		if(requestUpdate == 1) {
@@ -137,11 +135,11 @@ public class Elevator extends Thread {
 		sensor = currentSensor;
 	}
 
-	public synchronized void sendPacket() throws InterruptedException {
+/*	public synchronized void sendPacket() throws InterruptedException {
 		byte[] requestElevator = new byte[8];
 
-		/* ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which elevator), FloorRequest/update, curentFloor, up or down, destFloor, instruction)  ( */
-/*
+		 ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which elevator), FloorRequest/update, curentFloor, up or down, destFloor, instruction)  ( 
+
 		System.out.print("Enter floor number: ");
 		Scanner destination = new Scanner(System.in);
 		int floorRequest=1;
@@ -150,9 +148,9 @@ public class Elevator extends Thread {
 			floorRequest = value;
 		} else {
 			destination.close();
-		}*/
+		}
 		
-		floorRequest = 8; 
+
 		
 		requestElevator = responsePacketRequest(1);
 		//updateElevator = responsePacketRequest(update);
@@ -208,9 +206,9 @@ public class Elevator extends Thread {
 		// receivePacket.getPort());
 		//}
 	}
+*/
 
-
-	public void run() {
+/*	public void run() {
 		//System.out.println("Enter floor number: ");
 		//floorRequest = 2;
 		//Scanner destination = new Scanner(System.in);
@@ -232,7 +230,7 @@ public class Elevator extends Thread {
 		receivePacket();
 
 		//destination.close();
-
+*/
 	}
-}
+
 
