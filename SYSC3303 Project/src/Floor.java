@@ -44,7 +44,7 @@ public class Floor implements Runnable{
 	/* Gets an elevator request as an int(up or down)
 	 * @returns a byte[] array that can be then used to send to the Scheduler
 	 */
-	//[0, floor[69] or elevator[420] id, request(always), up or down(for floor), current floor, command(what is coming back from scheduler), 0]
+	//[Floor[69] or elevator[21] id, floorID(whichFlooramI), request(always), current floor of the elevator, up or down(for floor), Destination(null), command(what is coming back from scheduler)]
 	public byte[] responsePacket() {
 		// creates the byte array according to the required format in this case 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();

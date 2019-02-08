@@ -39,7 +39,7 @@ public class FloorIntermediate {
 	}
 
 	public void packetHandler() {
-		requestFloor = new byte[6];
+		requestFloor = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
