@@ -6,7 +6,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({})
 public class AllTests {
 
-	
 	// Test Elevator class
 
 	// Test Floor class
