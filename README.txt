@@ -3,15 +3,15 @@ SYSC 3303 - Project Group 5 - Iteration 1
 Group members and responsibilities:
 
 
-Jonathan Arava: JUnit Testing, Diagrams, Elevator Class, ElevatorIntermidiate Class
+Jonathan Arava: JUnit Testing, Diagrams, Elevator Class, ElevatorIntermidiate Class, FloorIntermidiate Class
 
-Viktor Dimitrov: JUnit Testing, Diagrams, Elevator Class, ElevatorIntermidiate Class
+Viktor Dimitrov: JUnit Testing, Diagrams, Elevator Class, ElevatorIntermidiate Class, FloorIntermidiate Class
 
-Calvin Lam: Scheduler Class, Diagrams, ElevatorIntermidiate Class
+Calvin Lam: Scheduler Class, Diagrams, ElevatorIntermidiate Class, FloorIntermidiate Class
 
-Shaviyo Marasinghe: Elevator Class, Floor Class, ElevatorIntermidiate Class
+Shaviyo Marasinghe: Elevator Class, Floor Class, ElevatorIntermidiate Class, FloorIntermidiate Class
 
-Brian Philip: Elevator Class, Floor Class, ElevatorIntermidiate Class
+Brian Philip: Elevator Class, Floor Class, ElevatorIntermidiate Class, FloorIntermidiate Class
 
 The above shows what each member contributed to significantly, but every member contributed passively in the programming of all classes.
 
@@ -36,16 +36,21 @@ Elevator.java :
 	- Multiple different threads of the Elevator will be created in the ElevatorIntermediate Class
 	- Has getters and setters that the ElevatorIntermediate class can utilize
 
-Floor.java (Incomplete):
-	- Not in this iteration, but we created a skeleton to help for further iterations
-	- It makes an array of floors for each Elevator Class and sets the bounds for the elevator to go up or down
+Floor.java:
+	- This is the actual Floor
+	- Multiple different threads of the Floor will be created in the FloorIntermediate Class
+	- Has getters and setters that the FloorIntermediate class can utilize
 
-FloorIntermidiate.java(Incomplete):
+FloorIntermidiate.java:
 	- Similar to ElevatorIntermediate, this will take charge of threading for multiple Floor Classes
+	- Has input perameters on the number of Floors required for the system
+	- Handles packets sending/receiving to the scheduler
+	- Information to be sent to the Scheduler is taken by the Floor threads
 
 Setup Instructions:
 	1. Run Scheduler.java
-	2. Run ElevatorIntermidiate.java with 1 as a paramater (in the future more elevators can be implemented by changing the parameter)
+	2. Run ElevatorIntermidiate.java and FloorIntermidiate.java with 1 as a paramater for both (the order of running these two does not matter)
+	3. View three console windows for Scheduler.java, ElevatorIntermidiate.java, and FloorIntermidiate.java
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
