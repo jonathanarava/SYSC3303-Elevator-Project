@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Elevator extends Thread {
 	public int name;
-	public int floorRequest = 8; 
+	public int floorRequest = 3; 
 	private static byte hold = 0x00;
 	private static byte up = 0x02;
 	private static byte down = 0x01;

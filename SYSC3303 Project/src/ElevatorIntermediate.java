@@ -57,10 +57,9 @@ public class ElevatorIntermediate {
 
 		// allocate sockets, packets
 		try {
-			System.out.print("Sending to scheduler: " + Arrays.toString(requestElevator));
+			System.out.println("\nSending to scheduler: " + Arrays.toString(requestElevator));
 			elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
 					369);
-			System.out.print("I've sent\n");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -80,7 +79,7 @@ public class ElevatorIntermediate {
 		byte data[] = new byte[5];
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
 
-		System.out.println("elevator_subsystem: Waiting for Packet.\n");
+		//System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.

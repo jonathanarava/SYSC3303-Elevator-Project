@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class Scheduler {
 	
@@ -18,7 +19,9 @@ public class Scheduler {
 	public int elevatorID;
 	public int floorRequest;
 	public int currentFloor;
-
+	public int elevatorOrFloor;
+	public int destFloor;
+	
 	public Scheduler() {
 		try {
 			schedulerSocetSendElevator = new DatagramSocket();
@@ -36,7 +39,7 @@ public class Scheduler {
 
 	public void receivedPacket() throws InterruptedException  {
 
-		byte data[] = new byte[4];
+		byte data[] = new byte[7];
 
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		//System.out.println("Server: Waiting for Packet.\n");
@@ -45,8 +48,7 @@ public class Scheduler {
 		try {   
 			System.out.println("waiting");	
 			schedulerSocketReceiveElevator.receive(schedulerReceivePacket);
-				System.out.println("Received it");
-				System.out.println(data.toString());
+				System.out.println("Request from elevator: " + Arrays.toString(data));
 
 				//schedulerSocketReceiveElevator.close();
 				//schedulerSocetSendElevator.close()
@@ -65,23 +67,24 @@ public class Scheduler {
 			System.exit(1);
 		}
 		
-		byte[] parseThroughData = new byte[4];
-		
-		decodingRequest(parseThroughData);
+		elevatorOrFloor = data[0];
+		elevatorID = data[1];
+		floorRequest = data[2];
+		currentFloor = data[3];
+		destFloor = data[5];
 
-		byte [] responseByteArray = new byte[4];
-		responseByteArray[0]=0;
-		responseByteArray[1]=1;
-		responseByteArray[2]=1;
-		responseByteArray[3]=0;
-		/*byte [] responseByteArray = responsePacket();
-		if(elevatorID == 1) {
-			while(floorRequest != 0) {
-				floorRequest--;*/
-				schedulerSendPacket = new DatagramPacket(responseByteArray, schedulerReceivePacket.getLength(),
+		byte [] responseByteArray = new byte[5];
+		if (elevatorOrFloor == 21) {
+			if(elevatorID == 1) {
+				if(currentFloor != destFloor) {
+				responseByteArray = responsePacket(currentFloor, destFloor);
+				System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+				schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 						schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
 			//}
-		//}
+			}
+			}
+		}
 		
 		// or (as we should be sending back the same thing)
 		// System.out.println(received); 
@@ -89,7 +92,7 @@ public class Scheduler {
 		// Send the datagram packet to the client via the send socket. 
 		try {
 			schedulerSocetSendElevator.send(schedulerSendPacket);
-			System.out.println("Sent");
+			//System.out.println("Sent");
 		} catch (IOException e) {
 			System.out.print("hi");
 			e.printStackTrace();
@@ -99,41 +102,35 @@ public class Scheduler {
 		//System.out.println();
 	}
 	
-	public void decodingRequest(byte[] data) {
-		
-		elevatorID = data[1];
-		floorRequest = data[2];
-		currentFloor = data[3];
-		
-	}
-	
-	public  byte[] responsePacket() {
+	public  byte[] responsePacket(int currentFloor1, int floorRequest1) {
 
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);
 		
-		if((currentFloor - floorRequest) <0) {
-			requestElevator.write(1);
+		if((floorRequest1 - currentFloor1) < 0) {
+			requestElevator.write(1);		//downwards
 			requestElevator.write(0);
-		} else if((currentFloor - floorRequest) >0) {
-			requestElevator.write(2);
+		} else if((floorRequest1-currentFloor1) > 0) {
+			requestElevator.write(2);		//upwards
 			requestElevator.write(0);
 		} else {
 			requestElevator.write(0);    //motorDirection
-			requestElevator.write(0); 	//open or Close
+			requestElevator.write(1); 	//open or Close
 		}
 		
-		if((currentFloor-floorRequest) != 0) {
+		if((floorRequest1-currentFloor1) != 0) {
 			requestElevator.write(1);
 		} else {
 			requestElevator.write(0);    //MotorSpin Time
 		}
-		
+		requestElevator.write(0);
+		 // 0,2,0,1,0 (0, direction, openClose, motorSpin,0)
 		
 		return requestElevator.toByteArray();
 
 	}
+
 
 	/*void stopListening() {
 		isListen=false;
