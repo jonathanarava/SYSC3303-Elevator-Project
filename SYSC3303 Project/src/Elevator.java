@@ -107,32 +107,28 @@ public class Elevator extends Thread {
 
 	public int runElevator(byte motorDirection) {
 		// sensor = currentFloor; //sensor is at current floor
-		int time = 1;
 		if (motorDirection == up || motorDirection == down) {
-			while (time > 0) {
-				try {
-					System.out.println("current floor: " + sensor); // sensor = current floor
-					Thread.sleep(1000);
-					time--;
-					if (motorDirection == up) {
-						System.out.println("Elevator going up");
-						sensor++; // increment the floor
-						currentFloor(sensor); // updates the current floor
-					} else if (motorDirection == down) {
-						System.out.println("Elevator going down");
-						sensor--; // decrements the floor
-						currentFloor(sensor); // updates the current floor
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			try {
+				System.out.println("current floor: " + sensor); // sensor = current floor
+				Thread.sleep(1000);
+				if (motorDirection == up) {
+					System.out.println("Elevator going up");
+					sensor++; // increment the floor
+					currentFloor(sensor); // updates the current floor
+				} else if (motorDirection == down) {
+					System.out.println("Elevator going down");
+					sensor--; // decrements the floor
+					currentFloor(sensor); // updates the current floor
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		} else if (motorDirection == hold) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
 		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
-										// floor
+		// floor
 	}
 
 	// sets Current location of elevator through this setter

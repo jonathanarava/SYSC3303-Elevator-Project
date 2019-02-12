@@ -68,6 +68,7 @@ public class Scheduler {
 			System.exit(1);
 		}
 
+		
 		elevatorOrFloor = data[0];
 		elevatorID = data[1];
 		floorRequest = data[2];
@@ -106,6 +107,12 @@ public class Scheduler {
 
 	public byte[] responsePacket(int currentFloor1, int floorRequest1) {
 
+		/*
+		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
+		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
+		 * instruction) (
+		 */
+		
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(0);

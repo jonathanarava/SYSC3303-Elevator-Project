@@ -23,7 +23,7 @@ public class Floor implements Runnable {
 	// This String List will contain ALL of the real time input information that is
 	// Given to the system.
 	// List index
-
+	public boolean schedulerInstruction;
 	public int sendPort_num;
 	public int elevatorLocation;
 	public static int NAMING;
@@ -53,14 +53,21 @@ public class Floor implements Runnable {
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(0); // ********** WHITE SPACE *****************
-		requestElevator.write(69); // To Say That I am a floor(69) elevator has ID(21)
+		requestElevator.write(69);  // To Say That I am a floor(69) elevator has ID(21)
+		requestElevator.write(69);
 		requestElevator.write(0); // Floor Will only send requests to Scheduler:
-		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(NAMING); // Current Floor: Which Floor is sending this packet
-		requestElevator.write(0); // ********* WHITE SPACE **************
+		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
+		requestElevator.write(0); // Destination floor (null)
+		requestElevator.write(0); // scheduler instruction
 
 		return requestElevator.toByteArray();
+	}
+	
+	public void LEDOnOrOff(byte up_or_down, ) {
+		while (schedulerInstruction != true) {
+			if (NAMING =)
+		}
 	}
 
 	/*
