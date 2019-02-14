@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Scheduler {
 
@@ -21,6 +22,10 @@ public class Scheduler {
 	public int currentFloor;
 	public int elevatorOrFloor;
 	public int destFloor;
+	
+	public static LinkedList<Integer> ElevatorList = new LinkedList<Integer>();
+	public static final int limit = 20;
+	
 
 	public Scheduler() {
 		try {
@@ -62,7 +67,7 @@ public class Scheduler {
 		}
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -74,35 +79,60 @@ public class Scheduler {
 		floorRequest = data[2];
 		currentFloor = data[3];
 		destFloor = data[5];
+		
 
 		byte[] responseByteArray = new byte[5];
+		
+
 		if (elevatorOrFloor == 21) {
 			if (elevatorID == 1) {
+				if (floorRequest == 2) { // if its a new request
+					addToListQueue(destFloor);
+				}
+				
 				if (currentFloor != destFloor) {
 					responseByteArray = responsePacket(currentFloor, destFloor);
 					System.out.println(
 							"Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 					schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 							schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
-					// }
+					
+					try {
+						schedulerSocetSendElevator.send(schedulerSendPacket);
+						// System.out.println("Sent");
+					} catch (IOException e) {
+						System.out.print("hi");
+						e.printStackTrace();
+						System.exit(1);
+					}
+				} else if (currentFloor == destFloor) {
+					System.out.println("waiting");
+					removeFromListQueue();
 				}
 			}
 		}
-
-		// or (as we should be sending back the same thing)
-		// System.out.println(received);
-
-		// Send the datagram packet to the client via the send socket.
-		try {
-			schedulerSocetSendElevator.send(schedulerSendPacket);
-			// System.out.println("Sent");
-		} catch (IOException e) {
-			System.out.print("hi");
-			e.printStackTrace();
-			System.exit(1);
+	}
+	
+	public synchronized void addToListQueue(int destFloor2) throws InterruptedException {
+		synchronized(this) {
+			while (ElevatorList.size()==limit) {
+				wait();
+				System.out.println("Request already made. wait for elevator to complete request");
+			}
+			ElevatorList.add(destFloor2);
+			notifyAll();
 		}
-
-		// System.out.println();
+	}
+	
+	public synchronized void removeFromListQueue() throws InterruptedException {
+		synchronized(this) {
+			while (ElevatorList.size()==0) {
+				wait();
+				System.out.println("No recent requests made by any elevator");
+			}
+			ElevatorList.remove();
+			notifyAll();
+		}
 	}
 
 	public byte[] responsePacket(int currentFloor1, int floorRequest1) {
