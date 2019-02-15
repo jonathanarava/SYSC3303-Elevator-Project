@@ -134,7 +134,7 @@ public class ElevatorIntermediate {
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i + 1, 1);
+			elevatorArray[i] = new Elevator(i, 0); // i names the elevator, 0 initializes the floor it starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}

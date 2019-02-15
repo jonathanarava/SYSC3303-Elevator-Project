@@ -54,8 +54,8 @@ public class Floor implements Runnable {
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(69);  // To Say That I am a floor(69) elevator has ID(21)
-		requestElevator.write(69);
-		requestElevator.write(0); // Floor Will only send requests to Scheduler:
+		requestElevator.write(NAMING); // floor ID
+		requestElevator.write(0); // request/update. not used by floor
 		requestElevator.write(NAMING); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)
