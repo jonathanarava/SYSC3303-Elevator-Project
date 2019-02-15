@@ -1,0 +1,16 @@
+Data Structure:
+-[0]Packet ID: floor (69) or elevator (21)
+-[1]element #: floor[0], floor[1] -> 0 and 1, or elevator[1], elevator [2] -> 1 and 2
+-[2]request or status update: floor is always request, elevator can be status update or request
+-[3]elevator floor#: for status updates
+-[4]floor request: up or down
+-[5]command: sent from the scheduler
+
+[Floor[69] or elevator[21] id, floor#(whichFlooramI), request or Status update(always),current floor of the elevator, floor request (up/down), Destination Request(null),command(what is coming back from scheduler)]
+
+
+
+
+NOTES:
+-scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
+	-TO DO: receive packets from the intermediate classes on startup to initialize those variables
