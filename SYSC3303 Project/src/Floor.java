@@ -49,13 +49,18 @@ public class Floor implements Runnable {
 	// [Floor[69] or elevator[21] id, floorID(whichFlooramI), request(always),
 	// current floor of the elevator, up or down(for floor), Destination(null),
 	// command(what is coming back from scheduler)]
-	public byte[] responsePacket() {
+	public byte[] responsePacket(int request) {
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(69);  // To Say That I am a floor(69) elevator has ID(21)
 		requestElevator.write(NAMING); // floor ID
-		requestElevator.write(0); // request/update. not used by floor
+		if (request == 1) {
+			requestElevator.write(1); // request/update. not used by floor
+		} else {
+			requestElevator.write(0); // request/update. not used by floor
+		}
+		
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)

@@ -81,13 +81,14 @@ public class Scheduler {
 		destFloor = data[5];
 		
 
-		byte[] responseByteArray = new byte[5];
+		byte[] responseByteArray = new byte[7];
 		
 
 		if (elevatorOrFloor == 21) {
-			if (elevatorID == 1) {
+			if (elevatorID == 0) {
 				if (floorRequest == 2) { // if its a new request
 					addToListQueue(destFloor,elevatorID);
+					removeFromListQueue(elevatorID);
 				}
 				
 				if (currentFloor != destFloor) {
@@ -106,30 +107,30 @@ public class Scheduler {
 					}
 				} else if (currentFloor == destFloor) {
 					System.out.println("waiting");
-					removeFromListQueue();
+					
 				}
 			}
 		}
 	}
 	
-	public synchronized void addToListQueue(int destFloor2, int elevatorID) throws InterruptedException {
+	public synchronized void addToListQueue(int destFloor2, int elevatorID1) throws InterruptedException {
 		synchronized(this) {
-			while (ElevatorList[elevatorID].size()==limit) {
+			while (ElevatorList[elevatorID1].size()==limit) {
 				wait();
 				System.out.println("Request already made. wait for elevator to complete request");
 			}
-			ElevatorList[elevatorID].add(destFloor2);
+			ElevatorList[elevatorID1].add(destFloor2);
 			notifyAll();
 		}
 	}
 	
-	public synchronized void removeFromListQueue() throws InterruptedException {
+	public synchronized void removeFromListQueue(int elevatorID1) throws InterruptedException {
 		synchronized(this) {
-			while (ElevatorList[elevatorID].size()==0) {
+			while (ElevatorList[elevatorID1].size()==0) {
 				wait();
 				System.out.println("No recent requests made by any elevator");
 			}
-			ElevatorList[elevatorID].remove();
+			ElevatorList[elevatorID1].remove();
 			notifyAll();
 		}
 	}
@@ -144,25 +145,23 @@ public class Scheduler {
 		
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(0);
+		requestElevator.write(54);  // scheduler
+		requestElevator.write(0);   // id
+		requestElevator.write(0);	//request/update
+		requestElevator.write(0);	// current floor
+		requestElevator.write(0);	//up of down
+		requestElevator.write(0);	// dest floor 
 
 		if ((floorRequest1 - currentFloor1) < 0) {
 			requestElevator.write(1); // downwards
-			requestElevator.write(0);
+			//requestElevator.write(0);
 		} else if ((floorRequest1 - currentFloor1) > 0) {
 			requestElevator.write(2); // upwards
-			requestElevator.write(0);
+			//requestElevator.write(0);
 		} else {
-			requestElevator.write(0); // motorDirection
-			requestElevator.write(1); // open or Close
+			requestElevator.write(0); // motorDirection. hold
+			//requestElevator.write(1); // open or Close
 		}
-
-		if ((floorRequest1 - currentFloor1) != 0) {
-			requestElevator.write(1);
-		} else {
-			requestElevator.write(0); // MotorSpin Time
-		}
-		requestElevator.write(0);
 		// 0,2,0,1,0 (0, direction, openClose, motorSpin,0)
 
 		return requestElevator.toByteArray();
