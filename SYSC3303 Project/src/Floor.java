@@ -56,7 +56,7 @@ public class Floor implements Runnable {
 		requestElevator.write(69);  // To Say That I am a floor(69) elevator has ID(21)
 		requestElevator.write(NAMING); // floor ID
 		requestElevator.write(0); // request/update. not used by floor
-		requestElevator.write(NAMING); // Current Floor: Which Floor is sending this packet
+		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)
 		requestElevator.write(0); // scheduler instruction
