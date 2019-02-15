@@ -14,3 +14,4 @@ Data Structure:
 NOTES:
 -scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
 	-TO DO: receive packets from the intermediate classes on startup to initialize those variables
+		-change variable names to numElevators, numFloors
