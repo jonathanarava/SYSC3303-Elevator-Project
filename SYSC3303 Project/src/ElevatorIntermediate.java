@@ -78,7 +78,7 @@ public class ElevatorIntermediate {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
-		byte data[] = new byte[5];
+		byte data[] = new byte[7];
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
 
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
@@ -95,8 +95,8 @@ public class ElevatorIntermediate {
 			System.exit(1);
 		}
 
-		elevatorArray[0].runElevator(data[1]);
-		elevatorArray[0].openCloseDoor(data[2]);
+		elevatorArray[0].runElevator(data[6]);
+		//elevatorArray[0].openCloseDoor(data[2]);
 
 		// send packet for scheduler to know the port this elevator is allocated
 		// sendPacket = new DatagramPacket(data,

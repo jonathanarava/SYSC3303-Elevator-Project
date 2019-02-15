@@ -64,11 +64,11 @@ public class Floor implements Runnable {
 		return requestElevator.toByteArray();
 	}
 	
-	public void LEDOnOrOff(byte up_or_down, ) {
+	/*public void LEDOnOrOff(byte up_or_down, ) {
 		while (schedulerInstruction != true) {
 			if (NAMING =)
 		}
-	}
+	}*/
 
 	/*
 	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are

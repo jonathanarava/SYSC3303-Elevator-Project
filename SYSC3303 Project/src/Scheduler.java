@@ -23,7 +23,7 @@ public class Scheduler {
 	public int elevatorOrFloor;
 	public int destFloor;
 	
-	public static LinkedList<Integer> ElevatorList = new LinkedList<Integer>();
+	public LinkedList<Integer>[] ElevatorList = new LinkedList[4];
 	public static final int limit = 20;
 	
 
@@ -87,7 +87,7 @@ public class Scheduler {
 		if (elevatorOrFloor == 21) {
 			if (elevatorID == 1) {
 				if (floorRequest == 2) { // if its a new request
-					addToListQueue(destFloor);
+					addToListQueue(destFloor,elevatorID);
 				}
 				
 				if (currentFloor != destFloor) {
@@ -101,7 +101,6 @@ public class Scheduler {
 						schedulerSocetSendElevator.send(schedulerSendPacket);
 						// System.out.println("Sent");
 					} catch (IOException e) {
-						System.out.print("hi");
 						e.printStackTrace();
 						System.exit(1);
 					}
@@ -113,24 +112,24 @@ public class Scheduler {
 		}
 	}
 	
-	public synchronized void addToListQueue(int destFloor2) throws InterruptedException {
+	public synchronized void addToListQueue(int destFloor2, int elevatorID) throws InterruptedException {
 		synchronized(this) {
-			while (ElevatorList.size()==limit) {
+			while (ElevatorList[elevatorID].size()==limit) {
 				wait();
 				System.out.println("Request already made. wait for elevator to complete request");
 			}
-			ElevatorList.add(destFloor2);
+			ElevatorList[elevatorID].add(destFloor2);
 			notifyAll();
 		}
 	}
 	
 	public synchronized void removeFromListQueue() throws InterruptedException {
 		synchronized(this) {
-			while (ElevatorList.size()==0) {
+			while (ElevatorList[elevatorID].size()==0) {
 				wait();
 				System.out.println("No recent requests made by any elevator");
 			}
-			ElevatorList.remove();
+			ElevatorList[elevatorID].remove();
 			notifyAll();
 		}
 	}
