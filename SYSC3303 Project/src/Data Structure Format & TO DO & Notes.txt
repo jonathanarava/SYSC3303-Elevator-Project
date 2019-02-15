@@ -9,9 +9,25 @@ Data Structure:
 [Floor[69] or elevator[21] id, floor#(whichFlooramI), request or Status update(always),current floor of the elevator, floor request (up/down), Destination Request(null),command(what is coming back from scheduler)]
 
 
+Naming Convention:
+-ALL CAPS: should be constants
+-firstLowerCaseThenFirstLetterOfEachUpperCase: 
+
 
 
 NOTES:
--scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
-	-TO DO: receive packets from the intermediate classes on startup to initialize those variables
-		-change variable names to numElevators, numFloors
+General:
+-add/ set constants that are shared by all classes (copy/paste works just fine as long as we update all classes every time)
+
+-set constants:
+	-travel time between floors: 1 second right?
+	-stop time: 5 seconds right? (including doors opening and closing)
+
+
+Scheduling Specific:
+	-scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
+		-TO DO: receive packets from the intermediate classes on startup to initialize those variables
+			-change variable names to numElevators, numFloors
+	-stops: currently being fulfilled (current direction and next; does not include those that have already been missed)
+	-requests: not going to be fulfilled in the current round (ie. already missed that floor for the current direction)	
+
