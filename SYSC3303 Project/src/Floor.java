@@ -12,6 +12,17 @@ import java.util.Scanner;
  */
 public class Floor implements Runnable {
 
+	private static final byte HOLD = 0x00;//elevator is in hold state
+	private static final byte UP = 0x02;//elevator is going up
+	private static final byte DOWN = 0x01;//elevator is going down
+	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
+	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
+	private static final int SCHEDULER_ID=__;//for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN=1;//the door is open when ==1
+	private static final int DOOR_DURATION=4;//duration that doors stay open for
+	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
+	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
+	
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an
@@ -49,17 +60,19 @@ public class Floor implements Runnable {
 	// [Floor[69] or elevator[21] id, floorID(whichFlooramI), request(always),
 	// current floor of the elevator, up or down(for floor), Destination(null),
 	// command(what is coming back from scheduler)]
-	public byte[] responsePacket(int request) {
+	//public byte[] responsePacket(int request) {
+	public byte[] responsePacket(){
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(69);  // To Say That I am a floor(69) elevator has ID(21)
+		requestElevator.write(FLOOR);  // To Say That I am a floor(69) elevator has ID(21)
 		requestElevator.write(NAMING); // floor ID
-		if (request == 1) {
+		requestElevator.write(REQUEST); // request/update. floor only makes requests
+		/*if (request == REQUEST) {
 			requestElevator.write(1); // request/update. not used by floor
 		} else {
 			requestElevator.write(0); // request/update. not used by floor
-		}
+		}*/
 		
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
@@ -103,7 +116,7 @@ public class Floor implements Runnable {
 		// fileReader(String fullFile);
 		// elevatorRequestFromFile(String request);
 
-		up_or_down = 2; // Up request to start out with
+		up_or_down = UP; // Up request to start out with
 
 	}
 	/*
@@ -119,7 +132,11 @@ public class Floor implements Runnable {
 	 * 
 	 * while (true) {
 	 * 
-	 * // FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, up_or_down, 0)
+	 * // FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, 
+	 
+	 
+	 
+	 , 0)
 	 * //requestElevator = responsePacket(floorRequest); byte[] requestElevator =
 	 * new byte[7]; requestElevator = responsePacket(); int lengthOfByteArray =
 	 * requestElevator.length;
