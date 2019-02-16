@@ -28,7 +28,7 @@ General:
 	-stop time: 5 seconds right? (including doors opening and closing)
 	from scheduler: 
 	DOOR_OPEN=4;
-
+-HOLD compared with STOP states: HOLD is an elevator state (no requests, no stops) and STOP is a motor State
 
 Scheduling Specific:
 	-scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
