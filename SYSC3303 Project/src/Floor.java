@@ -23,6 +23,7 @@ public class Floor implements Runnable {
 	private static final int DOOR_DURATION=4;//duration that doors stay open for
 	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
+	private static final int FLOOR = 69;
 	
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided

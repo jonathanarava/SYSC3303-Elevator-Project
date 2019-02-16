@@ -95,7 +95,7 @@ public class Elevator extends Thread {
 			msg = "Doors are open.";
 			System.out.println(msg);
 			try {
-				int i = ;
+				int i = 4 ;
 				while (i != 0) {
 					System.out.format("Seconds until elevator door closes: %d second \n", i);
 					i--;
