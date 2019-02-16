@@ -22,18 +22,28 @@ public class Scheduler {
 
 	// Declare timing constants
 	public static final int TIME_PER_FLOOR=1;//time for the elevator to travel per floor
-	public static final int DOOR_OPEN=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
+	public static final int DOOR_DURATION=4;//time that taken for the door to open and close when given the open command (door closes automatically after alloted time)
 
 
 	//Declare Motor States:
-	public static final ___ HOLD=__;
+	/*public static final ___ HOLD=__;
 	public static final ___ UP=__;
 	public static final ___ DOWN=__;
 	public static final ___ ELEVATOR_ID=___;
 	public static final ___ FLOOR_ID=___;
 	public static final ___ SCHEDULER_ID=___;
 	public static final ___ STATUS=___;
-	public static final ___ REQUEST=___;
+	public static final ___ REQUEST=___;*/
+	private static final byte HOLD = 0x00;//elevator is in hold state
+	private static final byte UP = 0x02;//elevator is going up
+	private static final byte DOWN = 0x01;//elevator is going down
+	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
+	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
+	private static final int SCHEDULER_ID=54;//for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN=1;//the door is open when ==1
+	//private static final int DOOR_DURATION=4;//duration that doors stay open for
+	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
+	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 
 	//scheduling alogrithm variable declaration
 	public static int elevatorCurrentFloor[];//=new int[createNumElevators];
@@ -77,7 +87,7 @@ public class Scheduler {
 	//1=request, 2=status update
 	public static int elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
 	public static int stopRequest;//=packetData[]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
-	public static int floorRequesting;
+	//public static int floorRequesting;
 
 	public static int [] responseTime;//response time of individual elevators to got to a floor request
 	public static int indexOfFastestElevator;//index of array for which elevator is fastest
@@ -203,7 +213,7 @@ public class Scheduler {
 		packetIsStatus=packetData[2];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
 		//1=request, 2=status update
 		elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
-		stopRequest=packetData[]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
+		stopRequest=packetData[5]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
 		//int floorRequesting;
 
 		//int [] responseTime;//response time of individual elevators to got to a floor request
@@ -232,20 +242,20 @@ public class Scheduler {
 			packetAddress=schedulerReceivePacket.getAddress();
 			packetPort=schedulerReceivePacket.getPort();		
 
-			packetElementIndex=packetData[___];//index to find/ retrieve specific element from our array of elevators and floors
+			packetElementIndex=packetData[1];//index to find/ retrieve specific element from our array of elevators and floors
 			//should have been the name given to threads' constructor at creation
 			//
-			packetSentFrom=packetData[___];//elevator, floor, or other(testing/ error)
+			packetSentFrom=packetData[0];//elevator, floor, or other(testing/ error)
 			//0=? 1=? 2=?
-			packetIsStatus=packetData[___];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
+			packetIsStatus=packetData[2];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
 			//
-			elevatorLocation=packetData[__];//where the elevator is currently located (sensor information sent from elevator as status update)
-			stopRequest=packetData[___];//a request to stop at a given floor (-1 if no request)
+			elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
+			stopRequest=packetData[5];//a request to stop at a given floor (-1 if no request)
 
-			if (packetSentFrom==ELEVATOR_ID)) {//if it is an elevator
+			if (packetSentFrom==ELEVATOR_ID) {//if it is an elevator
 				//elevatorNum=__;//which elevator it is in 
 				//status or request
-				if (packetIsStatus==STATUS) {//status update from Elevator
+				if (packetIsStatus==UPDATE) {//status update from Elevator
 					//elevatorLocation=packetData[___];//status/ floor number from sensor in Elevator
 					//compare floor number with next stop of the elevator (==nextStop variable)
 					//if (floorStatus==nextStop[packetElementIndex])
@@ -465,13 +475,13 @@ public class Scheduler {
 		//elevatorLowestRequestFloor
 		//elevatorHighestRequestFloor
 		//TIME_PER_FLOOR
-		//DOOR_OPEN
+		//DOOR_DURATION
 		//UP
 		//DOWN
 		//HOLD
 		int [] responseTime=new int[numElevators];
-		int distance;//number of floors traveled before arrivating at the destination 
-		int stops;//number of stops that need to be made before the destination (floor that's making the request)
+		int distance=0;//number of floors traveled before arrivating at the destination 
+		int stops=0;//number of stops that need to be made before the destination (floor that's making the request)
 		int highest;//highest requested
 		int lowest;//lowest requested
 		int current;//current floor
@@ -542,14 +552,14 @@ public class Scheduler {
 				//catastrophic error
 				System.out.println("mismatch between motor status variables, status is "+ elevatorStatus[i]+" should only be HOLD: "+HOLD+" , UP: "+ UP+" , and DOWN: "+DOWN);
 			}
-			responseTime[i]=distance*TIME_PER_FLOOR+stops*DOOR_OPEN;
-			return responseTime;
+			responseTime[i]=distance*TIME_PER_FLOOR+stops*DOOR_DURATION;
+			
 		}
-
+		return responseTime;
 
 	}
 	public static int stopsBetween(LinkedList <Integer> floors, int current,int destination, int direction) {//calculates how many stops are between the destination and current floor for use in responseTime calculation
-		int stops;
+		int stops=0;
 		if (direction==UP) {
 			for (int i=current;i<destination;i++) {
 				if (floors.contains(current)) {
