@@ -18,10 +18,16 @@ Naming Convention:
 NOTES:
 General:
 -add/ set constants that are shared by all classes (copy/paste works just fine as long as we update all classes every time)
-
+	int or byte HOLD=___, UP=___, DOWN=___
+	ELEVATOR_ID=___, FLOOR_ID=___, SCHEDULER_ID=___
+	
 -set constants:
 	-travel time between floors: 1 second right?
+	from scheduler: 
+	TIME_PER_FLOOR=1;
 	-stop time: 5 seconds right? (including doors opening and closing)
+	from scheduler: 
+	DOOR_OPEN=4;
 
 
 Scheduling Specific:
