@@ -4,6 +4,7 @@
 //most logic for changing of states
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class Scheduler {
@@ -210,6 +211,8 @@ public class Scheduler {
 			try {// Block until a datagram packet is received from receiveSocket.        
 				//System.out.println("Waiting..."); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket);
+				System.out.println("Recieving from Elevator: ");
+				System.out.println(Arrays.toString(data));
 			} 
 			catch (IOException e) {
 				System.out.print("IO Exception: likely:");
@@ -219,7 +222,7 @@ public class Scheduler {
 			}
 			
 			//variable definitions used to unpack/ coordinate/ allocate actions
-			  byte [] packetData=schedulerReceivePacket.getData();		
+			  byte [] packetData=schedulerReceivePacket.getData();	
 			  int packetElementIndex=packetData[1];//index to find/ retrieve specific element from our array of elevators and floors
 			//should have been the name given to threads' constructor at creation
 			//
@@ -473,6 +476,28 @@ public class Scheduler {
 			}
 		}
 	}
+			
+/*	schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+					schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
+		//}
+		
+	
+	
+	// or (as we should be sending back the same thing)
+	// System.out.println(received); 
+
+	// Send the datagram packet to the client via the send socket. 
+	try {
+		schedulerSendSocket.send(schedulerSendPacket);
+		System.out.println("Sent");
+	} catch (IOException e) {;
+		e.printStackTrace();
+		System.exit(1);
+		}
+	}
+}
+	*/
+	
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {//destination is the floor that is making the request
 
 		//elevatorLowestRequestFloor
