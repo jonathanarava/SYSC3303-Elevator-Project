@@ -143,7 +143,7 @@ public class Scheduler {
 		}
 
 		//allocate receive packet
-		byte data[] = new byte[100];
+		byte data[] = new byte[7];
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		packetAddress=schedulerReceivePacket.getAddress();
 		packetPort=schedulerReceivePacket.getPort();
