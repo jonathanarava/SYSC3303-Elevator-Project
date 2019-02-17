@@ -76,25 +76,10 @@ public class Scheduler {
 	public static int numFloors;
 
 
-	//variable definitions used to unpack/ coordinate/ allocate actions
-	public static byte [] packetData=schedulerReceivePacket.getData();		
-	public static int packetElementIndex=packetData[1];//index to find/ retrieve specific element from our array of elevators and floors
-	//should have been the name given to threads' constructor at creation
-	//
-	public static int packetSentFrom=packetData[0];//elevator, floor, or other(testing/ error)
-	//21=elevator, 69=floor
-	public static int packetIsStatus=packetData[2];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
-	//1=request, 2=status update
-	public static int elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
-	public static int stopRequest;//=packetData[]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
-	//public static int floorRequesting;
-
-	public static int [] responseTime;//response time of individual elevators to got to a floor request
-	public static int indexOfFastestElevator;//index of array for which elevator is fastest
-	public static int temp;//temporary for finding the fastest response time
+	
 
 	public static void main(String args[]){//2 arguments: args[0] is the number of Elevators in the system and 
-
+		
 
 		//SINCE THE INTERMEDIATE CLASSES NOW START THE THREADS AN INITIAL CONNECTION PACKET FROM EACH IS NEEDED
 		//WILL PASS THE NUMBER OF ELEVATORS AND FLOORS IN THE SYSTEM IN THE INITIAL CONNECTION
@@ -145,8 +130,7 @@ public class Scheduler {
 		elevatorHighestRequestFloor=new int [numElevators];//the floor that the elevator will go down to once the requests going down have been met to then go up again
 		elevatorLowestRequestFloor=new int [numElevators];//the floor that the elevator will go up to once down requests have been fulfilled
 
-		packetAddress=schedulerReceivePacket.getAddress();
-		packetPort=schedulerReceivePacket.getPort();
+		
 
 		//allocation of Datagram Sockets
 		//allocate receive socket
@@ -161,6 +145,8 @@ public class Scheduler {
 		//allocate receive packet
 		byte data[] = new byte[100];
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
+		packetAddress=schedulerReceivePacket.getAddress();
+		packetPort=schedulerReceivePacket.getPort();
 		//System.out.println("Server: Waiting for Packet.\n");
 
 		/*UNUSED BECAUSE OF INCLUSION OF INTERMEDIATE CLASSES...
@@ -203,7 +189,7 @@ public class Scheduler {
 		}
 		 */
 
-		//variable definitions used to unpack/ coordinate/ allocate actions
+		/*//variable definitions used to unpack/ coordinate/ allocate actions
 		packetData=schedulerReceivePacket.getData();		
 		packetElementIndex=packetData[1];//index to find/ retrieve specific element from our array of elevators and floors
 		//should have been the name given to threads' constructor at creation
@@ -215,7 +201,7 @@ public class Scheduler {
 		elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
 		stopRequest=packetData[5]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
 		//int floorRequesting;
-
+*/
 		//int [] responseTime;//response time of individual elevators to got to a floor request
 		//int indexOfFastestElevator;//index of array for which elevator is fastest
 		//int temp;//temporary for finding the fastest response time
@@ -231,7 +217,24 @@ public class Scheduler {
 				e.printStackTrace();
 				System.exit(1);
 			}
+			
+			//variable definitions used to unpack/ coordinate/ allocate actions
+			  byte [] packetData=schedulerReceivePacket.getData();		
+			  int packetElementIndex=packetData[1];//index to find/ retrieve specific element from our array of elevators and floors
+			//should have been the name given to threads' constructor at creation
+			//
+			  int packetSentFrom=packetData[0];//elevator, floor, or other(testing/ error)
+			//21=elevator, 69=floor
+			 int packetIsStatus=packetData[2];//whether it is a status update from elevator or a request (elevator or floor but handled differently)
+			//1=request, 2=status update
+			 int elevatorLocation=packetData[3];//where the elevator is currently located (sensor information sent from elevator as status update)
+			 int stopRequest;//=packetData[]; //a request to give to an elevator for stopping at a given floor (from elevator or floor)
+			//public static int floorRequesting;
 
+			 int [] responseTime;//response time of individual elevators to got to a floor request
+			 int indexOfFastestElevator = 0;//index of array for which elevator is fastest
+			 int temp;//temporary for finding the fastest response time
+			 
 			//check whether the packet was from an elevator (requests and status) or a floor(request)
 			//floor: allocate to an appropriate elevator (same direction, fastest response time, least load)
 			//if no currently allocatable elevators then add to requests linked list
