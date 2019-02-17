@@ -13,7 +13,7 @@ public class Scheduler {
 	/*send sockets should be allocated dynamically since the ports would be
 	variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = 23;
+	public static final int RECEIVEPORTNUM = 369;
 
 
 
@@ -136,7 +136,7 @@ public class Scheduler {
 		//allocate receive socket
 		//send socket allocated dynamically for specific port of current elevator or floor 
 		try {
-			schedulerReceiveSocket=new DatagramSocket(23);//arbitrary usage of 23 for port number of Scheduler's receive port
+			schedulerReceiveSocket=new DatagramSocket(RECEIVEPORTNUM);//arbitrary usage of 23 for port number of Scheduler's receive port
 		} catch (SocketException se) {//if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
