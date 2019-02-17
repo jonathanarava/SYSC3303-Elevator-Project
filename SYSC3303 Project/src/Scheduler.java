@@ -84,7 +84,7 @@ public class Scheduler {
 		//SINCE THE INTERMEDIATE CLASSES NOW START THE THREADS AN INITIAL CONNECTION PACKET FROM EACH IS NEEDED
 		//WILL PASS THE NUMBER OF ELEVATORS AND FLOORS IN THE SYSTEM IN THE INITIAL CONNECTION
 		numElevators=4;
-		numFloors=10;
+		numFloors=6;
 
 		//setting up array of linked lists for keeping track of stops and requests
 		//array of size numElevators stores a linked list for each elevator for each use
