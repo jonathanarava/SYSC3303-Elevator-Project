@@ -62,7 +62,7 @@ public class Scheduler {
 		}
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -75,25 +75,25 @@ public class Scheduler {
 		destFloor = data[5];
 
 		byte[] responseByteArray = new byte[5];
-		if (elevatorOrFloor == 21) {
-			if (elevatorID == 1) {
-				if (currentFloor != destFloor) {
-					responseByteArray = responsePacket(currentFloor, destFloor);
-					System.out.println(
-							"Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-					schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-							schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
-					// }
-				}
-			}
-		}
 
-		// or (as we should be sending back the same thing)
-		// System.out.println(received);
 
 		// Send the datagram packet to the client via the send socket.
 		try {
-			schedulerSocetSendElevator.send(schedulerSendPacket);
+			if (elevatorOrFloor == 21) {
+				if (elevatorID == 0) {
+					if (currentFloor != destFloor) {
+						responseByteArray = responsePacket(currentFloor, destFloor);
+						System.out.println(
+								"Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+						schedulerSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+								schedulerReceivePacket.getAddress(), schedulerReceivePacket.getPort());
+						schedulerSocetSendElevator.send(schedulerSendPacket);
+					} else if (currentFloor == destFloor) {
+						System.out.println("waiting");
+					}
+				}
+			}
+
 			// System.out.println("Sent");
 		} catch (IOException e) {
 			System.out.print("hi");
@@ -108,29 +108,24 @@ public class Scheduler {
 
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
+		requestElevator.write(69);
 		requestElevator.write(0);
+		requestElevator.write(0);
+		requestElevator.write(0);
+		requestElevator.write(0);
+		requestElevator.write(0);
+		
 
 		if ((floorRequest1 - currentFloor1) < 0) {
 			requestElevator.write(1); // downwards
-			requestElevator.write(0);
 		} else if ((floorRequest1 - currentFloor1) > 0) {
 			requestElevator.write(2); // upwards
-			requestElevator.write(0);
 		} else {
 			requestElevator.write(0); // motorDirection
-			requestElevator.write(1); // open or Close
 		}
 
-		if ((floorRequest1 - currentFloor1) != 0) {
-			requestElevator.write(1);
-		} else {
-			requestElevator.write(0); // MotorSpin Time
-		}
-		requestElevator.write(0);
 		// 0,2,0,1,0 (0, direction, openClose, motorSpin,0)
-
 		return requestElevator.toByteArray();
-
 	}
 
 	/*

@@ -22,6 +22,10 @@ public class ElevatorIntermediate {
 	
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendReceiveSocket;
+	
+	public static int currentFloor;
+	public static int destFloor;
+
 
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
@@ -66,6 +70,8 @@ public class ElevatorIntermediate {
 		// destination.close();
 		requestElevator = elevatorArray[0].responsePacketRequest(1);// elevatorArray[0].floorRequest);
 
+		currentFloor = elevatorArray[0].sensor;
+		destFloor = elevatorArray[0].floorRequest;
 		// allocate sockets, packets
 		try {
 			System.out.println("\nSending to scheduler: " + Arrays.toString(requestElevator));
@@ -83,25 +89,31 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public synchronized void receivePacket() {
+	public synchronized void receivePacket() throws InterruptedException {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
 		byte data[] = new byte[7];
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
-
+		synchronized(this){
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
-		try {
-			// Block until a datagram packet is received from receiveSocket.
-			elevatorSendReceiveSocket.receive(elevatorReceivePacket);
-			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
-		} catch (IOException e) {
-			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
-			e.printStackTrace();
-			System.exit(1);
+			while (currentFloor == destFloor) {
+				elevatorArray[0].openCloseDoor((byte) 1);
+				wait();
+			}
+				try {
+					// Block until a datagram packet is received from receiveSocket.
+					elevatorSendReceiveSocket.receive(elevatorReceivePacket);
+					System.out.print("Received from scheduler: ");
+					System.out.println(Arrays.toString(data));
+					notifyAll();
+				} catch (IOException e) {
+					System.out.print("IO Exception: likely:");
+					System.out.println("Receive Socket Timed Out.\n" + e);
+					e.printStackTrace();
+					System.exit(1);
+				}
 		}
 
 		elevatorArray[0].runElevator(data[6]);
@@ -114,7 +126,7 @@ public class ElevatorIntermediate {
 		// }
 	}
 
-	public static void main(String args[]) throws IOException {// 2 arguments: args[0] is the number of Elevators in the
+	public static void main(String args[]) throws IOException, InterruptedException {// 2 arguments: args[0] is the number of Elevators in the
 																// system and
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
 		// for iteration 1 there will only be 1 elevator
