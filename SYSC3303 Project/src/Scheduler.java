@@ -16,17 +16,18 @@ public class Scheduler {
 
 	// public boolean isListen;
 
-	public int elevatorID;
-	public int floorRequest;
-	public int currentFloor;
-	public int elevatorOrFloor;
-	public int destFloor;
+	public static byte data[] = new byte[7];
+	public static int elevatorID;
+	public static int floorRequest;
+	public static int currentFloor;
+	public static int elevatorOrFloor;
+	public static int destFloor;
 
 	public Scheduler() {
 		try {
 			schedulerSocetSendElevator = new DatagramSocket();
 			schedulerSocketReceiveElevator = new DatagramSocket(369);// can be any available port, Scheduler will reply
-																		// to the port
+			// to the port
 			// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
@@ -34,13 +35,7 @@ public class Scheduler {
 		}
 	}
 
-	public void breakDown(byte[] x) {
-
-	}
-
-	public void receivedPacket() throws InterruptedException {
-
-		byte data[] = new byte[7];
+	public static void receivedPacket() throws InterruptedException {
 
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
@@ -73,7 +68,9 @@ public class Scheduler {
 		floorRequest = data[2];
 		currentFloor = data[3];
 		destFloor = data[5];
+	}
 
+	public static void sendPacket() throws InterruptedException {
 		byte[] responseByteArray = new byte[5];
 
 
@@ -93,18 +90,13 @@ public class Scheduler {
 					}
 				}
 			}
-
-			// System.out.println("Sent");
 		} catch (IOException e) {
-			System.out.print("hi");
 			e.printStackTrace();
 			System.exit(1);
 		}
-
-		// System.out.println();
 	}
 
-	public byte[] responsePacket(int currentFloor1, int floorRequest1) {
+	public static byte[] responsePacket(int currentFloor1, int floorRequest1) {
 
 		// creates the byte array according to the required format
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
@@ -114,7 +106,6 @@ public class Scheduler {
 		requestElevator.write(0);
 		requestElevator.write(0);
 		requestElevator.write(0);
-		
 
 		if ((floorRequest1 - currentFloor1) < 0) {
 			requestElevator.write(1); // downwards
@@ -135,10 +126,13 @@ public class Scheduler {
 
 	public static void main(String args[]) throws InterruptedException {
 
+		//int createNumElevators = Integer.parseInt(args[0]);
+		//int createNumFloors = Integer.parseInt(args[1]);
 		Scheduler packet = new Scheduler();
 		for (;;) {
 
 			packet.receivedPacket();
+			packet.sendPacket();
 			// Thread.sleep(1000);
 			// packet.stopListening();
 

@@ -10,7 +10,7 @@ import java.util.Scanner;
 /*
  * class Floor:has direction buttons and Floor display
  */
-public class Floor implements Runnable {
+public class Floor extends Thread {
 
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;//elevator is in hold state
@@ -24,7 +24,7 @@ public class Floor implements Runnable {
 	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	private static final int FLOOR = 69;
-	
+
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an
@@ -75,7 +75,7 @@ public class Floor implements Runnable {
 		} else {
 			requestElevator.write(0); // request/update. not used by floor
 		}*/
-		
+
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)
@@ -83,7 +83,7 @@ public class Floor implements Runnable {
 
 		return requestElevator.toByteArray();
 	}
-	
+
 	/*public void LEDOnOrOff(byte up_or_down, ) {
 		while (schedulerInstruction != true) {
 			if (NAMING =)
@@ -96,70 +96,21 @@ public class Floor implements Runnable {
 	 * input information and creates a list of Strings that will have the real time
 	 * inputs as a string. For now This section will be commented. Will be
 	 * implemented for other itterations
-	 * 
-	 * 
-	 * public void fileReader(String fullFile) { String text = ""; int i=0;
-	 * List<String> strings = new ArrayList<String>(); try { FileReader input = new
-	 * FileReader(fullFile); Scanner reader = new Scanner(input);
-	 * reader.useDelimiter("[\n]");
-	 * 
-	 * while (reader.hasNext()){ text = reader.next(); if (i<=1) { i++; } else if
-	 * (i>=2) { strings.add(text); }
-	 * 
-	 * } }catch(Exception e) { e.printStackTrace(); } }
 	 */
+	public void fileReader(String fullFile) { String text = ""; int i=0;
+	List<String> strings = new ArrayList<String>();
+	try { 
+		FileReader input = new FileReader(fullFile); Scanner reader = new Scanner(input);
+		reader.useDelimiter("[\n]");
 
-	/*
-	 * (Runnable method for Floor Class)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-		// fileReader(String fullFile);
-		// elevatorRequestFromFile(String request);
+		while (reader.hasNext()){
+			text = reader.next();
+			if (i<=1) {
+				i++;
+			} else if(i>=2) {
+				strings.add(text);
+			}
 
-		up_or_down = UP; // Up request to start out with
-
-	}
-	/*
-	 * {inside while if statement if(whoamI == (number of floor)){ returns a byte[]:
-	 * floor(number of floor).create a packet to schedular(); }
-	 * 
-	 * floor(number of floor).send the byte[] from above if statement to schedular;
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * while (true) {
-	 * 
-	 * // FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, 
-	 
-	 
-	 
-	 , 0)
-	 * //requestElevator = responsePacket(floorRequest); byte[] requestElevator =
-	 * new byte[7]; requestElevator = responsePacket(); int lengthOfByteArray =
-	 * requestElevator.length;
-	 * 
-	 * // allocate packets if(requestElevator != null) { try { floorSendPacket = new
-	 * DatagramPacket(requestElevator, lengthOfByteArray,
-	 * InetAddress.getLocalHost(), sendPort_num); } catch (UnknownHostException e) {
-	 * e.printStackTrace(); System.exit(1); } }
-	 * 
-	 * /* SCHEDULER --> FLOOR (0, open OR close door, 0) byte data[] = new byte[3];
-	 * floorReceivePacket = new DatagramPacket(data, data.length);
-	 * 
-	 * System.out.println("floor_subsystem: Waiting for Packet.\n");
-	 * 
-	 * try { // Block until a datagram packet is received from receiveSocket.
-	 * floorReceiveSocket.receive(floorReceivePacket); } catch (IOException e) {
-	 * System.out.print("IO Exception: likely:");
-	 * System.out.println("Receive Socket Timed Out.\n" + e); e.printStackTrace();
-	 * System.exit(1); }
-	 * 
-	 * }
-	 */
-
+			}
+		}catch(Exception e) { e.printStackTrace(); } }
 }
