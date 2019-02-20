@@ -76,9 +76,6 @@ public class ElevatorIntermediate {
 		synchronized(this) {
 			while (currentFloor == destFloor+1) {
 				wait(1000);
-				requestElevator = elevatorArray[1].responsePacketRequest(1);// elevatorArray[0].floorRequest);
-				currentFloor = elevatorArray[1].sensor;
-				destFloor = elevatorArray[1].floorRequest;
 				break;
 			}
 			// allocate sockets, packets
