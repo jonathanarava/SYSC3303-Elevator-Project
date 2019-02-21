@@ -52,7 +52,7 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public synchronized void packetHandler() throws InterruptedException {
+	public synchronized void sendPacket() throws InterruptedException {
 
 		byte[] requestElevator = new byte[7];
 
@@ -163,7 +163,7 @@ public class ElevatorIntermediate {
 		}
 
 		while (true) {
-			elevatorHandler.packetHandler();
+			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
