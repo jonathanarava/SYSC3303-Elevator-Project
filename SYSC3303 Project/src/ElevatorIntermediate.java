@@ -53,7 +53,7 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public void packetHandler() {
+	public void sendPacket() {
 		byte[] requestElevator = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
@@ -153,7 +153,7 @@ public class ElevatorIntermediate {
 		}
 
 		while (true) {
-			elevatorHandler.packetHandler();
+			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
