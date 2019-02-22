@@ -10,17 +10,18 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class Scheduler {
-	
+
 	// Packets and sockets required to connect with the Elevator and Floor class
 
 	public static DatagramSocket schedulerSocketSendReceiveElevator, schedulerSocketSendReceiveFloor;
 	public static DatagramPacket schedulerElevatorSendPacket, schedulerElevatorReceivePacket, schedulerFloorSendPacket, schedulerFloorReceivePacket;
 
-	
+
 	public static int PORTNUM = 69;
 	// Variables
 
 	public static byte data[] = new byte[7];
+	public static byte dataFloor[] = new byte[7];
 	public static int elevatorOrFloor;
 	public static int elevatorOrFloorID;
 	public static int requestOrUpdate;
@@ -41,8 +42,8 @@ public class Scheduler {
 	}
 
 	public static void elevatorPacket() throws InterruptedException {
-		
-										/* ELEVATOR RECEIVING PACKET HERE*/
+
+														/* ELEVATOR RECEIVING PACKET HERE*/
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
 
@@ -62,9 +63,20 @@ public class Scheduler {
 			System.exit(1);
 		}
 		
-													/* ELEVATOR SENDING PACKET HERE*/
 		
-		byte[] responseByteArray = new byte[5];
+
+														/* Separating byte array received */
+
+		elevatorOrFloor = data[0];
+		elevatorOrFloorID = data[1];
+		requestOrUpdate = data[2];
+		currentFloor = data[3];
+		upOrDown = data[4];
+		destFloor = data[5];
+
+														/* ELEVATOR SENDING PACKET HERE*/
+
+		byte[] responseByteArray = new byte[7];
 
 		responseByteArray = responsePacket(currentFloor, destFloor);
 		System.out.println(
@@ -77,22 +89,15 @@ public class Scheduler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
-									/* Separating byte array received */
-		
-		elevatorOrFloor = data[0];
-		elevatorOrFloorID = data[1];
-		requestOrUpdate = data[2];
-		currentFloor = data[3];
-		upOrDown = data[4];
-		destFloor = data[5];
+
+
 	}
 
 	public static void floorPacket() throws InterruptedException {
 
-											/* FLOOR RECEIVING PACKET HERE*/
-
+													/* FLOOR RECEIVING PACKET HERE*/
+		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
+		
 		// Block until a datagram packet is received from receiveSocket.
 		try {
 			System.out.println("waiting");
@@ -104,11 +109,19 @@ public class Scheduler {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-		
-		
-											/*FLOOR SENDING PACKET HERE*/
-		
+
+
+													/* Separating byte array received */
+		elevatorOrFloor = data[0];
+		elevatorOrFloorID = data[1];
+		requestOrUpdate = data[2];
+		currentFloor = data[3];
+		upOrDown = data[4];
+		destFloor = data[5];
+
+
+													/*FLOOR SENDING PACKET HERE*/
+
 		byte[] responseByteArray = new byte[5];
 
 		responseByteArray = responsePacket(currentFloor, destFloor);
@@ -121,25 +134,13 @@ public class Scheduler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		
-		
-		
-		if (elevatorOrFloor == 21) {
-			if (elevatorOrFloorID == 0) {
-				if (currentFloor != destFloor) {
-					
-				} else if (currentFloor == destFloor) {
-					System.out.println("waiting");
-				}
-			}
 		}
 	}
 
@@ -169,6 +170,15 @@ public class Scheduler {
 	/*
 	 * void stopListening() { isListen=false;
 	 * schedulerSocketReceiveElevator.close(); }
+	 * 	if (elevatorOrFloor == 21) {
+			if (elevatorOrFloorID == 0) {
+				if (currentFloor != destFloor) {
+
+				} else if (currentFloor == destFloor) {
+					System.out.println("waiting");
+				}
+			}
+		}
 	 */
 
 	public static void main(String args[]) throws InterruptedException {
@@ -178,12 +188,10 @@ public class Scheduler {
 		Scheduler packet = new Scheduler();
 		for (;;) {
 
-			packet.elevatorPacket();
-			//packet.sendPacket();
-			// Thread.sleep(1000);
-			// packet.stopListening();
+			packet.elevatorPacket();   // connection to elevator class
 
+
+			//packet.floorPacket();		// connection to floor class
 		}
-
 	}
 }
