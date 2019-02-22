@@ -75,7 +75,7 @@ public class ElevatorIntermediate {
 
 		synchronized(this) {
 			while (currentFloor == destFloor+1) {
-				wait(1000);
+				wait();
 				break;
 			}
 			// allocate sockets, packets
@@ -107,7 +107,7 @@ public class ElevatorIntermediate {
 
 			while (currentFloor == destFloor) {
 				elevatorArray[0].openCloseDoor((byte) 1);
-				wait(5000);
+				wait();
 				break;
 			}
 			try {
