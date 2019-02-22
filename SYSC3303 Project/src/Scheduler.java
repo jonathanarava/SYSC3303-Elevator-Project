@@ -7,9 +7,11 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.lang.*;
 
 public class Scheduler extends Thread{
 
@@ -38,8 +40,11 @@ public class Scheduler extends Thread{
 	
 	// lists to keep track of what requests need to be handled
 	
-	private static List<Thread> queue  = new LinkedList<Thread>();
+	private static ArrayList<Thread> queue  = new ArrayList<Thread>();
+	private static int[] allDestinationFloors = new int[queue.size()];
 	public static Object obj = new Object();
+	public static int limit = numFloors*numElevators;
+	private static Thread newRequest;
 	
 
 	public Scheduler() {
@@ -190,26 +195,51 @@ public class Scheduler extends Thread{
 	private synchronized void elevatorPacketHandler() {
 		synchronized(queue) {
 			if (!newRequest()) {
-				for(int i = 0; i < numElevators; i++)
+				for(int i = 0; i < numElevators; i++) {
 					
-				while(!isInterrupted()) {
-
 				}
+
 			}else {	
 
 			}
 		}
 	}
 	
-	
-	public static boolean newRequest() {
-		if (requestOrUpdate == 2) {
-			return true;
-		} else {
-			return false;
+	public void run() {
+
+		boolean makeThread = false;
+		int [] x = new int[queue.size()];
+		while(!isInterrupted()) {
+			synchronized(queue) {
+				try {
+					while (queue.isEmpty()) {
+						queue.wait();
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				if(allDestinationFloors.length > 0) {
+					for(int i : allDestinationFloors) {
+						if (destFloor == i) {
+							makeThread = true;
+						} 
+					}
+				} else if (makeThread = false) {
+					queue.add(createNewthread(destFloor));
+				}
+			}
+			elevatorPacketHandler();
 		}
 	}
-	
+
+	private Thread createNewthread(int destFloor2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 	private static void floorPacketHandler() {
 		// TODO Auto-generated method stub
 		
