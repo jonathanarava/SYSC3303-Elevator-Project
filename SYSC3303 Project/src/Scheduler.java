@@ -8,8 +8,10 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
-public class Scheduler {
+public class Scheduler extends Thread{
 
 	// Packets and sockets required to connect with the Elevator and Floor class
 
@@ -28,6 +30,17 @@ public class Scheduler {
 	public static int currentFloor;
 	public static int upOrDown;
 	public static int destFloor;
+	
+	// number of elevators and floors. Can change here!
+	public static int numElevators = 3;
+	public static int numFloors = 15;
+	
+	
+	// lists to keep track of what requests need to be handled
+	
+	private static List<Thread> queue  = new LinkedList<Thread>();
+	public static Object obj = new Object();
+	
 
 	public Scheduler() {
 		try {
@@ -89,8 +102,6 @@ public class Scheduler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-
 	}
 
 	public static void floorPacket() throws InterruptedException {
@@ -166,20 +177,43 @@ public class Scheduler {
 		// 0,2,0,1,0 (0, direction, openClose, motorSpin,0)
 		return requestElevator.toByteArray();
 	}
+	
+	public void packetDealer() {
+		if (elevatorOrFloor == 21) {
+			elevatorPacketHandler();
+		} else if (elevatorOrFloor == 69 ) {
+			floorPacketHandler();
+		}
+		
+	}
+	
+	private synchronized void elevatorPacketHandler() {
+		synchronized(queue) {
+			if (!newRequest()) {
+				for(int i = 0; i < numElevators; i++)
+					
+				while(!isInterrupted()) {
 
-	/*
-	 * void stopListening() { isListen=false;
-	 * schedulerSocketReceiveElevator.close(); }
-	 * 	if (elevatorOrFloor == 21) {
-			if (elevatorOrFloorID == 0) {
-				if (currentFloor != destFloor) {
-
-				} else if (currentFloor == destFloor) {
-					System.out.println("waiting");
 				}
+			}else {	
+
 			}
 		}
-	 */
+	}
+	
+	
+	public static boolean newRequest() {
+		if (requestOrUpdate == 2) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private static void floorPacketHandler() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public static void main(String args[]) throws InterruptedException {
 
