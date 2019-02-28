@@ -40,7 +40,7 @@ public class Scheduler extends Thread{
 	
 	// lists to keep track of what requests need to be handled
 	
-	private static ArrayList<Thread> queue  = new ArrayList<Thread>();
+	private static LinkedList<Thread> queue  = new LinkedList<Thread>();
 	private static int[] allDestinationFloors = new int[queue.size()];
 	public static Object obj = new Object();
 	public static int limit = numFloors*numElevators;
@@ -92,7 +92,7 @@ public class Scheduler extends Thread{
 		upOrDown = data[4];
 		destFloor = data[5];
 
-														/* ELEVATOR SENDING PACKET HERE*/
+														/* SENDING ELEVATOR PACKET HERE*/
 
 		byte[] responseByteArray = new byte[7];
 
@@ -206,7 +206,7 @@ public class Scheduler extends Thread{
 	}
 	
 	public void run() {
-
+		
 		boolean makeThread = true;
 		int [] x = new int[queue.size()];
 		while(!isInterrupted()) {
@@ -219,6 +219,7 @@ public class Scheduler extends Thread{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
 
 				if(allDestinationFloors.length > 0) {
 					for(int i : allDestinationFloors) {
@@ -237,9 +238,12 @@ public class Scheduler extends Thread{
 		}
 	}
 
+	private Thread newThread;
 	private Thread createNewthread(int destFloor2) {
-		// TODO Auto-generated method stub
-		return null;
+		newThread = new Scheduler();
+		newThread.start();
+		return newThread;
+		
 	}
 
 
