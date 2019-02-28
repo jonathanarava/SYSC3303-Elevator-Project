@@ -207,7 +207,7 @@ public class Scheduler extends Thread{
 	
 	public void run() {
 
-		boolean makeThread = false;
+		boolean makeThread = true;
 		int [] x = new int[queue.size()];
 		while(!isInterrupted()) {
 			synchronized(queue) {
@@ -223,8 +223,11 @@ public class Scheduler extends Thread{
 				if(allDestinationFloors.length > 0) {
 					for(int i : allDestinationFloors) {
 						if (destFloor == i) {
-							makeThread = true;
-						} 
+							makeThread = false;
+						}						
+					}
+					if (makeThread = false) {
+						queue.add(createNewthread(destFloor));
 					}
 				} else if (makeThread = false) {
 					queue.add(createNewthread(destFloor));
