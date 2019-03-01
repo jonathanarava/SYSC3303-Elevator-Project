@@ -183,6 +183,9 @@ public class Scheduler extends Thread{
 		return requestElevator.toByteArray();
 	}
 	
+	
+	/* Splitting the packet to determine if its for a floor or elevator request   */
+	
 	public void packetDealer() {
 		if (elevatorOrFloor == 21) {
 			elevatorPacketHandler();
@@ -191,6 +194,11 @@ public class Scheduler extends Thread{
 		}
 		
 	}
+	
+	public void upOrDown() {
+		
+	}
+	
 	
 	private synchronized void elevatorPacketHandler() {
 		synchronized(queue) {
@@ -205,10 +213,20 @@ public class Scheduler extends Thread{
 		}
 	}
 	
-	public void run() {
-		
-		boolean makeThread = true;
-		int [] x = new int[queue.size()];
+
+	
+	private Thread newThread;
+	private Thread createNewthread(int destFloor2) {
+		newThread = new Scheduler();
+		newThread.start();
+		return newThread;	
+	} 
+	
+	public final void interruptThread() {
+		newThread.interrupt();
+	}
+	
+	public void run() {		
 		while(!isInterrupted()) {
 			synchronized(queue) {
 				try {
@@ -216,12 +234,12 @@ public class Scheduler extends Thread{
 						queue.wait();
 					}
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					return;
 				}
 
+			
 
-				if(allDestinationFloors.length > 0) {
+		/*		if(allDestinationFloors.length > 0) {
 					for(int i : allDestinationFloors) {
 						if (destFloor == i) {
 							makeThread = false;
@@ -232,19 +250,13 @@ public class Scheduler extends Thread{
 					}
 				} else if (makeThread = false) {
 					queue.add(createNewthread(destFloor));
-				}
+				}*/
 			}
 			elevatorPacketHandler();
 		}
 	}
 
-	private Thread newThread;
-	private Thread createNewthread(int destFloor2) {
-		newThread = new Scheduler();
-		newThread.start();
-		return newThread;
-		
-	}
+
 
 
 	private static void floorPacketHandler() {
