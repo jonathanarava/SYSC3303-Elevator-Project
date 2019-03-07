@@ -36,13 +36,6 @@ public class Elevator extends Thread {
 	public Elevator(int name, int initiateFloor) {
 		this.name = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
-
-		try {
-			elevatorSendSocket = new DatagramSocket();
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
