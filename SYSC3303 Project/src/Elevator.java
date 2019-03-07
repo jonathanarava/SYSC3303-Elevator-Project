@@ -22,7 +22,7 @@ public class Elevator extends Thread {
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	
 	
-	public int name;
+	public int elevatorNumber;
 	public int floorRequest = 3;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
@@ -34,7 +34,7 @@ public class Elevator extends Thread {
 	}
 
 	public Elevator(int name, int initiateFloor) {
-		this.name = name;// mandatory for having it actually declared as a thread object
+		this.elevatorNumber = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
@@ -63,7 +63,7 @@ public class Elevator extends Thread {
 
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(ELEVATOR_ID); // elevator
-		requestElevator.write(name); // elevator id
+		requestElevator.write(elevatorNumber); // elevator id
 
 		// request/ update
 		if (requestUpdate == REQUEST) {
@@ -140,6 +140,11 @@ public class Elevator extends Thread {
 	public void setSensor(int currentSensor) {
 		sensor = currentSensor;
 	}
+	
+	
+	public void run() { //System.out.println("Enter floor number: ");
+		  
+	}
 
 	/*
 	 * public synchronized void sendPacket() throws InterruptedException { byte[]
@@ -193,21 +198,5 @@ public class Elevator extends Thread {
 	 * receivePacket.getLength(),receivePacket.getAddress(), //
 	 * receivePacket.getPort()); //} }
 	 */
-
-	/*
-	 * public void run() { //System.out.println("Enter floor number: ");
-	 * //floorRequest = 2; //Scanner destination = new Scanner(System.in);
-	 * 
-	 * //if (destination.nextInt() != 0) { //floorRequest = destination.nextInt();
-	 * //} else {
-	 * 
-	 * //} //destination.close();
-	 * 
-	 * try { sendPacket(); } catch (InterruptedException e) { // TODO Auto-generated
-	 * catch block e.printStackTrace(); }
-	 * 
-	 * receivePacket();
-	 * 
-	 * //destination.close();
-	 */
+	 
 }

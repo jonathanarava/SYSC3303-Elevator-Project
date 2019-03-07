@@ -68,7 +68,9 @@ public class ElevatorIntermediate {
 
 		// }
 		// destination.close();
-		requestElevator = elevatorArray[0].responsePacketRequest(1);// elevatorArray[0].floorRequest);
+		requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes into the first index of elevatorArray list, and tells that elevator to return a byte array that
+																	 // will be the packet that is being sent to the Scheduler. This needs to be done in a dynamic manner so all 
+																	 // elevators can acquire a lock to send a packet one at a time. 
 
 		// allocate sockets, packets
 		try {
