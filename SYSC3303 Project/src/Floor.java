@@ -12,19 +12,19 @@ import java.util.Scanner;
  */
 public class Floor implements Runnable {
 
-	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;//elevator is in hold state
-	private static final byte UP = 0x02;//elevator is going up
-	private static final byte DOWN = 0x01;//elevator is going down
-	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
-	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
-	private static final int SCHEDULER_ID=54;//for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN=1;//the door is open when ==1
-	private static final int DOOR_DURATION=4;//duration that doors stay open for
-	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
-	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
+	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte UP = 0x02;// elevator is going up
+	private static final byte DOWN = 0x01;// elevator is going down
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final int DOOR_DURATION = 4;// duration that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 	private static final int FLOOR = 69;
-	
+
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an
@@ -62,20 +62,20 @@ public class Floor implements Runnable {
 	// [Floor[69] or elevator[21] id, floorID(whichFlooramI), request(always),
 	// current floor of the elevator, up or down(for floor), Destination(null),
 	// command(what is coming back from scheduler)]
-	//public byte[] responsePacket(int request) {
-	public byte[] responsePacket(){
+	// public byte[] responsePacket(int request) {
+	public byte[] responsePacket() {
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(FLOOR);  // To Say That I am a floor(69) elevator has ID(21)
+		requestElevator.write(FLOOR); // To Say That I am a floor(69) elevator has ID(21)
 		requestElevator.write(NAMING); // floor ID
 		requestElevator.write(REQUEST); // request/update. floor only makes requests
-		/*if (request == REQUEST) {
-			requestElevator.write(1); // request/update. not used by floor
-		} else {
-			requestElevator.write(0); // request/update. not used by floor
-		}*/
-		
+		/*
+		 * if (request == REQUEST) { requestElevator.write(1); // request/update. not
+		 * used by floor } else { requestElevator.write(0); // request/update. not used
+		 * by floor }
+		 */
+
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)
@@ -83,12 +83,11 @@ public class Floor implements Runnable {
 
 		return requestElevator.toByteArray();
 	}
-	
-	/*public void LEDOnOrOff(byte up_or_down, ) {
-		while (schedulerInstruction != true) {
-			if (NAMING =)
-		}
-	}*/
+
+	/*
+	 * public void LEDOnOrOff(byte up_or_down, ) { while (schedulerInstruction !=
+	 * true) { if (NAMING =) } }
+	 */
 
 	/*
 	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are
@@ -134,13 +133,12 @@ public class Floor implements Runnable {
 	 * 
 	 * while (true) {
 	 * 
-	 * // FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0, 
-	 
-	 
-	 
-	 , 0)
-	 * //requestElevator = responsePacket(floorRequest); byte[] requestElevator =
-	 * new byte[7]; requestElevator = responsePacket(); int lengthOfByteArray =
+	 * // FLOOR --> SCHEDULER (0, real_time, 0, whoamI, 0,
+	 * 
+	 * 
+	 * 
+	 * , 0) //requestElevator = responsePacket(floorRequest); byte[] requestElevator
+	 * = new byte[7]; requestElevator = responsePacket(); int lengthOfByteArray =
 	 * requestElevator.length;
 	 * 
 	 * // allocate packets if(requestElevator != null) { try { floorSendPacket = new

@@ -114,14 +114,14 @@ public class Elevator extends Thread {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
-				System.out.println("current floor: " + sensor); // sensor = current floor
+				System.out.println("Current floor: " + sensor); // sensor = current floor
 				Thread.sleep(1000);
 				if (motorDirection == UP) {
-					System.out.println("Elevator going up");
+					System.out.println("Elevator is going up...");
 					sensor++; // increment the floor
 					currentFloor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
-					System.out.println("Elevator going down");
+					System.out.println("Elevator is going down...");
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
@@ -131,7 +131,7 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("Current floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
