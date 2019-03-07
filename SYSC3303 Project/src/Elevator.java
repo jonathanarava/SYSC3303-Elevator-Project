@@ -30,9 +30,6 @@ public class Elevator extends Thread {
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	public Elevator() {
-	}
-
 	public Elevator(int name, int initiateFloor) {
 		this.elevatorNumber = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
