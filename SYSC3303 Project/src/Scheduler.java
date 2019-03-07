@@ -34,7 +34,7 @@ public class Scheduler extends Thread{
 	public static int destFloor;
 	
 	// number of elevators and floors. Can change here!
-	public static int numElevators = 3;
+	public static int numElevators = 2;
 	public static int numFloors = 15;
 	
 	
@@ -59,7 +59,7 @@ public class Scheduler extends Thread{
 		}
 	}
 
-	public static void elevatorPacket() throws InterruptedException {
+	public static synchronized void elevatorReceivePacket() {
 
 														/* ELEVATOR RECEIVING PACKET HERE*/
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
@@ -81,7 +81,6 @@ public class Scheduler extends Thread{
 			System.exit(1);
 		}
 		
-		
 
 														/* Separating byte array received */
 
@@ -91,8 +90,10 @@ public class Scheduler extends Thread{
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
-
-														/* SENDING ELEVATOR PACKET HERE*/
+	}
+	
+	public static synchronized void elevatorSendPacket() {
+													/* SENDING ELEVATOR PACKET HERE*/
 
 		byte[] responseByteArray = new byte[7];
 
@@ -109,7 +110,7 @@ public class Scheduler extends Thread{
 		}
 	}
 
-	public static void floorPacket() throws InterruptedException {
+	public static synchronized void floorReceivePacket() {
 
 													/* FLOOR RECEIVING PACKET HERE*/
 		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
@@ -134,9 +135,10 @@ public class Scheduler extends Thread{
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
-
-
-													/*FLOOR SENDING PACKET HERE*/
+	}
+	
+	public static synchronized void floorSendPacket() {
+														/*FLOOR SENDING PACKET HERE*/
 
 		byte[] responseByteArray = new byte[5];
 
@@ -159,7 +161,7 @@ public class Scheduler extends Thread{
 			e1.printStackTrace();
 		}
 	}
-
+	
 	public static byte[] responsePacket(int currentFloor1, int floorRequest1) {
 
 		// creates the byte array according to the required format
@@ -184,32 +186,33 @@ public class Scheduler extends Thread{
 	}
 	
 	
+	public enum DIRECTION{
+		HOLD, UP, DOWN
+	}
+	
 	/* Splitting the packet to determine if its for a floor or elevator request   */
 	
 	public void packetDealer() {
 		if (elevatorOrFloor == 21) {
 			elevatorPacketHandler();
+			
 		} else if (elevatorOrFloor == 69 ) {
 			floorPacketHandler();
 		}
 		
 	}
 	
-	public void upOrDown() {
-		
-	}
-	
-	
 	private synchronized void elevatorPacketHandler() {
-		synchronized(queue) {
-			if (!newRequest()) {
-				for(int i = 0; i < numElevators; i++) {
-					
-				}
-
-			}else {	
-
+		if(elevatorOrFloorID == 1) {
+			if(DIRECTION.UP != null) {
+				
+				
 			}
+		} else if (elevatorOrFloorID == 2) {
+			goingDown = true;
+		}
+		synchronized() {
+			
 		}
 	}
 	
