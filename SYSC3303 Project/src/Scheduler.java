@@ -14,7 +14,7 @@ public class Scheduler {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = 369;
+	public static final int RECEIVEPORTNUM = SCHEDULER_ID;
 
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
@@ -22,7 +22,7 @@ public class Scheduler {
 	// Declare timing constants
 	public static final int TIME_PER_FLOOR = 1;// time for the elevator to travel per floor
 	public static final int DOOR_DURATION = 4;// time that taken for the door to open and close when given the open
-												// command (door closes automatically after alloted time)
+	// command (door closes automatically after alloted time)
 
 	// Declare Motor States:
 	/*
@@ -45,9 +45,9 @@ public class Scheduler {
 	// scheduling alogrithm variable declaration
 	public static int elevatorCurrentFloor[];// =new int[createNumElevators];
 	public static int elevatorStatus[];// =new int[createNumElevators];//each elevator is either holding(0), going
-										// up(1), or going down(2)
+	// up(1), or going down(2)
 	public static int elevatorNextStop[];// =new int [createNumElevators];//the floor number of the next stop for that
-											// elevator
+	// elevator
 	// public static int elevatorLowestRequest[];//=new int
 	// [createNumElevators];//the floor that the elevator will go down to once the
 	// requests going down have been met to then go up again
@@ -63,10 +63,10 @@ public class Scheduler {
 	// int elevatorNextStopUp[]=new int [createNumElevators];//the floor number of
 	// the next stop for that elevator
 	public static int elevatorHighestRequestFloor[];// =new int [createNumElevators];//the floor that the elevator will
-													// go down to once the requests going down have been met to then go
-													// up again
+	// go down to once the requests going down have been met to then go
+	// up again
 	public static int elevatorLowestRequestFloor[];// =new int [createNumElevators];//the floor that the elevator will
-													// go up to once down requests have been fulfilled
+	// go up to once down requests have been fulfilled
 	// int elevatorProximity[]=new int [createNumElevators];//the distance between
 	// the next request and the current floor the elevator is on
 	// int elevatorNumStops[]=new int [createNumElevators];//number of stops that
@@ -76,15 +76,15 @@ public class Scheduler {
 	public static int floorRequestDirection;// the floor is requesting to go up or down
 	// up= ,down=
 	public static LinkedList<Integer>[] elevatorRequestsUp;// = new LinkedList();//[createNumElevators];//requests to go
-															// up from floors which aren't currently allocated to an
-															// elevator (in use past the floor)
+	// up from floors which aren't currently allocated to an
+	// elevator (in use past the floor)
 	public static LinkedList<Integer>[] elevatorStopsUp;// =new LinkedList();//[createNumElevators];//linked list for
-														// stops needed in the up direction
+	// stops needed in the up direction
 	public static LinkedList<Integer>[] elevatorRequestsDown;// = new LinkedList();//[createNumElevators];//requests to
-																// go down from floors which aren't currently allocated
-																// to an elevator (in use past the floor)
+	// go down from floors which aren't currently allocated
+	// to an elevator (in use past the floor)
 	public static LinkedList<Integer>[] elevatorStopsDown;// =new LinkedList();//[createNumElevators];//linked list for
-															// stops needed in the down direction
+	// stops needed in the down direction
 	// int nextStop[]=new int[createNumElevators];//the next stop for each elevator;
 	// if unallocated (in hold) then set as -1
 	// variable declarations for replying/ creating send packet
@@ -92,6 +92,7 @@ public class Scheduler {
 	public static int packetPort;// =schedulerReceivePacket.getPort();
 	public static int numElevators;
 	public static int numFloors;
+	public static byte[] sendingData;//data in the format specified to be sent to either FloorIntermediate or ElevatorIntermediate
 
 	public static void main(String args[]) {// 2 arguments: args[0] is the number of Elevators in the system and
 
@@ -106,27 +107,27 @@ public class Scheduler {
 		// array of size numElevators stores a linked list for each elevator for each
 		// use
 		elevatorRequestsUp = new LinkedList[numElevators];// ();//[createNumElevators];//requests to go up from floors
-															// which aren't currently allocated to an elevator (in use
-															// past the floor)
+		// which aren't currently allocated to an elevator (in use
+		// past the floor)
 		elevatorStopsUp = new LinkedList[numElevators];// ();//[createNumElevators];//linked list for stops needed in
-														// the up direction
+		// the up direction
 		elevatorRequestsDown = new LinkedList[numElevators];// ();//[createNumElevators];//requests to go down from
-															// floors which aren't currently allocated to an elevator
-															// (in use past the floor)
+		// floors which aren't currently allocated to an elevator
+		// (in use past the floor)
 		elevatorStopsDown = new LinkedList[numElevators];// ();//[createNumElevators];//linked list for stops needed in
-															// the down direction
+		// the down direction
 		// initialize new Integer type linked lists in the array
 		for (int i = 0; i < numElevators; i++) {
 			elevatorRequestsUp[i] = new LinkedList<Integer>();// [createNumElevators];//requests to go up from floors
-																// which aren't currently allocated to an elevator (in
-																// use past the floor)
+			// which aren't currently allocated to an elevator (in
+			// use past the floor)
 			elevatorStopsUp[i] = new LinkedList<Integer>();// [createNumElevators];//linked list for stops needed in the
-															// up direction
+			// up direction
 			elevatorRequestsDown[i] = new LinkedList<Integer>();// [createNumElevators];//requests to go down from
-																// floors which aren't currently allocated to an
-																// elevator (in use past the floor)
+			// floors which aren't currently allocated to an
+			// elevator (in use past the floor)
 			elevatorStopsDown[i] = new LinkedList<Integer>();// [createNumElevators];//linked list for stops needed in
-																// the down direction
+			// the down direction
 		}
 
 		/*
@@ -159,17 +160,16 @@ public class Scheduler {
 		elevatorNextStop = new int[numElevators];// the floor number of the next stop for that elevator
 		elevatorNumStops = new int[numElevators];// number of stops that each elevator has,
 		elevatorHighestRequestFloor = new int[numElevators];// the floor that the elevator will go down to once the
-															// requests going down have been met to then go up again
+		// requests going down have been met to then go up again
 		elevatorLowestRequestFloor = new int[numElevators];// the floor that the elevator will go up to once down
-															// requests have been fulfilled
+		// requests have been fulfilled
 
 		// allocation of Datagram Sockets
 		// allocate receive socket
 		// send socket allocated dynamically for specific port of current elevator or
 		// floor
 		try {
-			schedulerReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);// arbitrary usage of 23 for port number of
-																		// Scheduler's receive port
+			schedulerReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
@@ -229,7 +229,7 @@ public class Scheduler {
 
 		while (true) {
 			try {// Block until a datagram packet is received from receiveSocket.
-					// System.out.println("Waiting..."); // so we know we're waiting
+				// System.out.println("Waiting..."); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket);
 				System.out.println("Recieving from Elevator: ");
 				System.out.println(Arrays.toString(data));
@@ -243,18 +243,18 @@ public class Scheduler {
 			// variable definitions used to unpack/ coordinate/ allocate actions
 			byte[] packetData = schedulerReceivePacket.getData();
 			int packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of
-													// elevators and floors
+			// elevators and floors
 			// should have been the name given to threads' constructor at creation
 			//
 			int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 			// 21=elevator, 69=floor
 			int packetIsStatus = packetData[2];// whether it is a status update from elevator or a request (elevator or
-												// floor but handled differently)
+			// floor but handled differently)
 			// 1=request, 2=status update
 			int elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent
-													// from elevator as status update)
+			// from elevator as status update)
 			int stopRequest;// =packetData[]; //a request to give to an elevator for stopping at a given
-							// floor (from elevator or floor)
+			// floor (from elevator or floor)
 			// public static int floorRequesting;
 
 			int[] responseTime;// response time of individual elevators to got to a floor request
@@ -274,16 +274,16 @@ public class Scheduler {
 			packetPort = schedulerReceivePacket.getPort();
 
 			packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of elevators
-												// and floors
+			// and floors
 			// should have been the name given to threads' constructor at creation
 			//
 			packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 			// 0=? 1=? 2=?
 			packetIsStatus = packetData[2];// whether it is a status update from elevator or a request (elevator or
-											// floor but handled differently)
+			// floor but handled differently)
 			//
 			elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent from
-												// elevator as status update)
+			// elevator as status update)
 			stopRequest = packetData[5];// a request to stop at a given floor (-1 if no request)
 
 			if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
@@ -297,102 +297,113 @@ public class Scheduler {
 					if (elevatorStatus[packetElementIndex] == UP) {// direction that the elevator is going is up
 
 						if (elevatorStopsUp[packetElementIndex].contains(elevatorLocation)) {// we have reached a
-																								// destination stop and
-																								// need to stop the
-																								// elevator
+							// destination stop and
+							// need to stop the
+							// elevator
 							// open the doors (closes automatically after preallocated duration)
 							// create sendpacket to stop the elevator (and open, close the door)
 							// send the sendPacket
 							// remove the stop from goingup linked list
 							// check if there are more stops
+							createSendingData(packetElementIndex,0,0,3);//3: make a stop
 							if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 								// check if there are more requests
 								if (elevatorRequestsUp[packetElementIndex].isEmpty()) {// no missed floors for going Up
 									// do nothing
 								} else {// there are outstanding requests to go Up
 									elevatorStopsUp[packetElementIndex] = elevatorRequestsUp[packetElementIndex];// the
-																													// requests
-																													// to
-																													// go
-																													// Up
-																													// can
-																													// now
-																													// be
-																													// met
-																													// once
-																													// we've
-																													// finished
-																													// going
-																													// down
-																													// first
+									// requests
+									// to
+									// go
+									// Up
+									// can
+									// now
+									// be
+									// met
+									// once
+									// we've
+									// finished
+									// going
+									// down
+									// first
 									elevatorRequestsUp[packetElementIndex].clear();
 								}
 								// check if there are more stops down
 								if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
+									createSendingData(packetElementIndex,0,0,4);//4: place on hold state
+									
 								} else {// we have stops to go up, start fulfilling those
-										// create and send SendPacket for the motor to go Up
+									// create and send SendPacket for the motor to go Up
+									createSendingData(packetElementIndex,0,0,1);//1: up
 								}
-							} else {// finished stopping for destination floor, continue going Up to fufill other
-									// stops
-									// create and send SendPacket to restart the motor/ have the motor in the up
-									// direction
+							} 
+							else {// finished stopping for destination floor, continue going Up to fufill other
+								// stops
+								// create and send SendPacket to restart the motor/ have the motor in the up
+								// direction
+								createSendingData(packetElementIndex,0,0,1);//1: up
 							}
 						} else {// not a floor that we need to stop at
-								// do nothing
+							// do nothing
 						}
 
 					} else {// elevator is going down
 						if (elevatorStopsDown[packetElementIndex].contains(elevatorLocation)) {// we have reached a
-																								// destination stop and
-																								// need to stop the
-																								// elevator
+							// destination stop and
+							// need to stop the
+							// elevator
 							// open the doors (closes automatically after preallocated duration)
 							// create sendpacket to stop the elevator (and open, close the door)
 							// send the sendPacket
 							// remove the stop from goingup linked list
 							// check if there are more stops
+							createSendingData(packetElementIndex,0,0,3);//3: make a stop
 							if (elevatorStopsDown[packetElementIndex].isEmpty()) {
 								// check if there are more requests
 								if (elevatorRequestsDown[packetElementIndex].isEmpty()) {// no missed floors for going
-																							// down
+									// down
 									// do nothing
 								} else {// there are outstanding requests to go down
 									elevatorStopsDown[packetElementIndex] = elevatorRequestsDown[packetElementIndex];// the
-																														// requests
-																														// to
-																														// go
-																														// down
-																														// can
-																														// now
-																														// be
-																														// met
-																														// once
-																														// we've
-																														// finished
-																														// going
-																														// up
-																														// first
+									// requests
+									// to
+									// go
+									// down
+									// can
+									// now
+									// be
+									// met
+									// once
+									// we've
+									// finished
+									// going
+									// up
+									// first
 									elevatorRequestsDown[packetElementIndex].clear();
 								}
 								// check if there are more stops up
 								if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
+									createSendingData(packetElementIndex,0,0,4);//4: hold
 								} else {// we have stops to go up, start fulfilling those
-										// create and send SendPacket for the motor to go Down
+									// create and send SendPacket for the motor to go Down
+									createSendingData(packetElementIndex,0,0,2);//2: down
 								}
 							} else {// finished stopping for a destination floor, continue fulfilling other stops
-									// create and send SendPacket to restart the motor/ have the motor in the up
-									// direction
+								// create and send SendPacket to restart the motor/ have the motor in the down
+								// direction
+								createSendingData(packetElementIndex,0,0,2);//2: down
 							}
 						} else {// not a floor that we need to stop at
-								// do nothing
+							// do nothing
 						}
 
 					}
 
 					// }
 					// update floor number and direction displays for elevator and all floors
+					createSendingData(0,0,0,5);//5: status update
 				} else {// elevator sent a request
 
 					// floorRequesting=packetElementIndex;//the floor# of the requesting floor
@@ -407,18 +418,18 @@ public class Scheduler {
 						// check direction
 						if (elevatorStatus[packetElementIndex] == UP) {// elevator is going up
 							if (elevatorLocation < stopRequest) {// we haven't reached that floor yet and can still stop
-																	// in time
+								// in time
 								if (elevatorStopsUp[packetElementIndex].contains(stopRequest)) {// check if the request
-																								// is already in the
-																								// linked list
-																								// (duplicate) if so
-																								// then do nothing, else
-																								// add it
+									// is already in the
+									// linked list
+									// (duplicate) if so
+									// then do nothing, else
+									// add it
 									// do nothing, don't want duplicates
 								} else {
 									elevatorStopsUp[packetElementIndex].add(stopRequest);// add to the stopsUp
-																							// linkedlist for the
-																							// current elevator
+									// linkedlist for the
+									// current elevator
 								}
 							} else {// the stop has already been missed
 								elevatorStopsDown[packetElementIndex].add(stopRequest);
@@ -426,19 +437,19 @@ public class Scheduler {
 							}
 						} else {// elevator is going down
 							if (elevatorLocation > stopRequest) {// we haven't reached that floor yet and can still stop
-																	// in time
+								// in time
 								if (elevatorStopsDown[packetElementIndex].contains(stopRequest)) {// check if the
-																									// request is
-																									// already in the
-																									// linked list
-																									// (duplicate) if so
-																									// then do nothing,
-																									// else add it
+									// request is
+									// already in the
+									// linked list
+									// (duplicate) if so
+									// then do nothing,
+									// else add it
 									// do nothing, don't want duplicates
 								} else {
 									elevatorStopsDown[packetElementIndex].add(stopRequest);// add to the stopsDown
-																							// linkedlist for the
-																							// current elevator
+									// linkedlist for the
+									// current elevator
 								}
 
 							} else {// the stop has already been missed
@@ -447,7 +458,7 @@ public class Scheduler {
 							}
 						}
 					} else {// currently in hold mode, we can fulfill that request immediately
-							// can assume no stops or requests exist, don't need to check for duplicates
+						// can assume no stops or requests exist, don't need to check for duplicates
 						if (elevatorLocation < stopRequest) {// we are below the destination floor, we need to go up
 							elevatorStopsUp[packetElementIndex].add(stopRequest);
 							// create and send sendPacket to start the motor
@@ -458,7 +469,7 @@ public class Scheduler {
 
 					}
 				}
-			} else {// request is from floor (FOR SINGLE ELEVATOR ONLY)
+			} else {// request is from floor 
 				responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);
 				temp = responseTime[0];
 				for (int i = 1; i < responseTime.length; i++) {
@@ -473,7 +484,7 @@ public class Scheduler {
 				if (elevatorStatus[indexOfFastestElevator] != HOLD) {// not in hold
 					if (elevatorStatus[indexOfFastestElevator] == UP) {// elevator is going up
 						if (floorRequestDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
-																								// go up also
+							// go up also
 							if (packetElementIndex > elevatorLocation) {// still time
 								if (elevatorStopsUp[indexOfFastestElevator].contains(packetElementIndex)) {
 									// already have that stop requested, don't want to duplicate
@@ -485,34 +496,34 @@ public class Scheduler {
 									// already have that stop requested, don't want to duplicate
 								} else {
 									elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);// add the floor
-																										// to requests
+									// to requests
 								}
 							}
-						} else {// eleveator is currently fulfilling down stops
+						} else {// elevator is currently fulfilling down stops
 							if (elevatorRequestsUp[indexOfFastestElevator].contains(packetElementIndex)) {
 								// already have that stop requested, don't want to duplicate
 							} else {
 								elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);// add the floor to
-																									// requests
+								// requests
 							}
 						}
 					} else {// elevator is going down
 						if (floorRequestDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
-																								// go Down also
+							// go Down also
 							if (packetElementIndex < elevatorLocation) {// still time
 								if (elevatorStopsDown[indexOfFastestElevator].contains(packetElementIndex)) {
 									// already have that stop requested, don't want to duplicate
 								} else {
 									elevatorStopsDown[indexOfFastestElevator].add(packetElementIndex);// add to stops
-																										// list
+									// list
 								}
 							} else {// missed
 								if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElementIndex)) {
 									// already have that stop requested, don't want to duplicate
 								} else {
 									elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);// add the
-																											// floor to
-																											// requests
+									// floor to
+									// requests
 								}
 							}
 						} else {// eleveator is currently fulfilling Up stops
@@ -520,26 +531,27 @@ public class Scheduler {
 								// already have that stop requested, don't want to duplicate
 							} else {
 								elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);// add the floor to
-																										// requests
+								// requests
 							}
 						}
 					}
 				} else {// holding, can fulfill immediately
-						// can assume no stops or requests exist, don't need to check for duplicates
-						// if above
+					// can assume no stops or requests exist, don't need to check for duplicates
+					// if above
 					if (packetElementIndex > elevatorLocation) {// the floor requesting is above the elevator's current
-																// location
+						// location
 						elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Down direction
 					}
 
 					else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
-							// elevator's current location
+						// elevator's current location
 						elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Up direction
 					}
 				}
 			}
+			sendThePacket(sendData,packetAddress,packetPort);
 		}
 	}
 
@@ -559,7 +571,7 @@ public class Scheduler {
 	 */
 
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {// destination is the floor that
-																						// is making the request
+		// is making the request
 
 		// elevatorLowestRequestFloor
 		// elevatorHighestRequestFloor
@@ -571,7 +583,7 @@ public class Scheduler {
 		int[] responseTime = new int[numElevators];
 		int distance = 0;// number of floors traveled before arrivating at the destination
 		int stops = 0;// number of stops that need to be made before the destination (floor that's
-						// making the request)
+		// making the request)
 		int highest;// highest requested
 		int lowest;// lowest requested
 		int current;// current floor
@@ -647,21 +659,21 @@ public class Scheduler {
 	}
 
 	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {// calculates
-																												// how
-																												// many
-																												// stops
-																												// are
-																												// between
-																												// the
-																												// destination
-																												// and
-																												// current
-																												// floor
-																												// for
-																												// use
-																												// in
-																												// responseTime
-																												// calculation
+		// how
+		// many
+		// stops
+		// are
+		// between
+		// the
+		// destination
+		// and
+		// current
+		// floor
+		// for
+		// use
+		// in
+		// responseTime
+		// calculation
 		int stops = 0;
 		if (direction == UP) {
 			for (int i = current; i < destination; i++) {
@@ -678,4 +690,50 @@ public class Scheduler {
 		}
 		return stops;
 	}
+	public static void sendThePacket(byte[] data, InetAddress address, int port) {
+
+		try {
+			schedulerSendSocket = new DatagramSocket(port);
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
+		schedulerSendPacket=new DatagramPacket(data, data.length(), address, port);
+	}
+	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
+		/*parameters:
+		-target: exact elevator/ floor to send to
+		-currentFloor: for updating the Floor of where the elevator is at for the display
+		-direction: for updating the Floor of which direction the elevator is going for the display
+		-instruction: tells the floors/ elevators what to do
+		 */
+		// creates the byte array according to the required format in this case
+
+		/*Scheduler Instructions/ Commands:
+		-sending to elevator
+		1:start motor up
+		2:start motor down
+		3:stop motor/ put on hold
+		4:open & close doors
+		-sending to floor
+		5:update floor's displays (current floor of the elvator, and direction of the elevator)
+		 */
+		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
+		sendingOutputStream.write(SCHEDULER); //Identifying as the scheduler
+		sendingOutputStream.write(target); // (exact floor or elevator to receive)
+		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
+		// somewhat redundant usage since floors would only receive updates and elevators would only receive requests
+		if (instruction==5) {//update displays of the floors
+			sendingOutputStream.write(currentFloor); // (current floor of elevator)
+			sendingOutputStream.write(direction); // (direction of elevator)
+		}
+		else {
+			sendingOutputStream.write(0); // not needed (current floor of elevator)
+			sendingOutputStream.write(0); // not needed (direction of elevator)
+		}
+		sendingOutputStream.write(0); // not needed (destination request)
+		sendingOutputStream.write(instruction); // scheduler instruction
+		sendData= requestElevator.toByteArray();
+	}
+}
 }

@@ -37,7 +37,7 @@ public class FloorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = 23;
+	public static final int RECEIVEPORTNUM = FLOOR_ID;
 
 	public FloorIntermediate() {
 		try {
