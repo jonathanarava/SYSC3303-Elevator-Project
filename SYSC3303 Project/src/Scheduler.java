@@ -200,6 +200,7 @@ public class Scheduler extends Thread {
 			if (elevatorOrFloorID == 0) {
 				if (requestOrUpdate == 1) {
 					if (destFloor - currentFloor > 0) {
+						
 						addToUpQueue(upQueue1);
 						// goingUpList(upQueue1, destFloor);
 					} else if (destFloor - currentFloor < 0) {
@@ -235,9 +236,7 @@ public class Scheduler extends Thread {
 			} else if (i == upQueue.size()) {
 				upQueue.addLast(destFloor);
 				break;
-
 			}
-
 		}
 	}
 
@@ -307,71 +306,17 @@ public class Scheduler extends Thread {
 		x.add(2, upQueue2);
 		x.add(3, downQueue2);
 
-		Thread t1 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				if(!(x.get(0).isEmpty())) {
-					LinkedList<Integer> firstUpRequest = x.get(0);
-					int first = firstUpRequest.getFirst();
-					byte[] responseByteArray = responsePacket(0, currentFloor, first);
-					if (currentFloor == first) {
-						upQueue1.removeFirst();
-					}
-					Scheduler.elevatorSendPacket(responseByteArray);
-				}
-			}
-		});
-		
-		Thread t2 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				if(!(x.get(1).isEmpty())) {
-					LinkedList<Integer> firstDownRequest = x.get(1);
-					int first1 = firstDownRequest.getFirst();
-					byte[] responseByteArrayd1 = responsePacket(1, currentFloor, first1);
-					if (currentFloor == first1) {
-						downQueue1.removeFirst();
-					}
-					Scheduler.elevatorSendPacket(responseByteArrayd1);
-				}
-			}
-		});
-		
-		Thread t3 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				if(!(x.get(2).isEmpty())) {
-					LinkedList<Integer> firstUpRequest = x.get(2);
-					int first = firstUpRequest.getFirst();
-					byte[] responseByteArray = responsePacket(2, currentFloor, first);
-					if (currentFloor == first) {
-						upQueue2.removeFirst();
-					}
-					Scheduler.elevatorSendPacket(responseByteArray);
-				}
-			}
-		});
-		
-		Thread t4 = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				if(!(x.get(4).isEmpty())) {
-					LinkedList<Integer> firstDownRequest = x.get(4);
-					int first1 = firstDownRequest.getFirst();
-					byte[] responseByteArrayd1 = responsePacket(4, currentFloor, first1);
-					if (currentFloor == first1) {
-						downQueue2.removeFirst();
-					}
-					Scheduler.elevatorSendPacket(responseByteArrayd1);
-				}
-			}
-		});
-		
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
 			Direction(destFloor, currentFloor);
 
-			if (packet.requestOrUpdate == 1) {
+			if (requestOrUpdate == 1) {
 				packet.packetDealer();
 			}
-			for (int i = 0; i <= 2; i = i + 2) {
-				System.out.println(i);
+			
+
+		for (int i = 0; i <= 2; i = i + 2) {
+				//System.out.println(i);
 				switch (direction) {
 
 				case UP:
@@ -404,3 +349,4 @@ public class Scheduler extends Thread {
 		}
 	}
 }
+
