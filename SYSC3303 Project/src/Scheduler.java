@@ -15,8 +15,8 @@ public class Scheduler {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int RECEIVEPORTNUM = 369;
-	public static byte[] sendData  = new byte[7];
-	
+	public static byte[] sendData = new byte[7];
+
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
@@ -93,7 +93,8 @@ public class Scheduler {
 	public static int packetPort;// =schedulerReceivePacket.getPort();
 	public static int numElevators;
 	public static int numFloors;
-	public static byte[] sendingData;//data in the format specified to be sent to either FloorIntermediate or ElevatorIntermediate
+	public static byte[] sendingData;// data in the format specified to be sent to either FloorIntermediate or
+										// ElevatorIntermediate
 
 	public static void main(String args[]) {// 2 arguments: args[0] is the number of Elevators in the system and
 
@@ -177,7 +178,7 @@ public class Scheduler {
 		}
 
 		// allocate receive packet
-		
+
 		// System.out.println("Server: Waiting for Packet.\n");
 
 		/*
@@ -228,11 +229,11 @@ public class Scheduler {
 		while (true) {
 			byte data[] = new byte[7];
 			schedulerReceivePacket = new DatagramPacket(data, data.length);
-			//packetAddress = schedulerReceivePacket.getAddress();
-			//packetPort = schedulerReceivePacket.getPort();
-			
+			// packetAddress = schedulerReceivePacket.getAddress();
+			// packetPort = schedulerReceivePacket.getPort();
+
 			try {// Block until a datagram packet is received from receiveSocket.
-				// System.out.println("Waiting..."); // so we know we're waiting
+					// System.out.println("Waiting..."); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket);
 				System.out.println("Recieving from Elevator: ");
 				System.out.println(Arrays.toString(data));
@@ -274,7 +275,7 @@ public class Scheduler {
 			// update unpack/ coordinate/ allocate action variables
 			packetData = schedulerReceivePacket.getData();
 			packetAddress = schedulerReceivePacket.getAddress();
-			packetPort = 23; //schedulerReceivePacket.getPort();
+			packetPort = 23; // schedulerReceivePacket.getPort();
 
 			packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of elevators
 			// and floors
@@ -308,7 +309,7 @@ public class Scheduler {
 							// send the sendPacket
 							// remove the stop from goingup linked list
 							// check if there are more stops
-							createSendingData(packetElementIndex,0,0,3);//3: make a stop
+							createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
 							if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 								// check if there are more requests
 								if (elevatorRequestsUp[packetElementIndex].isEmpty()) {// no missed floors for going Up
@@ -334,18 +335,17 @@ public class Scheduler {
 								// check if there are more stops down
 								if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
-									createSendingData(packetElementIndex,0,0,4);//4: place on hold state
-									
+									createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
+
 								} else {// we have stops to go up, start fulfilling those
 									// create and send SendPacket for the motor to go Up
-									createSendingData(packetElementIndex,0,0,1);//1: up
+									createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 								}
-							} 
-							else {// finished stopping for destination floor, continue going Up to fufill other
-								// stops
-								// create and send SendPacket to restart the motor/ have the motor in the up
-								// direction
-								createSendingData(packetElementIndex,0,0,1);//1: up
+							} else {// finished stopping for destination floor, continue going Up to fufill other
+									// stops
+									// create and send SendPacket to restart the motor/ have the motor in the up
+									// direction
+								createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 							}
 						} else {// not a floor that we need to stop at
 							// do nothing

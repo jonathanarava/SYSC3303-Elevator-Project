@@ -9,25 +9,29 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
-	
-	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;//elevator is in hold state
-	private static final byte UP = 0x02;//elevator is going up
-	private static final byte DOWN = 0x01;//elevator is going down
-	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
-	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
-	private static final int SCHEDULER_ID=54;//for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN=1;//the door is open when ==1
-	private static final int DOOR_DURATION=4;//duration that doors stay open for
-	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
-	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
-	
-	public byte motorDirection;	// make getters and setters: 
-	public boolean hasRequest = false;	// make getters and setters: This Boolean will be set to true when the Elevator Intermediate wants a specific elevator thread to do something. 
-										// if hasRequest is true, then the Elevator thread will not send another request. Ie, he needs to take care of the job he is told to do by the intermediate
-										// before he takes more real time requests by the people. Incidentally, hasRequest == true means that the elevator should move up or down a floor.
+
+	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte UP = 0x02;// elevator is going up
+	private static final byte DOWN = 0x01;// elevator is going down
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final int DOOR_DURATION = 4;// duration that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+
+	public byte motorDirection; // make getters and setters:
+	public boolean hasRequest = false; // make getters and setters: This Boolean will be set to true when the Elevator
+										// Intermediate wants a specific elevator thread to do something.
+										// if hasRequest is true, then the Elevator thread will not send another
+										// request. Ie, he needs to take care of the job he is told to do by the
+										// intermediate
+										// before he takes more real time requests by the people. Incidentally,
+										// hasRequest == true means that the elevator should move up or down a floor.
 	public boolean hasRTRequest = false;
-	
+
 	public int elevatorNumber;
 	public int RealTimefloorRequest = 3;
 
@@ -35,9 +39,9 @@ public class Elevator extends Thread {
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-	
+
 	private List<byte[]> elevatorTable;
-	
+
 	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
@@ -87,35 +91,22 @@ public class Elevator extends Thread {
 		}
 		return requestElevator.toByteArray();
 	}
-/*	COMENTING OUT FOR TESTING REASONS, DO NOT DELETE
-	public String openCloseDoor(byte door) {
-		String msg;
-		if (door == DOOR_OPEN) {
-			msg = "Doors are open.";
-			System.out.println(msg);
-			try {
-				int i = 4 ;
-				while (i != 0) {
-					System.out.format("Seconds until elevator door closes: %d second \n", i);
-					i--;
-					Thread.sleep(1000);
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		} else {
-			msg = "Doors are closed.";
-			System.out.println(msg);
-		}
-		return msg;
-	}
-*/
+
+	/*
+	 * COMENTING OUT FOR TESTING REASONS, DO NOT DELETE public String
+	 * openCloseDoor(byte door) { String msg; if (door == DOOR_OPEN) { msg =
+	 * "Doors are open."; System.out.println(msg); try { int i = 4 ; while (i != 0)
+	 * { System.out.format("Seconds until elevator door closes: %d second \n", i);
+	 * i--; Thread.sleep(1000); } } catch (InterruptedException e) {
+	 * e.printStackTrace(); } } else { msg = "Doors are closed.";
+	 * System.out.println(msg); } return msg; }
+	 */
 	public int currentFloor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
 
 		return sensor;
 	}
-	
+
 	public int runElevator() {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
@@ -146,12 +137,10 @@ public class Elevator extends Thread {
 	public void setSensor(int currentSensor) {
 		sensor = currentSensor;
 	}
-	
-	
-	
+
 	public synchronized void sendPacket(int requestOrUpdate) {
-		synchronized(elevatorTable) {
-			while(elevatorTable.size() != 0) {
+		synchronized (elevatorTable) {
+			while (elevatorTable.size() != 0) {
 				try {
 					elevatorTable.wait();
 				} catch (InterruptedException e) {
@@ -162,13 +151,13 @@ public class Elevator extends Thread {
 			elevatorTable.notifyAll();
 		}
 	}
-	
+
 	public void run() {
-		while(hasRTRequest) {				//********TESTING LINE 1.0************** Make while(hasRTRequest) to while(true) to activate all elevator threads in this system
-			if(!hasRequest) {
+		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
+								// while(true) to activate all elevator threads in this system
+			if (!hasRequest) {
 				sendPacket(1);
-			}
-			else if(hasRequest) {
+			} else if (hasRequest) {
 				runElevator();
 				sendPacket(0);
 				hasRequest = false;
@@ -228,5 +217,5 @@ public class Elevator extends Thread {
 	 * receivePacket.getLength(),receivePacket.getAddress(), //
 	 * receivePacket.getPort()); //} }
 	 */
-	 
+
 }
