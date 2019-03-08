@@ -465,9 +465,11 @@ public class Scheduler {
 						if (elevatorLocation < stopRequest) {// we are below the destination floor, we need to go up
 							elevatorStopsUp[packetElementIndex].add(stopRequest);
 							// create and send sendPacket to start the motor
+							createSendingData(packetElementIndex,0,0,1);//1: up
 						} else {// we are above the destination floor, we need to go down
 							elevatorStopsDown[packetElementIndex].add(stopRequest);
 							// create and send sendPacket to start the motor
+							createSendingData(packetElementIndex,0,0,2);//2: down
 						}
 
 					}
@@ -545,12 +547,14 @@ public class Scheduler {
 						// location
 						elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Down direction
+						createSendingData(packetElementIndex,0,0,2);//2: down
 					}
 
 					else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
 						// elevator's current location
 						elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Up direction
+						createSendingData(packetElementIndex,0,0,1);//1: up
 					}
 				}
 			}
