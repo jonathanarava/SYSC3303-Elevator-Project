@@ -138,7 +138,7 @@ public class ElevatorIntermediate {
 	public static void main(String args[]) throws IOException, InterruptedException {// 2 arguments: args[0] is the
 																						// number of Elevators in the
 		// system and
-		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
+		ElevatorIntermediate elevatorIntermediate = new ElevatorIntermediate();
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
@@ -167,8 +167,8 @@ public class ElevatorIntermediate {
 		}
 		//
 		while (true) {
-			elevatorHandler.sendPacket();
-			elevatorHandler.receivePacket();
+			elevatorIntermediate.sendPacket();
+			elevatorIntermediate.receivePacket();
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 

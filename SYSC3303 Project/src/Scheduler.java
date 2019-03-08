@@ -669,7 +669,8 @@ public class Scheduler extends Thread {
 		for (;;) {
 
 			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket(); // connection to elevator class
-			Scheduler.SchdulingAlgorithm(packetRecieved);
+			//Schedules the queuing (scheduling algorytm) of what request needs to be done and also sends the packet to elevatorIntermediate at the end
+			Scheduler.SchdulingAlgorithm(packetRecieved); 
 
 		}
 	}
