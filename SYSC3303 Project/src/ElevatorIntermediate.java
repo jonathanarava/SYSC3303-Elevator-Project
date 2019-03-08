@@ -144,7 +144,7 @@ public class ElevatorIntermediate {
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
 		// argument[0]
-		System.out.println(createNumElevators);
+		System.out.println("Number of Elevators: " + createNumElevators);
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
 		// port numbers there
@@ -182,6 +182,5 @@ public class ElevatorIntermediate {
 
 		// }
 		// destination.close();
-
 	}
 }
