@@ -8,20 +8,19 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
-	
-	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;//elevator is in hold state
-	private static final byte UP = 0x02;//elevator is going up
-	private static final byte DOWN = 0x01;//elevator is going down
-	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
-	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
-	private static final int SCHEDULER_ID=54;//for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN=1;//the door is open when ==1
-	private static final int DOOR_DURATION=4;//duration that doors stay open for
-	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
-	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
-	
-	
+
+	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte UP = 0x02;// elevator is going up
+	private static final byte DOWN = 0x01;// elevator is going down
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final int DOOR_DURATION = 4;// duration that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+
 	public int name;
 	public int floorRequest = 3;
 
@@ -95,7 +94,7 @@ public class Elevator extends Thread {
 			msg = "Doors are open.";
 			System.out.println(msg);
 			try {
-				int i = 4 ;
+				int i = 4;
 				while (i != 0) {
 					System.out.format("Seconds until elevator door closes: %d second \n", i);
 					i--;
@@ -148,5 +147,4 @@ public class Elevator extends Thread {
 		sensor = currentSensor;
 	}
 
-	
 }

@@ -19,8 +19,8 @@ public class Scheduler extends Thread {
 	// Packets and sockets required to connect with the Elevator and Floor class
 
 	public static DatagramSocket schedulerSocketSendReceiveElevator, schedulerSocketSendReceiveFloor;
-	public static DatagramPacket schedulerElevatorSendPacket, schedulerElevatorReceivePacket, schedulerFloorSendPacket, schedulerFloorReceivePacket;
-
+	public static DatagramPacket schedulerElevatorSendPacket, schedulerElevatorReceivePacket, schedulerFloorSendPacket,
+			schedulerFloorReceivePacket;
 
 	public static int PORTNUM = 69;
 	// Variables
@@ -34,37 +34,35 @@ public class Scheduler extends Thread {
 	public static int upOrDown;
 	public static int destFloor;
 	public static int instruction;
-	
+
 	// number of elevators and floors. Can change here!
 	public static int numElevators = 2;
 	public static int numFloors = 15;
-	
-	
+
 	// lists to keep track of what requests need to be handled
 	public static Object obj = new Object();
-	public static int limit = numFloors*numElevators;
+	public static int limit = numFloors * numElevators;
 
-	
 	// scheduling alogrithm variable declaration
-	public static int elevatorCurrentFloor[]= new int[numElevators];
-	public static int elevatorStatus[]= new int[numElevators];
-	public static int elevatorNextStop[]= new int[numElevators];
-	
-	public static int elevatorNumStops[]= new int[numElevators];
-	public static int elevatorHighestRequestFloor[]= new int[numElevators];
-	public static int elevatorLowestRequestFloor[]= new int[numElevators];
-	
+	public static int elevatorCurrentFloor[] = new int[numElevators];
+	public static int elevatorStatus[] = new int[numElevators];
+	public static int elevatorNextStop[] = new int[numElevators];
+
+	public static int elevatorNumStops[] = new int[numElevators];
+	public static int elevatorHighestRequestFloor[] = new int[numElevators];
+	public static int elevatorLowestRequestFloor[] = new int[numElevators];
+
 	// temporary sorting algorithm variables
 	public static int floorRequestDirection;
 	public static LinkedList<Integer>[] elevatorRequestsUp = new LinkedList[numElevators];
 	public static LinkedList<Integer>[] elevatorStopsUp = new LinkedList[numElevators];
-	public static LinkedList<Integer>[] elevatorRequestsDown  = new LinkedList[numElevators];
-	public static LinkedList<Integer>[] elevatorStopsDown= new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorRequestsDown = new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorStopsDown = new LinkedList[numElevators];
 	public static InetAddress packetAddress;
 	public static int packetPort;
 
-	public static byte[] sendData  = new byte[7];
-	
+	public static byte[] sendData = new byte[7];
+
 	// Declare timing constants
 	public static final int TIME_PER_FLOOR = 1;// time for the elevator to travel per floor
 	public static final int DOOR_DURATION = 4;// time that taken for the door to open and close when given the open
@@ -97,7 +95,6 @@ public class Scheduler extends Thread {
 		}
 	}
 
-
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(369);
@@ -112,7 +109,7 @@ public class Scheduler extends Thread {
 
 	public static DatagramPacket elevatorReceivePacket() {
 
-														/* ELEVATOR RECEIVING PACKET HERE*/
+		/* ELEVATOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
 
@@ -131,8 +128,8 @@ public class Scheduler extends Thread {
 			e.printStackTrace();
 			System.exit(1);
 		}
-														/* Separating byte array received */
-		
+		/* Separating byte array received */
+
 		elevatorOrFloor = data[0];
 		elevatorOrFloorID = data[1];
 		requestOrUpdate = data[2];
@@ -141,31 +138,31 @@ public class Scheduler extends Thread {
 		destFloor = data[5];
 		return schedulerElevatorReceivePacket;
 	}
-	
+
 	public static void elevatorSendPacket(byte[] sendData) {
-													/* SENDING ELEVATOR PACKET HERE*/
+		/* SENDING ELEVATOR PACKET HERE */
 
 		byte[] responseByteArray = new byte[7];
 		responseByteArray = sendData;
 
-		//responseByteArray = createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
-		System.out.println(
-				"Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		// responseByteArray = createSendingData(elevatorOrFloor, currentFloor,
+		// upOrDown, instruction);
+		System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
-			
+
 			e1.printStackTrace();
 		}
 	}
 
 	public static void floorReceivePacket() {
 
-													/* FLOOR RECEIVING PACKET HERE*/
+		/* FLOOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
-		
+
 		// Block until a datagram packet is received from receiveSocket.
 		try {
 			System.out.println("waiting");
@@ -178,8 +175,7 @@ public class Scheduler extends Thread {
 			System.exit(1);
 		}
 
-
-													/* Separating byte array received */
+		/* Separating byte array received */
 		elevatorOrFloor = data[0];
 		elevatorOrFloorID = data[1];
 		requestOrUpdate = data[2];
@@ -187,15 +183,14 @@ public class Scheduler extends Thread {
 		upOrDown = data[4];
 		destFloor = data[5];
 	}
-	
+
 	public static void floorSendPacket() {
-														/*FLOOR SENDING PACKET HERE*/
+		/* FLOOR SENDING PACKET HERE */
 
 		byte[] responseByteArray = new byte[5];
 
 		responseByteArray = createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
-		System.out.println(
-				"Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		try {
 			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 					InetAddress.getLocalHost(), PORTNUM);
@@ -204,7 +199,6 @@ public class Scheduler extends Thread {
 			e.printStackTrace();
 		}
 
-
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
 		} catch (IOException e1) {
@@ -212,19 +206,19 @@ public class Scheduler extends Thread {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
 
 		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
-		sendingOutputStream.write(SCHEDULER_ID); //Identifying as the scheduler
+		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
 		sendingOutputStream.write(target); // (exact floor or elevator to receive)
 		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
-		// somewhat redundant usage since floors would only receive updates and elevators would only receive requests
-		if (instruction==5) {//update displays of the floors
+		// somewhat redundant usage since floors would only receive updates and
+		// elevators would only receive requests
+		if (instruction == 5) {// update displays of the floors
 			sendingOutputStream.write(currentFloor); // (current floor of elevator)
 			sendingOutputStream.write(direction); // (direction of elevator)
-		}
-		else {
+		} else {
 			sendingOutputStream.write(0); // not needed (current floor of elevator)
 			sendingOutputStream.write(0); // not needed (direction of elevator)
 		}
@@ -233,7 +227,7 @@ public class Scheduler extends Thread {
 		sendData = sendingOutputStream.toByteArray();
 		return sendData;
 	}
-	
+
 	// variable definitions used to unpack/ coordinate/ allocate actions
 	void SchdulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket) {
 		byte[] packetData = schedulerElevatorReceivePacket.getData();
@@ -268,13 +262,15 @@ public class Scheduler extends Thread {
 		packetAddress = schedulerElevatorReceivePacket.getAddress();
 		packetPort = schedulerElevatorReceivePacket.getPort();
 
-		//packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of elevators
+		// packetElementIndex = packetData[1];// index to find/ retrieve specific
+		// element from our array of elevators
 		// and floors
 		// should have been the name given to threads' constructor at creation
 		//
-		//packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
+		// packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 		// 0=? 1=? 2=?
-		//packetIsStatus = packetData[2];// whether it is a status update from elevator or a request (elevator or
+		// packetIsStatus = packetData[2];// whether it is a status update from elevator
+		// or a request (elevator or
 		// floor but handled differently)
 		//
 		elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent from
@@ -298,7 +294,7 @@ public class Scheduler extends Thread {
 						// send the sendPacket
 						// remove the stop from goingup linked list
 						// check if there are more stops
-						sendData = createSendingData(packetElementIndex,0,0,3);//3: make a stop
+						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
 						if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 							// check if there are more requests
 							if (elevatorRequestsUp[packetElementIndex].isEmpty()) {// no missed floors for going Up
@@ -311,18 +307,17 @@ public class Scheduler extends Thread {
 							// check if there are more stops down
 							if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 								// create and send sendPacket to hold the motor
-								sendData = createSendingData(packetElementIndex,0,0,4);//4: place on hold state
-								
+								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
+
 							} else {// we have stops to go up, start fulfilling those
 								// create and send SendPacket for the motor to go Up
-								sendData = createSendingData(packetElementIndex,0,0,1);//1: up
+								sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 							}
-						} 
-						else {// finished stopping for destination floor, continue going Up to fufill other
-							// stops
-							// create and send SendPacket to restart the motor/ have the motor in the up
-							// direction
-							sendData = createSendingData(packetElementIndex,0,0,1);//1: up
+						} else {// finished stopping for destination floor, continue going Up to fufill other
+								// stops
+								// create and send SendPacket to restart the motor/ have the motor in the up
+								// direction
+							sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 						}
 					} else {// not a floor that we need to stop at
 						// do nothing
@@ -338,7 +333,7 @@ public class Scheduler extends Thread {
 						// send the sendPacket
 						// remove the stop from goingup linked list
 						// check if there are more stops
-						sendData = createSendingData(packetElementIndex,0,0,3);//3: make a stop
+						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
 						if (elevatorStopsDown[packetElementIndex].isEmpty()) {
 							// check if there are more requests
 							if (elevatorRequestsDown[packetElementIndex].isEmpty()) {// no missed floors for going
@@ -365,15 +360,15 @@ public class Scheduler extends Thread {
 							// check if there are more stops up
 							if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops
 								// create and send sendPacket to hold the motor
-								sendData = createSendingData(packetElementIndex,0,0,4);//4: hold
+								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
 							} else {// we have stops to go up, start fulfilling those
 								// create and send SendPacket for the motor to go Down
-								sendData = createSendingData(packetElementIndex,0,0,2);//2: down
+								sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
 							}
 						} else {// finished stopping for a destination floor, continue fulfilling other stops
 							// create and send SendPacket to restart the motor/ have the motor in the down
 							// direction
-							sendData = createSendingData(packetElementIndex,0,0,2);//2: down
+							sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
 						}
 					} else {// not a floor that we need to stop at
 						// do nothing
@@ -383,7 +378,7 @@ public class Scheduler extends Thread {
 
 				// }
 				// update floor number and direction displays for elevator and all floors
-				sendData = createSendingData(0,0,0,5);//5: status update
+				sendData = createSendingData(0, 0, 0, 5);// 5: status update
 			} else {// elevator sent a request
 
 				// floorRequesting=packetElementIndex;//the floor# of the requesting floor
@@ -449,7 +444,7 @@ public class Scheduler extends Thread {
 
 				}
 			}
-		} else {// request is from floor 
+		} else {// request is from floor
 			responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);
 			temp = responseTime[0];
 			for (int i = 1; i < responseTime.length; i++) {
@@ -525,25 +520,25 @@ public class Scheduler extends Thread {
 				}
 
 				else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
-					// elevator's current location
+						// elevator's current location
 					elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
 					// create and send sendPacket to start motor in Up direction
 				}
 			}
 		}
-		
-sendData[0] = 54;
-sendData[1] = 21;
-sendData[2] = 1;
-sendData[3] = packetData[3];
-sendData[4] = 0;
+
+		sendData[0] = 54;
+		sendData[1] = 21;
+		sendData[2] = 1;
+		sendData[3] = packetData[3];
+		sendData[4] = 0;
 //sendData[5] = 2; floor request from elevator hardcoded to be 3
-sendData[6] = UP;
-		
-		//System.out.println("Send Data: " + Arrays.toString(sendData));
-		//System.out.println("Packet Data: " + Arrays.toString(packetData));
+		sendData[6] = UP;
+
+		// System.out.println("Send Data: " + Arrays.toString(sendData));
+		// System.out.println("Packet Data: " + Arrays.toString(packetData));
 		elevatorSendPacket(sendData);
-		}
+	}
 
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {// destination is the floor that
 		// is making the request
@@ -665,19 +660,16 @@ sendData[6] = UP;
 		}
 		return stops;
 	}
-		
-	
-	
+
 	/*------------------------------------------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
 		Scheduler Scheduler = new Scheduler();
 		Scheduler.linkedListInitialization();
-		
+
 		for (;;) {
 
-			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket();   // connection to elevator class
+			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket(); // connection to elevator class
 			Scheduler.SchdulingAlgorithm(packetRecieved);
-			
 
 		}
 	}
