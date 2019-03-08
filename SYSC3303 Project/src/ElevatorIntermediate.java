@@ -24,7 +24,7 @@ public class ElevatorIntermediate {
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	private static DatagramSocket elevatorSendSocket;
+	private static DatagramSocket elevatorSendReceiveSocket;
 	private static DatagramSocket elevatorReceiveSocket;
 
 	// for iteration 1 there will only be 1 elevator
@@ -50,7 +50,7 @@ public class ElevatorIntermediate {
 
 	public ElevatorIntermediate() {
 		try {
-			elevatorSendSocket = new DatagramSocket();
+			elevatorSendReceiveSocket = new DatagramSocket();
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -101,7 +101,7 @@ public class ElevatorIntermediate {
 					System.exit(1);
 				}
 				try {
-					elevatorSendSocket.send(elevatorSendPacket);
+					elevatorSendReceiveSocket.send(elevatorSendPacket);
 				} catch (IOException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -125,7 +125,7 @@ public class ElevatorIntermediate {
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.
-			elevatorSendSocket.receive(elevatorReceivePacket);
+			elevatorSendReceiveSocket.receive(elevatorReceivePacket);
 			System.out.print("Received from scheduler: ");
 			System.out.println(Arrays.toString(data));
 		} catch (IOException e) {

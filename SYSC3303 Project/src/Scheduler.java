@@ -15,7 +15,8 @@ public class Scheduler {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int RECEIVEPORTNUM = 369;
-	public static byte[] sendData;
+	public static byte[] sendData  = new byte[7];
+	
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
@@ -176,10 +177,7 @@ public class Scheduler {
 		}
 
 		// allocate receive packet
-		byte data[] = new byte[7];
-		schedulerReceivePacket = new DatagramPacket(data, data.length);
-		packetAddress = schedulerReceivePacket.getAddress();
-		packetPort = schedulerReceivePacket.getPort();
+		
 		// System.out.println("Server: Waiting for Packet.\n");
 
 		/*
@@ -228,6 +226,11 @@ public class Scheduler {
 		// int temp;//temporary for finding the fastest response time
 
 		while (true) {
+			byte data[] = new byte[7];
+			schedulerReceivePacket = new DatagramPacket(data, data.length);
+			//packetAddress = schedulerReceivePacket.getAddress();
+			//packetPort = schedulerReceivePacket.getPort();
+			
 			try {// Block until a datagram packet is received from receiveSocket.
 				// System.out.println("Waiting..."); // so we know we're waiting
 				schedulerReceiveSocket.receive(schedulerReceivePacket);
@@ -271,7 +274,7 @@ public class Scheduler {
 			// update unpack/ coordinate/ allocate action variables
 			packetData = schedulerReceivePacket.getData();
 			packetAddress = schedulerReceivePacket.getAddress();
-			packetPort = schedulerReceivePacket.getPort();
+			packetPort = 23; //schedulerReceivePacket.getPort();
 
 			packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of elevators
 			// and floors
@@ -551,7 +554,9 @@ public class Scheduler {
 					}
 				}
 			}
-			System.out.println(sendData);
+			
+			sendData[0] = 41;
+			System.out.println(Arrays.toString(sendData));
 			sendThePacket(sendData,packetAddress,packetPort);
 		}
 	}
