@@ -153,6 +153,7 @@ public class ElevatorIntermediate {
 		case 0:
 			elevatorArray[0].hasRequest = true;
 			elevatorArray[0].motorDirection = data[6];
+			elevatorArray[0].isUpdate = 1;
 			break;
 		case 1:
 			elevatorArray[1].hasRequest = true;

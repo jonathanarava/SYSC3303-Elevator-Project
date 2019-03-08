@@ -12,8 +12,8 @@ public class Elevator extends Thread {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;// elevator is in hold state
-	private static final byte UP = 0x02;// elevator is going up
-	private static final byte DOWN = 0x01;// elevator is going down
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
@@ -32,7 +32,7 @@ public class Elevator extends Thread {
 										// hasRequest == true means that the elevator should move up or down a floor.
 	public boolean hasRTRequest = false;
 	
-	public boolean isUpdate = false;
+	public int isUpdate = 0;
 
 	public int elevatorNumber;
 	public int RealTimefloorRequest = 3;
@@ -113,7 +113,7 @@ public class Elevator extends Thread {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
-				System.out.println("Current floor: " + sensor); // sensor = current floor
+				System.out.println("At floor: " + sensor); // sensor = current floor
 				Thread.sleep(1000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator is going up...");
@@ -130,7 +130,7 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("Current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("Came to floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -158,11 +158,11 @@ public class Elevator extends Thread {
 	public void run() {
 		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
 								// while(true) to activate all elevator threads in this system
-			if (!hasRequest) {
+			if (!hasRequest && isUpdate == 0) {
 				sendPacket(1);
 			} else if (hasRequest) {
 				runElevator();
-				sendPacket(0);
+				sendPacket(2);
 				hasRequest = false;
 			}
 		}
