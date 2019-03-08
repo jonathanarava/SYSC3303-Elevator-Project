@@ -558,9 +558,6 @@ public class Scheduler {
 					}
 				}
 			}
-			
-			//sendData[0] = 41;			//********INITIALIZED TO 41 BECAUSE sendData DID NOT HAVE ANY CONTENT IN IT TO BE SENT********************
-										//		  Ideally this sendData byte array should be filled from the scheduler algorithm
 			System.out.println(Arrays.toString(sendData));
 			sendThePacket(sendData,packetAddress,packetPort);
 		}
