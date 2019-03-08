@@ -15,6 +15,7 @@ public class Scheduler {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int RECEIVEPORTNUM = 369;
+	public static final int SENDPORTNUM = 159;
 	public static byte[] sendData = new byte[7];
 
 	// request list
@@ -275,7 +276,7 @@ public class Scheduler {
 			// update unpack/ coordinate/ allocate action variables
 			packetData = schedulerReceivePacket.getData();
 			packetAddress = schedulerReceivePacket.getAddress();
-			packetPort = 23; // schedulerReceivePacket.getPort();
+			packetPort = schedulerReceivePacket.getPort();
 
 			packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of elevators
 			// and floors
@@ -559,7 +560,7 @@ public class Scheduler {
 				}
 			}
 			System.out.println(Arrays.toString(sendData));
-			sendThePacket(sendData,packetAddress,packetPort);
+			sendThePacket(sendData,packetAddress,SENDPORTNUM);
 		}
 	}
 
@@ -699,14 +700,19 @@ public class Scheduler {
 		return stops;
 	}
 	public static void sendThePacket(byte[] data, InetAddress address, int port) {
-
 		try {
-			schedulerSendSocket = new DatagramSocket(port);
+			schedulerSendSocket = new DatagramSocket();
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
 		}
+		
 		schedulerSendPacket=new DatagramPacket(data, data.length, address, port);
+		try {
+			schedulerSendSocket.send(schedulerSendPacket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 		/*parameters:

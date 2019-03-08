@@ -23,8 +23,11 @@ public class ElevatorIntermediate {
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 
+	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
+	private static final int RECEIVEPORTNUM = 159;
+	
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	private static DatagramSocket elevatorSendReceiveSocket;
+	private static DatagramSocket elevatorSendSocket;
 	private static DatagramSocket elevatorReceiveSocket;
 
 	// for iteration 1 there will only be 1 elevator
@@ -42,7 +45,6 @@ public class ElevatorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = ELEVATOR_ID;
 
 	// synchronized table that all of the elevator threads will put their requests
 	// and updates upon
@@ -50,7 +52,7 @@ public class ElevatorIntermediate {
 
 	public ElevatorIntermediate() {
 		try {
-			elevatorSendReceiveSocket = new DatagramSocket();
+			elevatorSendSocket = new DatagramSocket();
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -97,13 +99,13 @@ public class ElevatorIntermediate {
 			if (elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(), 369);
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(), SENDPORTNUM);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 					System.exit(1);
 				}
 				try {
-					elevatorSendReceiveSocket.send(elevatorSendPacket);
+					elevatorSendSocket.send(elevatorSendPacket);
 				} catch (IOException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -115,18 +117,19 @@ public class ElevatorIntermediate {
 
 	}
 
-	public void receivePacket() {
+	public void receivePacket() throws SocketException {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
 		byte data[] = new byte[7];
+		elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
-
+		
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.
-			elevatorSendReceiveSocket.receive(elevatorReceivePacket);
+			elevatorReceiveSocket.receive(elevatorReceivePacket);
 			System.out.print("Received from scheduler: ");
 			System.out.println(Arrays.toString(data));
 		} catch (IOException e) {
@@ -135,6 +138,7 @@ public class ElevatorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		elevatorReceiveSocket.close();
 
 		/*
 		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
