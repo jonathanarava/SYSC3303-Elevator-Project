@@ -14,8 +14,8 @@ public class Scheduler {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = SCHEDULER_ID;
-
+	public static final int RECEIVEPORTNUM = 369;
+	public static byte[] sendData;
 	// request list
 	// Define Data Types for passing to and from Elevator(s) and Floor(s)
 
@@ -551,6 +551,7 @@ public class Scheduler {
 					}
 				}
 			}
+			System.out.println(sendData);
 			sendThePacket(sendData,packetAddress,packetPort);
 		}
 	}
@@ -698,7 +699,7 @@ public class Scheduler {
 			se.printStackTrace();
 			System.exit(1);
 		}
-		schedulerSendPacket=new DatagramPacket(data, data.length(), address, port);
+		schedulerSendPacket=new DatagramPacket(data, data.length, address, port);
 	}
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 		/*parameters:
@@ -719,7 +720,7 @@ public class Scheduler {
 		5:update floor's displays (current floor of the elvator, and direction of the elevator)
 		 */
 		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
-		sendingOutputStream.write(SCHEDULER); //Identifying as the scheduler
+		sendingOutputStream.write(59); //Identifying as the scheduler
 		sendingOutputStream.write(target); // (exact floor or elevator to receive)
 		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
 		// somewhat redundant usage since floors would only receive updates and elevators would only receive requests
@@ -733,7 +734,7 @@ public class Scheduler {
 		}
 		sendingOutputStream.write(0); // not needed (destination request)
 		sendingOutputStream.write(instruction); // scheduler instruction
-		sendData= requestElevator.toByteArray();
+		sendData= sendingOutputStream.toByteArray();
 	}
 }
-}
+

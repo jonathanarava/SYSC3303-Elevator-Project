@@ -4,7 +4,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ElevatorIntermediate {
 	
@@ -40,6 +43,10 @@ public class ElevatorIntermediate {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int RECEIVEPORTNUM = ELEVATOR_ID;
+	
+	
+	// synchronized table that all of the elevator threads will put their requests and updates upon
+	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 
 	public ElevatorIntermediate() {
 		try {
@@ -53,8 +60,8 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public void sendPacket() {
-		byte[] requestElevator = new byte[7];
+	public synchronized void sendPacket() {
+		//byte[] requestElevator = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
@@ -68,28 +75,46 @@ public class ElevatorIntermediate {
 
 		// }
 		// destination.close();
-		requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes into the first index of elevatorArray list, and tells that elevator to return a byte array that
+		//requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes into the first index of elevatorArray list, and tells that elevator to return a byte array that
 																	 // will be the packet that is being sent to the Scheduler. This needs to be done in a dynamic manner so all 
 																	 // elevators can acquire a lock to send a packet one at a time. 
 
 		// allocate sockets, packets
-		try {
-			System.out.println("\nSending to scheduler: " + Arrays.toString(requestElevator));
-			elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
-					369);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.exit(1);
+		synchronized(elevatorTable) {	
+			while(elevatorTable.isEmpty()) {
+				try {
+					elevatorTable.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			System.out.println(elevatorTable.get(0));
+			if(elevatorTable.size() != 0) {
+				try {
+					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.size(), InetAddress.getLocalHost(),
+							369);
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				try {
+					elevatorSendSocket.send(elevatorSendPacket);
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				elevatorTable.clear();
+				elevatorTable.notifyAll();
+			}
 		}
-		try {
-			elevatorSendSocket.send(elevatorSendPacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		
+		
 	}
 
-	public synchronized void receivePacket() {
+	public void receivePacket() {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
@@ -109,8 +134,18 @@ public class ElevatorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
-
-		elevatorArray[0].runElevator(data[6]);
+		
+		
+		switch(data[2]) {
+		case 0:
+			elevatorArray[0].hasRequest = true;
+			elevatorArray[0].motorDirection = data[6];
+			break;
+		case 1:
+			elevatorArray[1].hasRequest = true;
+			elevatorArray[1].motorDirection = data[6];
+			break;
+		}
 		//elevatorArray[0].openCloseDoor(data[2]);
 
 		// send packet for scheduler to know the port this elevator is allocated
@@ -149,7 +184,7 @@ public class ElevatorIntermediate {
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i, 0); // i names the elevator, 0 initializes the floor it starts on
+			elevatorArray[i] = new Elevator(i, 0, elevatorTable); // i names the elevator, 0 initializes the floor it starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
