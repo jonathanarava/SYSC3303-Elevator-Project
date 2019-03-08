@@ -117,12 +117,16 @@ public class ElevatorIntermediate {
 
 	}
 
-	public void receivePacket() throws SocketException {
+	public void receivePacket() {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
 		byte data[] = new byte[7];
-		elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
+		try {
+			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
+		} catch (SocketException e1) {
+			e1.printStackTrace();
+		}
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
 		
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
@@ -153,6 +157,14 @@ public class ElevatorIntermediate {
 		case 1:
 			elevatorArray[1].hasRequest = true;
 			elevatorArray[1].motorDirection = data[6];
+			break;
+		case 2:
+			elevatorArray[2].hasRequest = true;
+			elevatorArray[2].motorDirection = data[6];
+			break;
+		case 3:
+			elevatorArray[3].hasRequest = true;
+			elevatorArray[3].motorDirection = data[6];
 			break;
 		}
 		// elevatorArray[0].openCloseDoor(data[2]);

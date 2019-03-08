@@ -31,6 +31,8 @@ public class Elevator extends Thread {
 										// before he takes more real time requests by the people. Incidentally,
 										// hasRequest == true means that the elevator should move up or down a floor.
 	public boolean hasRTRequest = false;
+	
+	public boolean isUpdate = false;
 
 	public int elevatorNumber;
 	public int RealTimefloorRequest = 3;
@@ -148,6 +150,7 @@ public class Elevator extends Thread {
 				}
 			}
 			elevatorTable.add(responsePacketRequest(requestOrUpdate));
+			System.out.println("reaches here");
 			elevatorTable.notifyAll();
 		}
 	}
