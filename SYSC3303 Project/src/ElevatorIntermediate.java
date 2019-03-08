@@ -88,7 +88,7 @@ public class ElevatorIntermediate {
 			// allocate sockets, packets
 			try {
 				System.out.println("\nSending to scheduler: " + Arrays.toString(requestElevator));
-				elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
+				elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(),
 						369);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
@@ -96,6 +96,7 @@ public class ElevatorIntermediate {
 			}
 			try {
 				elevatorSendReceiveSocket.send(elevatorSendPacket);
+				elevatorTable.clear();
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -178,8 +179,9 @@ public class ElevatorIntermediate {
 		floorRequest = Integer.parseInt(args[1]);// The number of Elevators in the system is passed via
 		elevatorArray[0] = new Elevator(0, floorRequest, elevatorTable);
 		
-		floorRequest = Integer.parseInt(args[2]);// The number of Elevators in the system is passed via
-		elevatorArray[1] = new Elevator(1, floorRequest, elevatorTable);
+		int floorRequest1 = Integer.parseInt(args[2]);// The number of Elevators in the system is passed via
+		System.out.println(floorRequest1);
+		elevatorArray[1] = new Elevator(1, floorRequest1, elevatorTable);
 		
 		for (int i = 0; i < createNumElevators; i++) {
 /*			floorRequest = Integer.parseInt(args[i+1]);// The number of Elevators in the system is passed via
