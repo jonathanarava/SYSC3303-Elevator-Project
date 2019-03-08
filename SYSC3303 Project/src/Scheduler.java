@@ -228,7 +228,7 @@ public class Scheduler extends Thread {
 	}
 
 	// variable definitions used to unpack/ coordinate/ allocate actions
-	void SchdulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket) {
+	void SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket) {
 		byte[] packetData = schedulerElevatorReceivePacket.getData();
 		int packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of
 		// elevators and floors
@@ -675,9 +675,24 @@ public class Scheduler extends Thread {
 		
 		//create temporary testing packets to simulate "Requests" sent to the schedulingAlrogirthm because it needs a parameter
 		
-		DatagramPacket temporary=new DatagramPacket ()
+		byte tempTestData[] = new byte[7];
+		tempTestData[0]= ELEVATOR_ID;//pretending to be an elevator
+		tempTestData[1]= 0;//pretending to be elevator #1
+		tempTestData[2]= REQUEST;//simulating a request
+		tempTestData[3]= 0;//ground floor
+		tempTestData[4]= 0;//up or down
+		tempTestData[5]= 2;//destination floor, request for floor 2 
+		tempTestData[6]= 0;//scheduler instruction- not used now
+			
+		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
+		//
+		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);
+		tempTestData[1]=1;//for elevator number 2
+		tempTestData[5]=3;//destination floor, request for floor 3
+		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
+		//
+		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);
 		
-				
 				for (;;) {
 
 			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket(); // connection to elevator class
