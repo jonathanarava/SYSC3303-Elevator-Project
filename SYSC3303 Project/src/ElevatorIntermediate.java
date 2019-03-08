@@ -160,8 +160,8 @@ public class ElevatorIntermediate {
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
 		for (int i = 0; i < createNumElevators; i++) {
-			floorRequest = Integer.parseInt(args[i+1]);// The number of Elevators in the system is passed via
-			elevatorArray[i] = new Elevator(i, floorRequest); // i names the elevator, 0 initializes the floor it starts on
+			//floorRequest = Integer.parseInt(args[i+1]);// The number of Elevators in the system is passed via
+			elevatorArray[i] = new Elevator(i, 0); // i names the elevator, 0 initializes the floor it starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
