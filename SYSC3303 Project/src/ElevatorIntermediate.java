@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class ElevatorIntermediate {
-	
+
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;//elevator is in hold state
 	private static final byte UP = 0x02;//elevator is going up
@@ -22,10 +23,13 @@ public class ElevatorIntermediate {
 	private static final int DOOR_DURATION=4;//duration that doors stay open for
 	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
-	
+
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendReceiveSocket;
-	private static DatagramSocket elevatorReceiveSocket;
+
+	public static int currentFloor;
+	public static int destFloor;
+	public static int floorRequest;
 
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
@@ -34,19 +38,14 @@ public class ElevatorIntermediate {
 	// arrays to keep track of the number of elevators, eliminates naming confusion
 	private static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
+	
+	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 
-	private byte[] requestElevator = new byte[3];
-
-	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = ELEVATOR_ID;
-	
-	
-	// synchronized table that all of the elevator threads will put their requests and updates upon
-	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	public static final int RECEIVEPORTNUM = 23;
 
 	public ElevatorIntermediate() {
 		try {
@@ -60,82 +59,79 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public synchronized void sendPacket() {
-		//byte[] requestElevator = new byte[7];
+	public synchronized void sendPacket() throws InterruptedException {
+
+		byte[] requestElevator = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 
-		// System.out.println("Enter floor number: ");
+	   //System.out.println("Enter floor number: ");
 
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
+		/*Scanner destination = new Scanner(System.in);
+		int floorRequest;
+		if (destination.nextInt() != 0) {
+		floorRequest = destination.nextInt();
+	    } else {
 
-		// }
-		// destination.close();
-		//requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes into the first index of elevatorArray list, and tells that elevator to return a byte array that
-																	 // will be the packet that is being sent to the Scheduler. This needs to be done in a dynamic manner so all 
-																	 // elevators can acquire a lock to send a packet one at a time. 
+		}
+		 destination.close();*/
 
-		// allocate sockets, packets
-		synchronized(elevatorTable) {	
-			while(elevatorTable.isEmpty()) {
-				try {
-					elevatorTable.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		requestElevator = elevatorArray[0].responsePacketRequest(1);// elevatorArray[0].floorRequest);
+		currentFloor = elevatorArray[0].sensor;
+		destFloor = elevatorArray[0].floorRequest;
+
+		synchronized(elevatorTable) {
+			while ((currentFloor == destFloor-1)||elevatorTable.isEmpty()) {
+				elevatorTable.wait();
+				break;
 			}
-
-			//System.out.println(elevatorTable.get(0));
-			if(elevatorTable.size() != 0) {
-				try {
-					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(),
-							369);
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				try {
-					elevatorSendReceiveSocket.send(elevatorSendPacket);
-					//System.out.println(Arrays.toString(elevatorSendPacket.getData()));
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				elevatorTable.clear();
-				elevatorTable.notifyAll();
+			// allocate sockets, packets
+			try {
+				System.out.println("\nSending to scheduler: " + Arrays.toString(requestElevator));
+				elevatorSendPacket = new DatagramPacket(requestElevator, requestElevator.length, InetAddress.getLocalHost(),
+						369);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+			try {
+				elevatorSendReceiveSocket.send(elevatorSendPacket);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
 			}
 		}
-		
-		
 	}
 
-	public void receivePacket() {
+	public synchronized void receivePacket() throws InterruptedException {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
 
 		byte data[] = new byte[7];
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
+		synchronized(this){
+			// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
-		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
-
-		try {
-			// Block until a datagram packet is received from receiveSocket.
-			elevatorSendReceiveSocket.receive(elevatorReceivePacket);
-			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
-		} catch (IOException e) {
-			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
-			e.printStackTrace();
-			System.exit(1);
+			while (currentFloor == destFloor) {
+				elevatorArray[0].openCloseDoor((byte) 1);
+				wait();
+				break;
+			}
+			try {
+				// Block until a datagram packet is received from receiveSocket.
+				elevatorSendReceiveSocket.receive(elevatorReceivePacket);
+				System.out.print("Received from scheduler: ");
+				System.out.println(Arrays.toString(data));
+				notifyAll();
+			} catch (IOException e) {
+				System.out.print("IO Exception: likely:");
+				System.out.println("Receive Socket Timed Out.\n" + e);
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
-		
+
+		elevatorArray[0].runElevator(data[6]);
 		
 		switch(data[2]) {
 		case 0:
@@ -156,40 +152,44 @@ public class ElevatorIntermediate {
 		// }
 	}
 
-	public static void main(String args[]) throws IOException {// 2 arguments: args[0] is the number of Elevators in the
-																// system and
+	public static void main(String args[]) throws IOException, InterruptedException {// 2 arguments: args[0] is the number of Elevators in the
+		// system and
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
-														// argument[0]
-
+		// argument[0]
+		System.out.println(createNumElevators);
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
 		// port numbers there
 		// allocating port numbers to the variable number of elevators and floors would
 		// also be difficult, just using the ones which are available
-		int elevatorPortNumbers[] = new int[createNumElevators];
+
+		//int elevatorPortNumbers[] = new int[createNumElevators];
 
 		// arrays to keep track of the number of elevators, eliminates naming confusion
 		elevatorArray = new Elevator[createNumElevators];
 		elevatorThreadArray = new Thread[createNumElevators];
 
-		// Lets create a socket for the elevator Intermediate class to communicate
-		// with the scheduler. All the elevator threads will use this.
-
-		// allocate receive packet
-		byte data[] = new byte[100];
-		schedulerReceivePacket = new DatagramPacket(data, data.length);
-
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
+		
+		floorRequest = Integer.parseInt(args[1]);// The number of Elevators in the system is passed via
+		elevatorArray[0] = new Elevator(0, floorRequest, elevatorTable);
+		
+		floorRequest = Integer.parseInt(args[2]);// The number of Elevators in the system is passed via
+		elevatorArray[1] = new Elevator(1, floorRequest, elevatorTable);
+		
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i, 0, elevatorTable); // i names the elevator, 0 initializes the floor it starts on
+/*			floorRequest = Integer.parseInt(args[i+1]);// The number of Elevators in the system is passed via
+			elevatorArray[i] = new Elevator(i, floorRequest);
+			floorRequest = Integer.parseInt(args[i+2]);// The number of Elevators in the system is passed via
+			elevatorArray[i] = new Elevator(i, floorRequest); */// i names the elevator, 0 initializes the floor it starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
-
+		//
 		while (true) {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();

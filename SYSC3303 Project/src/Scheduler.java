@@ -205,9 +205,8 @@ public class Scheduler extends Thread {
 				if(requestOrUpdate == 1) {
 					if(destFloor - currentFloor > 0) {
 						addToUpQueue(upQueue1);
-
 						//goingUpList(upQueue1, destFloor);
-					} else if (destFloor - currentFloor < 0) {
+					} else if (destFloor - currentFloor < 0) {					
 						addToDownQueue(downQueue1);
 						//goingDownList(downQueue1, destFloor);
 					}
@@ -249,13 +248,20 @@ public class Scheduler extends Thread {
 	}
 	
 	public void addToDownQueue(LinkedList<Integer> downQueue) {
-		for(int i=0;i<downQueue.size();i++) {
-			if(destFloor < downQueue.get(i)) {
-				downQueue.add(i+1,destFloor);
+		for(int i=0;i<=downQueue.size();i++) {
+			if (downQueue.isEmpty()){
+				downQueue.addFirst(destFloor);
+				break;
+			}
+			if((destFloor <= downQueue.get(i))) {
+				downQueue.add(i, destFloor);
 				break;
 			} else if(i == downQueue.size()) {
 				downQueue.addLast(destFloor);
-			}
+				break;
+				
+			} 
+			
 		}
 	}
 	
@@ -332,7 +338,7 @@ public class Scheduler extends Thread {
 					if(!(x.get(i).isEmpty())) {
 						LinkedList<Integer> firstUpRequest = x.get(i);
 						int first = firstUpRequest.getFirst();
-						byte[] responseByteArray = responsePacket(1, currentFloor, first);
+						byte[] responseByteArray = responsePacket(i, currentFloor, first);
 						if (currentFloor == first) {
 							upQueue1.removeFirst();
 						}
@@ -344,7 +350,7 @@ public class Scheduler extends Thread {
 					if(!(x.get(i+1).isEmpty())) {
 						LinkedList<Integer> firstDownRequest = x.get(i+1);
 						int first1 = firstDownRequest.getFirst();
-						byte[] responseByteArrayd1 = responsePacket(1, currentFloor, first1);
+						byte[] responseByteArrayd1 = responsePacket(i, currentFloor, first1);
 						if (currentFloor == first1) {
 							downQueue1.removeFirst();
 						}

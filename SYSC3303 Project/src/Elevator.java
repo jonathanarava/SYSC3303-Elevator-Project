@@ -1,4 +1,3 @@
-
 //no main method
 //Output: floor request, 
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
@@ -22,23 +21,30 @@ public class Elevator extends Thread {
 	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	
-	public byte motorDirection;	// make getters and setter
-	public boolean hasRequest = false;	// make getters and setter
 	
-	public int elevatorNumber;
-	public int RealTimefloorRequest = 3;
+	public int name;
+	public int floorRequest;
 
+	public byte motorDirection;
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-	
-	private List<byte[]> elevatorTable;
-	
+
+	public Elevator() {
+	}
+
 	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable) {
-		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
+		this.name = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
+
+		try {
+			elevatorSendSocket = new DatagramSocket();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -66,14 +72,14 @@ public class Elevator extends Thread {
 
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(ELEVATOR_ID); // elevator
-		requestElevator.write(elevatorNumber); // elevator id
+		requestElevator.write(name); // elevator id
 
 		// request/ update
 		if (requestUpdate == REQUEST) {
 			requestElevator.write(REQUEST); // request/
 			requestElevator.write((byte) currentFloor(sensor)); // current floor
 			requestElevator.write(0); // up or down
-			requestElevator.write(RealTimefloorRequest); // dest floor
+			requestElevator.write(floorRequest); // dest floor
 			requestElevator.write(0); // instruction
 		} else if (requestUpdate == UPDATE) {
 			requestElevator.write(UPDATE); // update
@@ -113,18 +119,18 @@ public class Elevator extends Thread {
 		return sensor;
 	}
 
-	public int runElevator() {
+	public int runElevator(byte motorDirection) {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
-				System.out.println("Current floor: " + sensor); // sensor = current floor
-				Thread.sleep(1000);
+				System.out.println("current floor: " + sensor); // sensor = current floor
+				Thread.sleep(3000);
 				if (motorDirection == UP) {
-					System.out.println("Elevator is going up...");
+					System.out.println("Elevator going up");
 					sensor++; // increment the floor
 					currentFloor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
-					System.out.println("Elevator is going down...");
+					System.out.println("Elevator going down");
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
@@ -134,7 +140,7 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("Current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -144,7 +150,8 @@ public class Elevator extends Thread {
 		sensor = currentSensor;
 	}
 	
-	
+	private List<byte[]> elevatorTable;
+	public boolean hasRequest;
 	public synchronized void run() { //System.out.println("Enter floor number: ");
 		while(true) {
 			synchronized(elevatorTable) {
@@ -161,8 +168,9 @@ public class Elevator extends Thread {
 				elevatorTable.notifyAll();
 				//System.out.println("reached here");
 
+				
 				if(hasRequest == true) {
-					runElevator();
+					runElevator(motorDirection);
 					// do something
 					hasRequest = false;
 					System.out.println("Sensor reading = " + sensor);
@@ -223,5 +231,21 @@ public class Elevator extends Thread {
 	 * receivePacket.getLength(),receivePacket.getAddress(), //
 	 * receivePacket.getPort()); //} }
 	 */
-	 
+
+	/*
+	 * public void run() { //System.out.println("Enter floor number: ");
+	 * //floorRequest = 2; //Scanner destination = new Scanner(System.in);
+	 * 
+	 * //if (destination.nextInt() != 0) { //floorRequest = destination.nextInt();
+	 * //} else {
+	 * 
+	 * //} //destination.close();
+	 * 
+	 * try { sendPacket(); } catch (InterruptedException e) { // TODO Auto-generated
+	 * catch block e.printStackTrace(); }
+	 * 
+	 * receivePacket();
+	 * 
+	 * //destination.close();
+	 */
 }
