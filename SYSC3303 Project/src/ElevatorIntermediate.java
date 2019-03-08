@@ -94,7 +94,7 @@ public class ElevatorIntermediate {
 			if(elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.size(), InetAddress.getLocalHost(),
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(),
 							369);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -136,7 +136,12 @@ public class ElevatorIntermediate {
 		}
 		
 		
-		switch(data[2]) {
+												/*
+												 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
+												 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
+												 * instruction) (
+												 */
+		switch(data[2]) {	
 		case 0:
 			elevatorArray[0].hasRequest = true;
 			elevatorArray[0].motorDirection = data[6];
@@ -188,6 +193,9 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
+		elevatorArray[0].hasRTRequest = true;		//**************TESTING LINE 1.0************** this line makes only elevator 0 be active in this system. Put this line inside above for loop with i as the index of
+													//											elevatorArray so all elevator threads can be active. Remove the boolean constraints inside Elevator runnable that will 
+													//											prevent a (hasRTRequest==false) thread from running 
 
 		while (true) {
 			elevatorHandler.sendPacket();
