@@ -80,7 +80,7 @@ public class Scheduler extends Thread {
 		try {
 			System.out.println("waiting");
 			schedulerSocketSendReceiveElevator.receive(schedulerElevatorReceivePacket);
-			System.out.println("Request from elevator: " + Arrays.toString(data));
+			System.out.println("Request from elevator" + data[1] + ": " + Arrays.toString(data));
 
 			// schedulerSocketReceiveElevator.close();
 			// schedulerSocketSendReceiveElevator.close()
@@ -211,7 +211,9 @@ public class Scheduler extends Thread {
 						addToDownQueue(downQueue1);
 						//goingDownList(downQueue1, destFloor);
 					}
-				} else if (elevatorOrFloorID == 1) {
+				}
+			} else if (elevatorOrFloorID == 1) {
+				if(requestOrUpdate == 1) {
 					if(destFloor - currentFloor < 0) {
 						addToUpQueue(upQueue2);
 						//goingUpList(upQueue2, destFloor);
@@ -225,7 +227,7 @@ public class Scheduler extends Thread {
 			floorPacketHandler();
 		}		
 	}
-	
+
 	
 	
 	public void addToUpQueue(LinkedList<Integer> upQueue) {
@@ -307,92 +309,52 @@ public class Scheduler extends Thread {
 	public static void main(String args[]) throws InterruptedException {
 
 		Scheduler packet = new Scheduler();
-		
-/*		Thread t1 = new Thread(new Runnable() {				// thread to run the elevator going up 
-			public void run() {
-				while(upQueue1 != null) {
-					int firstDownRequest = downQueue1.getFirst();
-					responsePacket(1, currentFloor, firstDownRequest);
-				}
-			}
-		});
-		
-		Thread t2 = new Thread(new Runnable() {				// thread to run the elevator going down 
-			public void run() {
-				while(downQueue1 != null) {
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				while (upQueue1 != null) {
-					int firstUpRequest = upQueue1.getFirst();
-					responsePacket(1, currentFloor, firstUpRequest);
-				}
 
-			}
-		});
-		
-		t1.setPriority(MAX_PRIORITY);
-		t2.setPriority(MAX_PRIORITY);
-		
-		t1.start();
-		t2.start();
-		*/
 		ArrayList<LinkedList<Integer>> x = new ArrayList<>();
 		x.add(0,upQueue1);
 		x.add(1,downQueue1);
 		x.add(2,upQueue2);
-		x.add(3,downQueue1);
-		
+		x.add(3,downQueue2);
+
 		for (;;) {
 			Scheduler.elevatorReceivePacket();   // connection to elevator class
 			Direction(destFloor, currentFloor);
-			
-			
+
+
 			if(packet.requestOrUpdate == 1) {
 				packet.packetDealer();
 			}
 			for(int i=0; i <= 2; i=i+2) {
-					switch(direction) {
-					case UP:
-						if(x.indexOf(i) != 0) {
-							LinkedList<Integer> firstUpRequest = x.get(0);
-							int first = firstUpRequest.getFirst();
-							
-											
-							
-							
-							byte[] responseByteArray = responsePacket(1, currentFloor, first);
-							if (currentFloor == first) {
-								upQueue1.removeFirst();
-							}
-							Scheduler.elevatorSendPacket(responseByteArray);
+				System.out.println(i);
+				switch(direction) {
+				
+				case UP:
+					if(!(x.get(i).isEmpty())) {
+						LinkedList<Integer> firstUpRequest = x.get(i);
+						int first = firstUpRequest.getFirst();
+						byte[] responseByteArray = responsePacket(1, currentFloor, first);
+						if (currentFloor == first) {
+							upQueue1.removeFirst();
 						}
-						
-						break;
-					case DOWN:
-						while(x.indexOf(i+1) != 0) {
-							int firstUpRequest2 = downQueue1.getFirst();
-							byte[] responseByteArrayd1 = responsePacket(1, currentFloor, firstUpRequest2);
-							if (currentFloor == firstUpRequest2) {
-								downQueue1.removeFirst();
-							}
-						}
-						break;
-					default:
-						break;
+						Scheduler.elevatorSendPacket(responseByteArray);
 					}
+
+					break;
+				case DOWN:
+					if(!(x.get(i+1).isEmpty())) {
+						LinkedList<Integer> firstDownRequest = x.get(i+1);
+						int first1 = firstDownRequest.getFirst();
+						byte[] responseByteArrayd1 = responsePacket(1, currentFloor, first1);
+						if (currentFloor == first1) {
+							downQueue1.removeFirst();
+						}
+						Scheduler.elevatorSendPacket(responseByteArrayd1);
+					}
+					break;
+				default:
+					break;
 				}
 			}
-			
-
-			
-			
-
-			
-		
 		}
 	}
+}

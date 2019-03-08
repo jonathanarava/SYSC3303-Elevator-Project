@@ -5,6 +5,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
@@ -21,28 +22,23 @@ public class Elevator extends Thread {
 	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	
+	public byte motorDirection;	// make getters and setter
+	public boolean hasRequest = false;	// make getters and setter
 	
-	public int name;
-	public int floorRequest = 3;
+	public int elevatorNumber;
+	public int RealTimefloorRequest = 3;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
-
-	public Elevator() {
-	}
-
-	public Elevator(int name, int initiateFloor) {
-		this.name = name;// mandatory for having it actually declared as a thread object
+	
+	private List<byte[]> elevatorTable;
+	
+	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable) {
+		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
+		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
-
-		try {
-			elevatorSendSocket = new DatagramSocket();
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -70,14 +66,14 @@ public class Elevator extends Thread {
 
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(ELEVATOR_ID); // elevator
-		requestElevator.write(name); // elevator id
+		requestElevator.write(elevatorNumber); // elevator id
 
 		// request/ update
 		if (requestUpdate == REQUEST) {
 			requestElevator.write(REQUEST); // request/
 			requestElevator.write((byte) currentFloor(sensor)); // current floor
 			requestElevator.write(0); // up or down
-			requestElevator.write(floorRequest); // dest floor
+			requestElevator.write(RealTimefloorRequest); // dest floor
 			requestElevator.write(0); // instruction
 		} else if (requestUpdate == UPDATE) {
 			requestElevator.write(UPDATE); // update
@@ -117,18 +113,18 @@ public class Elevator extends Thread {
 		return sensor;
 	}
 
-	public int runElevator(byte motorDirection) {
+	public int runElevator() {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
-				System.out.println("current floor: " + sensor); // sensor = current floor
-				Thread.sleep(3000);
+				System.out.println("Current floor: " + sensor); // sensor = current floor
+				Thread.sleep(1000);
 				if (motorDirection == UP) {
-					System.out.println("Elevator going up");
+					System.out.println("Elevator is going up...");
 					sensor++; // increment the floor
 					currentFloor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
-					System.out.println("Elevator going down");
+					System.out.println("Elevator is going down...");
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
@@ -138,7 +134,7 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("Current floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -146,6 +142,33 @@ public class Elevator extends Thread {
 	// sets Current location of elevator through this setter
 	public void setSensor(int currentSensor) {
 		sensor = currentSensor;
+	}
+	
+	
+	public synchronized void run() { //System.out.println("Enter floor number: ");
+		while(true) {
+			synchronized(elevatorTable) {
+				while(elevatorTable.size() != 0) {
+					try {
+						elevatorTable.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				elevatorTable.add(responsePacketRequest(1));
+				elevatorTable.notifyAll();
+				//System.out.println("reached here");
+
+				if(hasRequest == true) {
+					runElevator();
+					// do something
+					hasRequest = false;
+					System.out.println("Sensor reading = " + sensor);
+				}
+			}
+		}
 	}
 
 	/*
@@ -200,21 +223,5 @@ public class Elevator extends Thread {
 	 * receivePacket.getLength(),receivePacket.getAddress(), //
 	 * receivePacket.getPort()); //} }
 	 */
-
-	/*
-	 * public void run() { //System.out.println("Enter floor number: ");
-	 * //floorRequest = 2; //Scanner destination = new Scanner(System.in);
-	 * 
-	 * //if (destination.nextInt() != 0) { //floorRequest = destination.nextInt();
-	 * //} else {
-	 * 
-	 * //} //destination.close();
-	 * 
-	 * try { sendPacket(); } catch (InterruptedException e) { // TODO Auto-generated
-	 * catch block e.printStackTrace(); }
-	 * 
-	 * receivePacket();
-	 * 
-	 * //destination.close();
-	 */
+	 
 }
