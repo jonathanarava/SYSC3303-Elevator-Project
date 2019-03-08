@@ -9,11 +9,12 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.lang.*;
 
-public class Scheduler extends Thread{
+public class Scheduler extends Thread {
 
 	// Packets and sockets required to connect with the Elevator and Floor class
 
@@ -41,6 +42,10 @@ public class Scheduler extends Thread{
 	// lists to keep track of what requests need to be handled
 	
 	private static LinkedList<Thread> queue  = new LinkedList<Thread>();
+	private static LinkedList<Integer> upQueue1  = new LinkedList<Integer>();
+	private static LinkedList<Integer> downQueue1  = new LinkedList<Integer>();
+	private static LinkedList<Integer> upQueue2  = new LinkedList<Integer>();
+	private static LinkedList<Integer> downQueue2  = new LinkedList<Integer>();
 	private static int[] allDestinationFloors = new int[queue.size()];
 	public static Object obj = new Object();
 	public static int limit = numFloors*numElevators;
@@ -59,7 +64,7 @@ public class Scheduler extends Thread{
 		}
 	}
 
-	public static synchronized void elevatorReceivePacket() {
+	public static void elevatorReceivePacket() {
 
 														/* ELEVATOR RECEIVING PACKET HERE*/
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
@@ -92,7 +97,7 @@ public class Scheduler extends Thread{
 		destFloor = data[5];
 	}
 	
-	public static synchronized void elevatorSendPacket() {
+	public static void elevatorSendPacket() {
 													/* SENDING ELEVATOR PACKET HERE*/
 
 		byte[] responseByteArray = new byte[7];
@@ -110,7 +115,7 @@ public class Scheduler extends Thread{
 		}
 	}
 
-	public static synchronized void floorReceivePacket() {
+	public static void floorReceivePacket() {
 
 													/* FLOOR RECEIVING PACKET HERE*/
 		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
@@ -137,7 +142,7 @@ public class Scheduler extends Thread{
 		destFloor = data[5];
 	}
 	
-	public static synchronized void floorSendPacket() {
+	public static void floorSendPacket() {
 														/*FLOOR SENDING PACKET HERE*/
 
 		byte[] responseByteArray = new byte[5];
@@ -186,47 +191,91 @@ public class Scheduler extends Thread{
 	}
 	
 	
-	public enum DIRECTION{
-		HOLD, UP, DOWN
-	}
-	
 	/* Splitting the packet to determine if its for a floor or elevator request   */
-	
+/*	
 	public void packetDealer() {
 		if (elevatorOrFloor == 21) {
-			elevatorPacketHandler();
-			
-		} else if (elevatorOrFloor == 69 ) {
+			if(elevatorOrFloorID == 1) {
+				if(destFloor - currentFloor > 0) {
+					addToUpQueue(upQueue1);
+					goingUpList(upQueue1, destFloor);
+				} else if (destFloor - currentFloor < 0) {
+					addToDownQueue(downQueue1);
+					goingDownList(downQueue1, destFloor);
+				}
+			} else if (elevatorOrFloorID == 2) {
+				if(destFloor - currentFloor < 0) {
+					addToUpQueue(upQueue2);
+					goingUpList(upQueue2, destFloor);
+				} else if (destFloor - currentFloor > 0) {
+					addToDownQueue(downQueue2);
+					goingDownList(downQueue2, destFloor);
+				}
+			}			
+		} else if (elevatorOrFloor == 69) {
 			floorPacketHandler();
-		}
-		
+		}		
 	}
 	
-	private synchronized void elevatorPacketHandler() {
-		if(elevatorOrFloorID == 1) {
-			if(DIRECTION.UP != null) {
-				
-				
+	public void addToUpQueue(LinkedList<Integer> upQueue) {
+		for(int i=0;i<upQueue.size();i++) {
+			if(destFloor < upQueue.get(i)) {
+				upQueue.add(i+1,destFloor);
+				break;
+			} else if(i == upQueue.size()) {
+				upQueue.addLast(destFloor);
 			}
-		} else if (elevatorOrFloorID == 2) {
-			goingDown = true;
 		}
+	}
+	
+	public void addToDownQueue(LinkedList<Integer> downQueue) {
+		for(int i=0;i<downQueue.size();i++) {
+			if(destFloor < downQueue.get(i)) {
+				downQueue.add(i+1,destFloor);
+				break;
+			} else if(i == downQueue.size()) {
+				downQueue.addLast(destFloor);
+			}
+		}
+	}
+	
+		
+	private synchronized void goingUpList(LinkedList<Integer> queueType, int destFloor2) {
+		synchronized(queueType) {
+			if(ID == 1) {
+				
+			} else if (ID == 2) {
+
+			}
+		}	
+	}
+	
+	private synchronized void goingDownList(LinkedList<Integer> queueType, int destFloor2) {
+		synchronized(queueType) {
+			while(queueType.size()==0) {
+				try {
+					queueType.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if(ID == 1) {
+				
+			} else if (ID == 2) {
+
+			}
+		}
+	}
+
+	private synchronized void elevatorPacketHandler(int ID) {
+		
 		synchronized() {
 			
 		}
 	}
 	
-
-	
-	private Thread newThread;
-	private Thread createNewthread(int destFloor2) {
-		newThread = new Scheduler();
-		newThread.start();
-		return newThread;	
-	} 
-	
-	public final void interruptThread() {
-		newThread.interrupt();
+	public final void interruptThread(Thread t) {
+		t.interrupt();
 	}
 	
 	public void run() {		
@@ -239,25 +288,10 @@ public class Scheduler extends Thread{
 				} catch (InterruptedException e) {
 					return;
 				}
-
-			
-
-		/*		if(allDestinationFloors.length > 0) {
-					for(int i : allDestinationFloors) {
-						if (destFloor == i) {
-							makeThread = false;
-						}						
-					}
-					if (makeThread = false) {
-						queue.add(createNewthread(destFloor));
-					}
-				} else if (makeThread = false) {
-					queue.add(createNewthread(destFloor));
-				}*/
 			}
 			elevatorPacketHandler();
 		}
-	}
+	}*/
 
 
 
@@ -274,10 +308,9 @@ public class Scheduler extends Thread{
 		Scheduler packet = new Scheduler();
 		for (;;) {
 
-			packet.elevatorPacket();   // connection to elevator class
+			packet.elevatorReceivePacket();   // connection to elevator class
+			
 
-
-			//packet.floorPacket();		// connection to floor class
 		}
 	}
 }
