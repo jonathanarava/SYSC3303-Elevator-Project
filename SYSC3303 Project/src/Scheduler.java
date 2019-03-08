@@ -153,7 +153,6 @@ public class Scheduler extends Thread {
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
-
 			e1.printStackTrace();
 		}
 	}
@@ -669,8 +668,17 @@ public class Scheduler extends Thread {
 	public static void main(String args[]) throws InterruptedException {
 		Scheduler Scheduler = new Scheduler();
 		Scheduler.linkedListInitialization();
-
-		for (;;) {
+		
+		//elevatorStopsUp[0].add(3);
+		//elevatorStopsDown[1].add(2);
+		
+		
+		//create temporary testing packets to simulate "Requests" sent to the schedulingAlrogirthm because it needs a parameter
+		
+		DatagramPacket temporary=new DatagramPacket ()
+		
+				
+				for (;;) {
 
 			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket(); // connection to elevator class
 			//Schedules the queuing (scheduling algorytm) of what request needs to be done and also sends the packet to elevatorIntermediate at the end
