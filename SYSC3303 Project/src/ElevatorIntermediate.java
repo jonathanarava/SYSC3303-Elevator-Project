@@ -95,7 +95,6 @@ public class ElevatorIntermediate {
 				}
 			}
 
-			System.out.println(elevatorTable.get(0));
 			if (elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
@@ -153,19 +152,22 @@ public class ElevatorIntermediate {
 		case 0:
 			elevatorArray[0].hasRequest = true;
 			elevatorArray[0].motorDirection = data[6];
-			elevatorArray[0].isUpdate = 1;
+			elevatorArray[0].isUpdate = true;
 			break;
 		case 1:
 			elevatorArray[1].hasRequest = true;
 			elevatorArray[1].motorDirection = data[6];
+			elevatorArray[1].isUpdate = true;
 			break;
 		case 2:
 			elevatorArray[2].hasRequest = true;
 			elevatorArray[2].motorDirection = data[6];
+			elevatorArray[2].isUpdate = true;
 			break;
 		case 3:
 			elevatorArray[3].hasRequest = true;
 			elevatorArray[3].motorDirection = data[6];
+			elevatorArray[3].isUpdate = true;
 			break;
 		}
 		// elevatorArray[0].openCloseDoor(data[2]);

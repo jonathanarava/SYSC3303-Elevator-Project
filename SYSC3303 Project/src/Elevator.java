@@ -18,7 +18,7 @@ public class Elevator extends Thread {
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final int DOOR_OPEN = 1;// the door is open when == 1
 	private static final int DOOR_DURATION = 4;// duration that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
@@ -31,9 +31,9 @@ public class Elevator extends Thread {
 										// intermediate
 										// before he takes more real time requests by the people. Incidentally,
 										// hasRequest == true means that the elevator should move up or down a floor.
-	public boolean hasRTRequest = false;
+	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 	
-	public int isUpdate = 0;
+	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
 
 	public int elevatorNumber;
 	public int RealTimefloorRequest = 3;
@@ -64,7 +64,12 @@ public class Elevator extends Thread {
 		 * accordingly
 		 */
 	}
-
+	
+	/**
+	 * 
+	 * @param requestUpdate
+	 * @return byte[] to be put on the synchronized table
+	 */
 	public byte[] responsePacketRequest(int requestUpdate) {
 
 		/*
@@ -154,7 +159,7 @@ public class Elevator extends Thread {
 				}
 			}
 			elevatorTable.add(responsePacketRequest(requestOrUpdate));
-			isUpdate = 0;
+			isUpdate = false;
 			elevatorTable.notifyAll();
 		}
 	}
@@ -162,7 +167,7 @@ public class Elevator extends Thread {
 	public void run() {
 		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
 								// while(true) to activate all elevator threads in this system
-			if (!hasRequest && isUpdate == 0) {
+			if (!hasRequest && !isUpdate) {
 				sendPacket(1);
 			} else if (hasRequest) {
 				runElevator();
