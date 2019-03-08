@@ -685,13 +685,11 @@ public class Scheduler extends Thread {
 		tempTestData[6]= 0;//scheduler instruction- not used now
 			
 		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
-		//
-		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);
+		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);//call method with simulated packet for elevator #1
 		tempTestData[1]=1;//for elevator number 2
 		tempTestData[5]=3;//destination floor, request for floor 3
 		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
-		//
-		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);
+		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);//call method with simulated packet for elevator #2
 		
 				for (;;) {
 
