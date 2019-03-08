@@ -11,7 +11,8 @@ import java.util.Scanner;
 public class Elevator extends Thread {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte DISPLAYUPDATE = 0x05;
 	private static final byte UP = 0x01;// elevator is going up
 	private static final byte DOWN = 0x02;// elevator is going down
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
@@ -128,8 +129,11 @@ public class Elevator extends Thread {
 				e.printStackTrace();
 			}
 		} else if (motorDirection == HOLD) {
-			currentFloor(sensor); // updates current floor - in this case nothing changes
+			currentFloor(sensor); // brings the elevator back to holding state. 
+		} else if(motorDirection == DISPLAYUPDATE) {
+			currentFloor(sensor);	// update the display so the current floor is shown
 		}
+		
 		System.out.println("Came to floor: " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
@@ -150,7 +154,7 @@ public class Elevator extends Thread {
 				}
 			}
 			elevatorTable.add(responsePacketRequest(requestOrUpdate));
-			System.out.println("reaches here");
+			isUpdate = 0;
 			elevatorTable.notifyAll();
 		}
 	}
