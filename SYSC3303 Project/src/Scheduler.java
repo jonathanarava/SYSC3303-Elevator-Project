@@ -202,24 +202,25 @@ public class Scheduler extends Thread {
 	public void packetDealer() {
 		if (elevatorOrFloor == 21) {
 			if(elevatorOrFloorID == 0) {
-				if(destFloor - currentFloor > 0) {
-					System.out.println("here");
-					addToUpQueue(upQueue1);
-					
-					//goingUpList(upQueue1, destFloor);
-				} else if (destFloor - currentFloor < 0) {
-					addToDownQueue(downQueue1);
-					//goingDownList(downQueue1, destFloor);
+				if(requestOrUpdate == 1) {
+					if(destFloor - currentFloor > 0) {
+						addToUpQueue(upQueue1);
+
+						//goingUpList(upQueue1, destFloor);
+					} else if (destFloor - currentFloor < 0) {
+						addToDownQueue(downQueue1);
+						//goingDownList(downQueue1, destFloor);
+					}
+				} else if (elevatorOrFloorID == 1) {
+					if(destFloor - currentFloor < 0) {
+						addToUpQueue(upQueue2);
+						//goingUpList(upQueue2, destFloor);
+					} else if (destFloor - currentFloor > 0) {
+						addToDownQueue(downQueue2);
+						//goingDownList(downQueue2, destFloor);
+					}
 				}
-			} else if (elevatorOrFloorID == 1) {
-				if(destFloor - currentFloor < 0) {
-					addToUpQueue(upQueue2);
-					//goingUpList(upQueue2, destFloor);
-				} else if (destFloor - currentFloor > 0) {
-					addToDownQueue(downQueue2);
-					//goingDownList(downQueue2, destFloor);
-				}
-			}			
+			}
 		} else if (elevatorOrFloor == 69) {
 			floorPacketHandler();
 		}		
@@ -229,18 +230,14 @@ public class Scheduler extends Thread {
 	
 	public void addToUpQueue(LinkedList<Integer> upQueue) {
 		for(int i=0;i<=upQueue.size();i++) {
-			System.out.println("hi56");
 			if (upQueue.isEmpty()){
-				System.out.println("hi3");
 				upQueue.addFirst(destFloor);
 				break;
 			}
-			if(destFloor < upQueue.get(i-1)) {
-				System.out.println("hi");
+			if((destFloor <= upQueue.get(i))) {
 				upQueue.add(i, destFloor);
 				break;
 			} else if(i == upQueue.size()) {
-				System.out.println("hi2");
 				upQueue.addLast(destFloor);
 				break;
 				
@@ -356,19 +353,13 @@ public class Scheduler extends Thread {
 			
 			
 			if(packet.requestOrUpdate == 1) {
-				System.out.println("if ");
 				packet.packetDealer();
-				System.out.println(upQueue1);
 			}
 			for(int i=0; i <= 2; i=i+2) {
-				System.out.println("for loop");
-				System.out.println(direction);
 					switch(direction) {
 					case UP:
-						System.out.println("UP ");
 						if(x.indexOf(i) != 0) {
 							LinkedList<Integer> firstUpRequest = x.get(0);
-							System.out.println(firstUpRequest);	
 							int first = firstUpRequest.getFirst();
 							
 											
