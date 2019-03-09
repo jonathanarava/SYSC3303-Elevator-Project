@@ -22,6 +22,7 @@ public class Elevator extends Thread {
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 
 	public int name;
+	public int destFloor;
 	public int floorRequest = 3;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
@@ -33,9 +34,10 @@ public class Elevator extends Thread {
 		//For Junit testing only
 	}
 
-	public Elevator(int name, int initiateFloor) {
+	public Elevator(int name, int initiateFloor, int destFloor) {
 		this.name = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
+		this.destFloor = destFloor;
 
 		try {
 			elevatorSendSocket = new DatagramSocket();

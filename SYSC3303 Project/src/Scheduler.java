@@ -150,7 +150,7 @@ public class Scheduler extends Thread {
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 		try {
-			schedulerSocketSendReceiveFloor.send(schedulerElevatorSendPacket);
+			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -612,21 +612,7 @@ public class Scheduler extends Thread {
 	}
 
 	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {// calculates
-		// how
-		// many
-		// stops
-		// are
-		// between
-		// the
-		// destination
-		// and
-		// current
-		// floor
-		// for
-		// use
-		// in
-		// responseTime
-		// calculation
+		// how many stops between between the destination and current floor for use in responseTime calculation
 		int stops = 0;
 		if (direction == UP) {
 			for (int i = current; i < destination; i++) {
@@ -671,6 +657,8 @@ public class Scheduler extends Thread {
 		 * Scheduler.SchedulingAlgorithm(schedulerElevatorReceivePacket);//call method
 		 * with simulated packet for elevator #2
 		 */
+		
+		 
 		for (;;) {
 
 			// connection to elevator class

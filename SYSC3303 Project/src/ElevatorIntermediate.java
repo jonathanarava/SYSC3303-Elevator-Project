@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -8,7 +7,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class ElevatorIntermediate {
+public class ElevatorIntermediate{
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x02;// elevator is going up
@@ -159,26 +158,16 @@ public class ElevatorIntermediate {
 		for (int i = 0; i < createNumElevators; i++) {
 			// floorRequest = Integer.parseInt(args[i+1]);// The number of Elevators in the
 			// system is passed via
-			elevatorArray[i] = new Elevator(i, 0); // i names the elevator, 0 initializes the floor it starts on
+			int b = 5;
+			elevatorArray[i] = new Elevator(i, 0, b); // i names the elevator, 0 initializes the floor it starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
+			b++;
 		}
 		//
 		while (true) {
 			elevatorIntermediate.sendPacket();
 			elevatorIntermediate.receivePacket();
 		}
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
 	}
 }
