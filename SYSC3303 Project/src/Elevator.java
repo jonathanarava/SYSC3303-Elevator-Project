@@ -36,7 +36,7 @@ public class Elevator extends Thread {
 	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
 
 	public int elevatorNumber;
-	public int RealTimefloorRequest;
+	public int RealTimefloorRequest = 3;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
@@ -45,11 +45,10 @@ public class Elevator extends Thread {
 
 	private List<byte[]> elevatorTable;
 
-	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
+	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
-		this.RealTimefloorRequest = RealTimefloorRequest;
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -95,7 +94,7 @@ public class Elevator extends Thread {
 			requestElevator.write(UPDATE); // update
 			requestElevator.write((byte) currentFloor(sensor)); // current floor
 			requestElevator.write(0); // up or down
-			requestElevator.write(RealTimefloorRequest); // dest floor
+			requestElevator.write(0); // dest floor
 			requestElevator.write(0); // instruction
 		}
 		return requestElevator.toByteArray();
@@ -119,9 +118,9 @@ public class Elevator extends Thread {
 	public int runElevator() {
 		// sensor = currentFloor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
-			//try {
+			try {
 				System.out.println("At floor: " + sensor); // sensor = current floor
-				//Thread.sleep(1000);
+				Thread.sleep(1000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator is going up...");
 					sensor++; // increment the floor
@@ -131,9 +130,9 @@ public class Elevator extends Thread {
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
-			//} catch (InterruptedException e) {
-				//e.printStackTrace();
-			//}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // brings the elevator back to holding state. 
 		} else if(motorDirection == DISPLAYUPDATE) {
