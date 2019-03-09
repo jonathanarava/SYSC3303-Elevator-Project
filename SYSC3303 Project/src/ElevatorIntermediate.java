@@ -27,8 +27,7 @@ public class ElevatorIntermediate {
 	private static final int RECEIVEPORTNUM = 159;
 	
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	private static DatagramSocket elevatorSendSocket;
-	private static DatagramSocket elevatorReceiveSocket;
+	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
@@ -148,7 +147,7 @@ public class ElevatorIntermediate {
 		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
 		 * instruction) (
 		 */
-		switch (data[2]) {
+		switch (data[1]) {
 		case 0:
 			elevatorArray[0].hasRequest = true;
 			elevatorArray[0].motorDirection = data[6];
@@ -208,12 +207,13 @@ public class ElevatorIntermediate {
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i, 0, elevatorTable); // i names the elevator, 0 initializes the floor it
+			elevatorArray[i] = new Elevator(i, 0, elevatorTable,Integer.parseInt(args[i+1])); // i names the elevator, 0 initializes the floor it
 																	// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
+			elevatorArray[i].hasRTRequest = true;
 		}
-		elevatorArray[0].hasRTRequest = true; // **************TESTING LINE 1.0************** this line makes only
+		//elevatorArray[0].hasRTRequest = true; // **************TESTING LINE 1.0************** this line makes only
 												// elevator 0 be active in this system. Put this line inside above for
 												// loop with i as the index of
 												// elevatorArray so all elevator threads can be active. Remove the
