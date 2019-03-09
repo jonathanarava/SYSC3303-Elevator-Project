@@ -108,7 +108,6 @@ public class Scheduler extends Thread {
 	}
 
 	public static DatagramPacket elevatorReceivePacket() {
-
 		/* ELEVATOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
@@ -158,7 +157,6 @@ public class Scheduler extends Thread {
 	}
 
 	public static void floorReceivePacket() {
-
 		/* FLOOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
 
@@ -187,21 +185,18 @@ public class Scheduler extends Thread {
 		/* FLOOR SENDING PACKET HERE */
 
 		byte[] responseByteArray = new byte[5];
-
 		responseByteArray = createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
 		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		try {
 			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 					InetAddress.getLocalHost(), PORTNUM);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -312,7 +307,7 @@ public class Scheduler extends Thread {
 								// create and send SendPacket for the motor to go Up
 								sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 							}
-						} else {// finished stopping for destination floor, continue going Up to fufill other
+						} else {// finished stopping for destination floor, continue going Up to fulfill other
 								// stops
 								// create and send SendPacket to restart the motor/ have the motor in the up
 								// direction
@@ -339,21 +334,8 @@ public class Scheduler extends Thread {
 								// down
 								// do nothing
 							} else {// there are outstanding requests to go down
-								elevatorStopsDown[packetElementIndex] = elevatorRequestsDown[packetElementIndex];// the
-								// requests
-								// to
-								// go
-								// down
-								// can
-								// now
-								// be
-								// met
-								// once
-								// we've
-								// finished
-								// going
-								// up
-								// first
+								elevatorStopsDown[packetElementIndex] = elevatorRequestsDown[packetElementIndex];
+								// the requests to go down can be met once we have finished going up first
 								elevatorRequestsDown[packetElementIndex].clear();
 							}
 							// check if there are more stops up
@@ -545,7 +527,6 @@ public class Scheduler extends Thread {
 
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {// destination is the floor that
 		// is making the request
-
 		// elevatorLowestRequestFloor
 		// elevatorHighestRequestFloor
 		// TIME_PER_FLOOR
@@ -554,9 +535,8 @@ public class Scheduler extends Thread {
 		// DOWN
 		// HOLD
 		int[] responseTime = new int[numElevators];
-		int distance = 0;// number of floors traveled before arrivating at the destination
-		int stops = 0;// number of stops that need to be made before the destination (floor that's
-		// making the request)
+		int distance = 0;// number of floors traveled before arriving at the destination
+		int stops = 0;// number of stops that need to be made before the destination (floor that's making the request)
 		int highest;// highest requested
 		int lowest;// lowest requested
 		int current;// current floor
@@ -582,7 +562,7 @@ public class Scheduler extends Thread {
 						distance = destination - current;
 					}
 					// distance=destination-current
-					// stops=stops between destinatino and current
+					// stops=stops between destination and current
 					else {
 						distance = (highest - current) + (highest - lowest) + (destination - lowest);
 						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
@@ -668,34 +648,36 @@ public class Scheduler extends Thread {
 	public static void main(String args[]) throws InterruptedException {
 		Scheduler Scheduler = new Scheduler();
 		Scheduler.linkedListInitialization();
-		
-		//elevatorStopsUp[0].add(3);
-		//elevatorStopsDown[1].add(2);
-		
-		
-		//create temporary testing packets to simulate "Requests" sent to the schedulingAlrogirthm because it needs a parameter
-		
-		byte tempTestData[] = new byte[7];
-		tempTestData[0]= ELEVATOR_ID;//pretending to be an elevator
-		tempTestData[1]= 0;//pretending to be elevator #1
-		tempTestData[2]= REQUEST;//simulating a request
-		tempTestData[3]= 0;//ground floor
-		tempTestData[4]= 0;//up or down
-		tempTestData[5]= 2;//destination floor, request for floor 2 
-		tempTestData[6]= 0;//scheduler instruction- not used now
-			
-		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
-		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);//call method with simulated packet for elevator #1
-		tempTestData[1]=1;//for elevator number 2
-		tempTestData[5]=3;//destination floor, request for floor 3
-		DatagramPacket testingPacket=new DatagramPacket (tempTestData,tempTestData.length());
-		SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket);//call method with simulated packet for elevator #2
-		
-				for (;;) {
 
-			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket(); // connection to elevator class
-			//Schedules the queuing (scheduling algorytm) of what request needs to be done and also sends the packet to elevatorIntermediate at the end
-			Scheduler.SchdulingAlgorithm(packetRecieved); 
+		/*
+		 * //elevatorStopsUp[0].add(3); //elevatorStopsDown[1].add(2);
+		 * 
+		 * 
+		 * //create temporary testing packets to simulate "Requests" sent to the
+		 * schedulingAlrogirthm because it needs a parameter
+		 * 
+		 * byte tempTestData[] = new byte[7]; tempTestData[0]= ELEVATOR_ID;//pretending
+		 * to be an elevator tempTestData[1]= 0;//pretending to be elevator #1
+		 * tempTestData[2]= REQUEST;//simulating a request tempTestData[3]= 0;//ground
+		 * floor tempTestData[4]= 0;//up or down tempTestData[5]= 2;//destination floor,
+		 * request for floor 2 tempTestData[6]= 0;//scheduler instruction- not used now
+		 * 
+		 * DatagramPacket testingPacket=new DatagramPacket
+		 * (tempTestData,tempTestData.length); Scheduler.SchedulingAlgorithm(
+		 * schedulerElevatorReceivePacket);//call method with simulated packet for
+		 * elevator #1 tempTestData[1]=1;//for elevator number 2
+		 * tempTestData[5]=3;//destination floor, request for floor 3 DatagramPacket
+		 * testingPacket2=new DatagramPacket (tempTestData,tempTestData.length);
+		 * Scheduler.SchedulingAlgorithm(schedulerElevatorReceivePacket);//call method
+		 * with simulated packet for elevator #2
+		 */
+		for (;;) {
+
+			// connection to elevator class
+			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket();
+			// Schedules the queuing (scheduling algorithm) of what request needs to be done
+			// and also sends the packet to elevatorIntermediate at the end
+			Scheduler.SchedulingAlgorithm(packetRecieved);
 
 		}
 	}

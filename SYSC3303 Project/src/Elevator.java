@@ -22,7 +22,7 @@ public class Elevator extends Thread {
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 
 	public int name;
-	public int floorRequest;// = 3;
+	public int floorRequest = 3;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
@@ -30,6 +30,7 @@ public class Elevator extends Thread {
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
 	public Elevator() {
+		//For Junit testing only
 	}
 
 	public Elevator(int name, int initiateFloor) {
@@ -112,7 +113,6 @@ public class Elevator extends Thread {
 
 	public int currentFloor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
-
 		return sensor;
 	}
 

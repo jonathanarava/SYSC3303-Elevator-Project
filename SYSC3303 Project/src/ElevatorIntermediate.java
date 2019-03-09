@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class ElevatorIntermediate {
-
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x02;// elevator is going up
@@ -54,7 +53,7 @@ public class ElevatorIntermediate {
 			System.exit(1);
 		}
 	}
-
+	
 	public synchronized void sendPacket() throws InterruptedException {
 
 		byte[] requestElevator = new byte[7];
