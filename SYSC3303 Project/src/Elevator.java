@@ -30,14 +30,14 @@ public class Elevator extends Thread {
 	
 	/* Variables used in this class*/
 	private static int sensor;
-	private int nameOfElevator;
+	private static int nameOfElevator;
 	private static byte toDoID;
 	private static byte instruction;
 	private static int initialFloor;
 	private byte motorDirection;
 
 	/* Table to synchronize threads */
-	public List<byte[]> ElevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	public static List<byte[]> ElevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 
 	public Elevator(int nameOfElevator, int initialFloor,  List<byte[]> ElevatorTable) {
 		this.nameOfElevator = nameOfElevator;
@@ -74,7 +74,7 @@ public class Elevator extends Thread {
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination floor
 	}
 	
-	public byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
+	public static byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
 
 		/*
 		 * Elevator --> SCHEDULER (Elevator or floor (Elevator-21), Elevator id(which
@@ -146,7 +146,7 @@ public class Elevator extends Thread {
 		}
 	}
 	
-	public synchronized void receivePacket() throws InterruptedException {
+	public synchronized static void receivePacket() throws InterruptedException {
 		
 		byte data[] = new byte[7];
 		ElevatorReceivePacket = new DatagramPacket(data, data.length);
@@ -164,50 +164,38 @@ public class Elevator extends Thread {
 		}
 		
 		ElevatorTable.add(data);
-		
-/*		System.out.print("///////////////////Received from scheduler: ");
-		System.out.println(Arrays.toString(ElevatorTable.get(0)));*/
 	}
 
 	
 	public void run() {
-		while(true) {
-			synchronized(ElevatorTable) {
-/*				while(ElevatorTable.size() == 0) {
+		synchronized(ElevatorTable) {
+			while(ElevatorTable.size() == 0) {
+				try {
+					ElevatorTable.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			byte data[] = new byte[7];
+
+			data = ElevatorTable.get(0);
+			toDoID = data[1];
+			instruction = data[6];
+
+			if(toDoID == nameOfElevator) {
+				if(instruction == 2 || instruction == 1) {
+					runElevator(motorDirection);
 					try {
-						System.out.println("here");
-						ElevatorTable.wait();
+						sendPacket(responsePacketRequest(2,0));
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-					}
-				}*/
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					}				
+				} else if (instruction == 3 || instruction == 4 || instruction == 5) {
+					openCloseDoor((byte)DOOR_OPEN);
 				}
-				byte data[] = new byte[7];
-
-				data = ElevatorTable.get(0);
-				toDoID = data[1];
-				instruction = data[6];
-
-				if(toDoID == nameOfElevator) {
-					if(instruction == 2 || instruction == 1) {
-						runElevator(motorDirection);
-						try {
-							sendPacket(responsePacketRequest(2,0));
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-					} else if (instruction == 3 || instruction == 4 || instruction == 5) {
-						openCloseDoor((byte)DOOR_OPEN);
-					}
-					ElevatorTable.clear();
-					ElevatorTable.notifyAll();
-				}			
-			}
+				ElevatorTable.clear();
+				ElevatorTable.notifyAll();
+			}			
 		}
 	}
 	
@@ -217,9 +205,9 @@ public class Elevator extends Thread {
 		int initialFloor0 = Integer.parseInt(args[0]);	// The number of Elevators in the system is passed via
 		int initialFloor1 = Integer.parseInt(args[1]);	
 		
-		List<byte[]> ElevatorTable1 = Collections.synchronizedList(new ArrayList<byte[]>());
-		Elevator Elevator0 = new Elevator(0, initialFloor0, ElevatorTable1);
-		Elevator Elevator1 = new Elevator(1, initialFloor1, ElevatorTable1);
+		List<byte[]> ElevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+		Elevator Elevator0 = new Elevator(0, initialFloor0, ElevatorTable);
+		Elevator Elevator1 = new Elevator(1, initialFloor1, ElevatorTable);
 		
 		try {
 			ElevatorSendRecieveReceiveSocket = new DatagramSocket();
@@ -228,20 +216,18 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
-		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
+		Elevator0.ElevatorTable.add(0,responsePacketRequest(1, 6));
+		Elevator1.ElevatorTable.add(1,responsePacketRequest(1, 4));
 		
-		sendPacket(ElevatorTable1.get(0));
-		sendPacket(ElevatorTable1.get(1));
+		sendPacket(ElevatorTable.get(0));
+		sendPacket(ElevatorTable.get(1));
 		
+
 		
-		ElevatorTable1.clear();
-		
-		Elevator0.start();
-		Elevator1.start();
-		
-		for(int i = 0; i<20; i++) {
-			Elevator0.receivePacket();
+		while(true) {
+			receivePacket();
+			Elevator0.start();
+			Elevator1.start();
 
 		}
 	}
