@@ -218,15 +218,8 @@ public class ElevatorIntermediate {
 																	// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
-			elevatorArray[i].hasRTRequest = true;
 		}
-		//elevatorArray[0].hasRTRequest = true; // **************TESTING LINE 1.0************** this line makes only
-												// elevator 0 be active in this system. Put this line inside above for
-												// loop with i as the index of
-												// elevatorArray so all elevator threads can be active. Remove the
-												// boolean constraints inside Elevator runnable that will
-												// prevent a (hasRTRequest==false) thread from running
-
+		
 		while (true) {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();

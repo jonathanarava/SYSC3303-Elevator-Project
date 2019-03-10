@@ -167,7 +167,7 @@ public class Elevator extends Thread {
 	}
 
 	public void run() {
-		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
+		while (true) {
 								// while(true) to activate all elevator threads in this system
 			while(respond) {
 				if (!hasRequest) {
