@@ -75,6 +75,9 @@ public class Scheduler {
 	 * final ___ FLOOR_ID=___; public static final ___ SCHEDULER_ID=___; public
 	 * static final ___ STATUS=___; public static final ___ REQUEST=___;
 	 */
+	public static final int EL_RECEIVEPORTNUM = 369;
+	public static final int EL_SENDPORTNUM = 159;
+	
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
@@ -97,7 +100,7 @@ public class Scheduler {
 
 	public Scheduler() {
 		try {
-			schedulerSocketSendReceiveElevator = new DatagramSocket(369);
+			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
 			schedulerSocketSendReceiveFloor = new DatagramSocket();// can be any available port, Scheduler will reply
 			// to the port
 			// that's been received
@@ -148,9 +151,9 @@ public class Scheduler {
 		// upOrDown, instruction);
 		System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
+				schedulerElevatorReceivePacket.getAddress(), EL_SENDPORTNUM);
 		try {
-			schedulerSocketSendReceiveFloor.send(schedulerElevatorSendPacket);
+			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -163,7 +166,7 @@ public class Scheduler {
 		// Block until a datagram packet is received from receiveSocket.
 		try {
 			System.out.println("waiting");
-			schedulerSocketSendReceiveFloor.receive(schedulerFloorReceivePacket);
+			schedulerSocketSendReceiveElevator.receive(schedulerFloorReceivePacket);
 			System.out.println("Request from elevator: " + Arrays.toString(data));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
@@ -512,13 +515,13 @@ public class Scheduler {
 			}
 		}
 
-		sendData[0] = 54;
-		sendData[1] = 21;
-		sendData[2] = 1;
-		sendData[3] = packetData[3];
-		sendData[4] = 0;
+		//sendData[0] = 54;
+		//sendData[1] = 21;
+		//sendData[2] = 1;
+		//sendData[3] = packetData[3];
+		//sendData[4] = 0;
 //sendData[5] = 2; floor request from elevator hardcoded to be 3
-		sendData[6] = UP;
+		//sendData[6] = UP;
 
 		// System.out.println("Send Data: " + Arrays.toString(sendData));
 		// System.out.println("Packet Data: " + Arrays.toString(packetData));

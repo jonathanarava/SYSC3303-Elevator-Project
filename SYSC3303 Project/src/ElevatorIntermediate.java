@@ -149,14 +149,22 @@ public class ElevatorIntermediate {
 		 */
 		switch (data[1]) {
 		case 0:
-			elevatorArray[0].hasRequest = true;
 			elevatorArray[0].motorDirection = data[6];
-			elevatorArray[0].isUpdate = true;
+			if(data[6] == 1) {
+				elevatorArray[0].hasRequest = true;
+			}
+			else if(data[6] == 5) {
+				elevatorArray[0].isUpdate = true;
+			}
 			break;
 		case 1:
-			elevatorArray[1].hasRequest = true;
 			elevatorArray[1].motorDirection = data[6];
-			elevatorArray[1].isUpdate = true;
+			if(data[6] == 1) {
+				elevatorArray[1].hasRequest = true;
+			}
+			else if(data[1] == 5) {
+				elevatorArray[1].isUpdate = true;
+			}
 			break;
 		case 2:
 			elevatorArray[2].hasRequest = true;

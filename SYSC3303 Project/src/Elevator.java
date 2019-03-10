@@ -15,6 +15,7 @@ public class Elevator extends Thread {
 	private static final byte DISPLAYUPDATE = 0x05;
 	private static final byte UP = 0x01;// elevator is going up
 	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
@@ -87,13 +88,13 @@ public class Elevator extends Thread {
 		// request/ update
 		if (requestUpdate == REQUEST) {
 			requestElevator.write(REQUEST); // request/
-			requestElevator.write((byte) currentFloor(sensor)); // current floor
+			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(0); // up or down
 			requestElevator.write(RealTimefloorRequest); // dest floor
 			requestElevator.write(0); // instruction
 		} else if (requestUpdate == UPDATE) {
 			requestElevator.write(UPDATE); // update
-			requestElevator.write((byte) currentFloor(sensor)); // current floor
+			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(0); // up or down
 			requestElevator.write(RealTimefloorRequest); // dest floor
 			requestElevator.write(0); // instruction
@@ -110,14 +111,14 @@ public class Elevator extends Thread {
 	 * e.printStackTrace(); } } else { msg = "Doors are closed.";
 	 * System.out.println(msg); } return msg; }
 	 */
-	public int currentFloor(int floorSensor) { // method to initialize where the elevator starts
+	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
 
 		return sensor;
 	}
 
 	public int runElevator() {
-		// sensor = currentFloor; //sensor is at current floor
+		// sensor = setSensor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			//try {
 				System.out.println("At floor: " + sensor); // sensor = current floor
@@ -125,30 +126,29 @@ public class Elevator extends Thread {
 				if (motorDirection == UP) {
 					System.out.println("Elevator is going up...");
 					sensor++; // increment the floor
-					currentFloor(sensor); // updates the current floor
+					setSensor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
 					System.out.println("Elevator is going down...");
 					sensor--; // decrements the floor
-					currentFloor(sensor); // updates the current floor
+					setSensor(sensor); // updates the current floor
+				} else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == DISPLAYUPDATE ) {
+					
 				}
 			//} catch (InterruptedException e) {
 				//e.printStackTrace();
 			//}
 		} else if (motorDirection == HOLD) {
-			currentFloor(sensor); // brings the elevator back to holding state. 
+			setSensor(sensor); // brings the elevator back to holding state. 
 		} else if(motorDirection == DISPLAYUPDATE) {
-			currentFloor(sensor);	// update the display so the current floor is shown
+			setSensor(sensor);	// update the display so the current floor is shown
 		}
 		
 		System.out.println("Came to floor: " + sensor); // prints out the current floor - in this case destination floor
-		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination
+		return setSensor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
 
 	// sets Current location of elevator through this setter
-	public void setSensor(int currentSensor) {
-		sensor = currentSensor;
-	}
 
 	public synchronized void sendPacket(int requestOrUpdate) {
 		synchronized (elevatorTable) {
@@ -160,7 +160,7 @@ public class Elevator extends Thread {
 				}
 			}
 			elevatorTable.add(responsePacketRequest(requestOrUpdate));
-			isUpdate = false;
+			//isUpdate = false;
 			elevatorTable.notifyAll();
 		}
 	}
@@ -168,12 +168,15 @@ public class Elevator extends Thread {
 	public void run() {
 		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
 								// while(true) to activate all elevator threads in this system
-			if (!hasRequest && !isUpdate) {
+			if (!hasRequest) {
 				sendPacket(1);
 			} else if (hasRequest) {
 				runElevator();
 				sendPacket(2);
 				hasRequest = false;
+			} else if (isUpdate) {
+				//set the lights sensors and stuff to proper value
+				isUpdate = false;
 			}
 		}
 	}
