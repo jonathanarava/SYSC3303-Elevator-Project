@@ -18,8 +18,8 @@ public class Elevator extends Thread {
 
 	/* UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES*/
 	public static final byte HOLD = 0x00;// Elevator is in hold state
-	public static final byte UP = 0x02;// Elevator is going up
-	public static final byte DOWN = 0x01;// Elevator is going down
+	public static final byte UP = 0x01;// Elevator is going up
+	public static final byte DOWN = 0x02;// Elevator is going down
 	public static final int Elevator_ID = 21;// for identifying the packet's source as Elevator
 	public static final int DOOR_OPEN = 1;// the door is open when ==1
 	public static final int DOOR_DURATION = 4;// duration that doors stay open for
@@ -31,7 +31,7 @@ public class Elevator extends Thread {
 	private int nameOfElevator;
 	private static byte toDoID;
 	private static byte instruction;
-	private byte motorDirection;
+	private boolean isInterrupt = false;
 
 	/* Table to synchronize threads */
 	public LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
@@ -50,8 +50,8 @@ public class Elevator extends Thread {
 	public int runElevator(byte motorDirection) {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
-				System.out.println("current floor: " + sensor); // sensor = current floor
-				Thread.sleep(3000);
+				System.out.println("current floor of " + nameOfElevator + ": " + sensor); // sensor = current floor
+				Thread.sleep(2000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -67,10 +67,10 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("current floor of " + nameOfElevator + ": " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination floor
 	}
-	
+
 	public byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
 
 		/*
@@ -166,31 +166,31 @@ public class Elevator extends Thread {
 	
 	public void run() {
 		synchronized(ElevatorTable) {
-			while(ElevatorTable.size() == 0) {
+			while(ElevatorTable.isEmpty()) {
 				try {
-					ElevatorTable.wait();
+					ElevatorTable.wait(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+			
 			byte data[] = new byte[7];
 
 			data = ElevatorTable.get(0);
 			toDoID = data[1];
 			instruction = data[6];
 
+			//System.out.println("here" +toDoID + " " + instruction);
+
 			if(toDoID == nameOfElevator) {
+				//System.out.println("here" );
 				if(instruction == 2 || instruction == 1) {
-					runElevator(motorDirection);
-					try {
-						sendPacket(responsePacketRequest(2,0));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}				
+					runElevator(instruction);
+					isInterrupt = true;				
 				} else if (instruction == 3 || instruction == 4 || instruction == 5) {
 					openCloseDoor((byte)DOOR_OPEN);
 				}
-				ElevatorTable.clear();
+				ElevatorTable.remove();
 				ElevatorTable.notifyAll();
 			}			
 		}
@@ -213,17 +213,27 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
-		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
+		ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
+		ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
-		Elevator0.sendPacket(ElevatorTable.get(0));
-		Elevator1.sendPacket(ElevatorTable.get(1));
-		
+		Elevator0.sendPacket(ElevatorTable.remove());
+		Elevator1.sendPacket(ElevatorTable.remove());
+
 		Elevator0.start();
 		Elevator1.start();
 		
 		while(true) {
 			Elevator0.receivePacket();
+			if(Elevator0.isInterrupt == true) {
+				System.out.println("here");
+				Elevator0.sendPacket(Elevator0.responsePacketRequest(2,0));
+				Elevator0.isInterrupt = false;
+			}
+			if(Elevator1.isInterrupt == true) {
+				System.out.println("here");
+				Elevator1.sendPacket(Elevator1.responsePacketRequest(2,0));
+				Elevator1.isInterrupt = false;
+			}
 		}
 	}
 }
