@@ -31,7 +31,7 @@ public class Elevator extends Thread {
 	private int nameOfElevator;
 	private static byte toDoID;
 	private static byte instruction;
-	private boolean isInterrupt = false;
+	//private boolean isInterrupt = false;
 
 	/* Table to synchronize threads */
 	public LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
@@ -49,9 +49,9 @@ public class Elevator extends Thread {
 	
 	public int runElevator(byte motorDirection) {
 		if (motorDirection == UP || motorDirection == DOWN) {
-			try {
+			//try {
 				System.out.println("current floor of " + nameOfElevator + ": " + sensor); // sensor = current floor
-				Thread.sleep(2000);
+				//Thread.sleep(3000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -61,16 +61,16 @@ public class Elevator extends Thread {
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
-			} catch (InterruptedException e) {
+/*			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
 		System.out.println("current floor of " + nameOfElevator + ": " + sensor); // prints out the current floor - in this case destination floor
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination floor
 	}
-
+	
 	public byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
 
 		/*
@@ -168,7 +168,7 @@ public class Elevator extends Thread {
 		synchronized(ElevatorTable) {
 			while(ElevatorTable.isEmpty()) {
 				try {
-					ElevatorTable.wait(100);
+					ElevatorTable.wait(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -186,7 +186,12 @@ public class Elevator extends Thread {
 				//System.out.println("here" );
 				if(instruction == 2 || instruction == 1) {
 					runElevator(instruction);
-					isInterrupt = true;				
+					try {
+						sendPacket(responsePacketRequest(2,0));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					//isInterrupt = true;				
 				} else if (instruction == 3 || instruction == 4 || instruction == 5) {
 					openCloseDoor((byte)DOOR_OPEN);
 				}
@@ -224,7 +229,7 @@ public class Elevator extends Thread {
 		
 		while(true) {
 			Elevator0.receivePacket();
-			if(Elevator0.isInterrupt == true) {
+/*			if(Elevator0.isInterrupt == true) {
 				System.out.println("here");
 				Elevator0.sendPacket(Elevator0.responsePacketRequest(2,0));
 				Elevator0.isInterrupt = false;
@@ -233,7 +238,7 @@ public class Elevator extends Thread {
 				System.out.println("here");
 				Elevator1.sendPacket(Elevator1.responsePacketRequest(2,0));
 				Elevator1.isInterrupt = false;
-			}
+			}*/
 		}
 	}
 }
