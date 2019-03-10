@@ -35,7 +35,8 @@ public class Elevator extends Thread {
 	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 	
 	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
-
+	public boolean respond = true;
+	
 	public int elevatorNumber;
 	public int RealTimefloorRequest;
 
@@ -168,16 +169,24 @@ public class Elevator extends Thread {
 	public void run() {
 		while (hasRTRequest) { // ********TESTING LINE 1.0************** Make while(hasRTRequest) to
 								// while(true) to activate all elevator threads in this system
-			if (!hasRequest) {
-				sendPacket(1);
-			} else if (hasRequest) {
-				runElevator();
-				sendPacket(2);
-				hasRequest = false;
-			} else if (isUpdate) {
-				//set the lights sensors and stuff to proper value
-				isUpdate = false;
+			while(respond) {
+				if (!hasRequest) {
+					sendPacket(1);
+					break;
+				}
 			}
+			 
+			while(!respond) {
+				if (hasRequest) {
+					runElevator();
+					sendPacket(2);
+					hasRequest = false;
+				} else if (isUpdate) {
+					//set the lights sensors and stuff to proper value
+					isUpdate = false;
+				} break;
+			} 
+			respond = !respond;
 		}
 	}
 

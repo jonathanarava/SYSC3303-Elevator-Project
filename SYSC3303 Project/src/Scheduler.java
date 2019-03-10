@@ -239,7 +239,7 @@ public class Scheduler {
 		// 1=request, 2=status update
 		int elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent
 		// from elevator as status update)
-		int stopRequest;// =packetData[]; //a request to give to an elevator for stopping at a given
+		int stopRequest;// =packetData[5]; //a request to give to an elevator for stopping at a given
 		// floor (from elevator or floor)
 		// public static int floorRequesting;
 
@@ -677,7 +677,7 @@ public class Scheduler {
 		for (;;) {
 
 			// connection to elevator class
-			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket();
+			DatagramPacket packetRecieved = elevatorReceivePacket();
 			// Schedules the queuing (scheduling algorithm) of what request needs to be done
 			// and also sends the packet to elevatorIntermediate at the end
 			Scheduler.SchedulingAlgorithm(packetRecieved);

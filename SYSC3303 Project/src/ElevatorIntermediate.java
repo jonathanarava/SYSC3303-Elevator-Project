@@ -89,7 +89,6 @@ public class ElevatorIntermediate {
 				try {
 					elevatorTable.wait();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -115,10 +114,9 @@ public class ElevatorIntermediate {
 
 	}
 
-	public void receivePacket() {
+	public synchronized void receivePacket() {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
-
 		byte data[] = new byte[7];
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
@@ -147,10 +145,11 @@ public class ElevatorIntermediate {
 		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
 		 * instruction) (
 		 */
+		
 		switch (data[1]) {
 		case 0:
 			elevatorArray[0].motorDirection = data[6];
-			if(data[6] == 1) {
+			if(data[6] == 1 || data[6] == 2) {
 				elevatorArray[0].hasRequest = true;
 			}
 			else if(data[6] == 5) {
@@ -159,7 +158,7 @@ public class ElevatorIntermediate {
 			break;
 		case 1:
 			elevatorArray[1].motorDirection = data[6];
-			if(data[6] == 1) {
+			if(data[6] == 1 || data[6] == 2) {
 				elevatorArray[1].hasRequest = true;
 			}
 			else if(data[1] == 5) {
