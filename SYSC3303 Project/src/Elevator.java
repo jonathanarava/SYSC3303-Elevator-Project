@@ -5,10 +5,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 public class Elevator extends Thread {
 	
@@ -30,18 +28,17 @@ public class Elevator extends Thread {
 	
 	/* Variables used in this class*/
 	private static int sensor;
-	private static int nameOfElevator;
+	private int nameOfElevator;
 	private static byte toDoID;
 	private static byte instruction;
-	private static int initialFloor;
 	private byte motorDirection;
 
 	/* Table to synchronize threads */
-	public static List<byte[]> ElevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	public LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
 
-	public Elevator(int nameOfElevator, int initialFloor,  List<byte[]> ElevatorTable) {
+	public Elevator(int nameOfElevator, int initialFloor,  LinkedList<byte[]> ElevatorTable) {
 		this.nameOfElevator = nameOfElevator;
-		this.initialFloor = initialFloor;
+		sensor = initialFloor;
 		this.ElevatorTable = ElevatorTable;
 	}
 	
@@ -74,7 +71,7 @@ public class Elevator extends Thread {
 		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination floor
 	}
 	
-	public static byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
+	public byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
 
 		/*
 		 * Elevator --> SCHEDULER (Elevator or floor (Elevator-21), Elevator id(which
@@ -126,7 +123,7 @@ public class Elevator extends Thread {
 		return msg;
 	}
 	
-	public synchronized static void sendPacket(byte[] toSend) throws InterruptedException {
+	public synchronized void sendPacket(byte[] toSend) throws InterruptedException {
 
 		byte[] data = new byte[7];
 		data = toSend;
@@ -146,7 +143,7 @@ public class Elevator extends Thread {
 		}
 	}
 	
-	public synchronized static void receivePacket() throws InterruptedException {
+	public synchronized void receivePacket() throws InterruptedException {
 		
 		byte data[] = new byte[7];
 		ElevatorReceivePacket = new DatagramPacket(data, data.length);
@@ -205,7 +202,7 @@ public class Elevator extends Thread {
 		int initialFloor0 = Integer.parseInt(args[0]);	// The number of Elevators in the system is passed via
 		int initialFloor1 = Integer.parseInt(args[1]);	
 		
-		List<byte[]> ElevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+		LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
 		Elevator Elevator0 = new Elevator(0, initialFloor0, ElevatorTable);
 		Elevator Elevator1 = new Elevator(1, initialFloor1, ElevatorTable);
 		
@@ -216,19 +213,17 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		Elevator0.ElevatorTable.add(0,responsePacketRequest(1, 6));
-		Elevator1.ElevatorTable.add(1,responsePacketRequest(1, 4));
+		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
+		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
-		sendPacket(ElevatorTable.get(0));
-		sendPacket(ElevatorTable.get(1));
+		Elevator0.sendPacket(ElevatorTable.get(0));
+		Elevator1.sendPacket(ElevatorTable.get(1));
 		
-
+		Elevator0.start();
+		Elevator1.start();
 		
 		while(true) {
-			receivePacket();
-			Elevator0.start();
-			Elevator1.start();
-
+			Elevator0.receivePacket();
 		}
 	}
 }
