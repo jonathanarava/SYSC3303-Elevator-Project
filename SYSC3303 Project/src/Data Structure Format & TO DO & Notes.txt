@@ -21,7 +21,17 @@ Data Structure:
 
 
 
-[Floor[69] or elevator[21] id, floor#(whichFlooramI), request or Status update(always),current floor of the elevator, floor request (up/down), Destination Request(null),command(what is coming back from scheduler)]
+ID (identify whether it is a floor, elevator, or scheduler), floor# or elevator# (identify which floor/elevator), request or Status update(always),current floor of the elevator, floor request (up/down), Destination Request(null),command(what is coming back from scheduler)]
+
+Scheduler Commands:
+-sending to elevator
+1:start motor up
+2:start motor down
+3:make a stop
+4:put on hold
+-sending to floor
+5:update floor's displays (current floor of the elvator, and direction of the elevator)
+	-should automatically update all the floors
 
 
 Naming Convention:
@@ -55,4 +65,3 @@ Scheduling Specific:
 			-change variable names to numElevators, numFloors
 	-stops: currently being fulfilled (current direction and next; does not include those that have already been missed)
 	-requests: not going to be fulfilled in the current round (ie. already missed that floor for the current direction)	
-
