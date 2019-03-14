@@ -5,8 +5,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.List;
 
 public class Elevator extends Thread {
 	
@@ -31,18 +32,15 @@ public class Elevator extends Thread {
 	private int nameOfElevator;
 	private static byte toDoID;
 	private static byte instruction;
-<<<<<<< HEAD
-	//private boolean isInterrupt = false;
-=======
+	private int initialFloor;
 	private byte motorDirection;
->>>>>>> parent of 69f91d0... commit
 
 	/* Table to synchronize threads */
-	public LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
+	public List<byte[]> ElevatorTable =new ArrayList<byte[]>();
 
-	public Elevator(int nameOfElevator, int initialFloor,  LinkedList<byte[]> ElevatorTable) {
+	public Elevator(int nameOfElevator, int initialFloor,  List<byte[]> ElevatorTable) {
 		this.nameOfElevator = nameOfElevator;
-		sensor = initialFloor;
+		this.setInitialFloor(initialFloor);
 		this.ElevatorTable = ElevatorTable;
 	}
 	
@@ -51,17 +49,20 @@ public class Elevator extends Thread {
 		return sensor;
 	}
 	
+
+	public int getInitialFloor() {
+		return initialFloor;
+	}
+
+	public void setInitialFloor(int initialFloor) {
+		this.initialFloor = initialFloor;
+	}
+	
 	public int runElevator(byte motorDirection) {
 		if (motorDirection == UP || motorDirection == DOWN) {
-<<<<<<< HEAD
-			//try {
-				System.out.println("current floor of " + nameOfElevator + ": " + sensor); // sensor = current floor
-				//Thread.sleep(3000);
-=======
 			try {
 				System.out.println("current floor: " + sensor); // sensor = current floor
 				Thread.sleep(3000);
->>>>>>> parent of 69f91d0... commit
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -71,9 +72,9 @@ public class Elevator extends Thread {
 					sensor--; // decrements the floor
 					currentFloor(sensor); // updates the current floor
 				}
-/*			} catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}*/
+			}
 		} else if (motorDirection == HOLD) {
 			currentFloor(sensor); // updates current floor - in this case nothing changes
 		}
@@ -133,7 +134,7 @@ public class Elevator extends Thread {
 		return msg;
 	}
 	
-	public synchronized void sendPacket(byte[] toSend) throws InterruptedException {
+	public synchronized static void sendPacket(byte[] toSend) throws InterruptedException {
 
 		byte[] data = new byte[7];
 		data = toSend;
@@ -171,51 +172,45 @@ public class Elevator extends Thread {
 		}
 		
 		ElevatorTable.add(data);
+		
+/*		System.out.print("///////////////////Received from scheduler: ");
+		System.out.println(Arrays.toString(ElevatorTable.get(0)));*/
 	}
 
 	
 	public void run() {
-		synchronized(ElevatorTable) {
-			while(ElevatorTable.size() == 0) {
-				try {
-<<<<<<< HEAD
-					ElevatorTable.wait(1);
-=======
-					ElevatorTable.wait();
->>>>>>> parent of 69f91d0... commit
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			byte data[] = new byte[7];
-
-			data = ElevatorTable.get(0);
-			toDoID = data[1];
-			instruction = data[6];
-
-			if(toDoID == nameOfElevator) {
-				if(instruction == 2 || instruction == 1) {
-<<<<<<< HEAD
-					runElevator(instruction);
-=======
-					runElevator(motorDirection);
->>>>>>> parent of 69f91d0... commit
+		while(true) {
+			synchronized(ElevatorTable) {
+				while(ElevatorTable.isEmpty()) {
 					try {
-						sendPacket(responsePacketRequest(2,0));
+						System.out.println("here");
+						ElevatorTable.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-<<<<<<< HEAD
 					}
-					//isInterrupt = true;				
-=======
-					}				
->>>>>>> parent of 69f91d0... commit
-				} else if (instruction == 3 || instruction == 4 || instruction == 5) {
-					openCloseDoor((byte)DOOR_OPEN);
 				}
-				ElevatorTable.clear();
-				ElevatorTable.notifyAll();
-			}			
+
+				byte data[] = new byte[7];
+
+				data = ElevatorTable.get(0);
+				toDoID = data[1];
+				instruction = data[6];
+
+				if(toDoID == nameOfElevator) {
+					if(instruction == 2 || instruction == 1) {
+						runElevator(motorDirection);
+						try {
+							sendPacket(responsePacketRequest(2,0));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}				
+					} else if (instruction == 3 || instruction == 4 || instruction == 5) {
+						openCloseDoor((byte)DOOR_OPEN);
+					}
+					ElevatorTable.clear();
+					ElevatorTable.notifyAll();
+				}			
+			}
 		}
 	}
 	
@@ -225,9 +220,9 @@ public class Elevator extends Thread {
 		int initialFloor0 = Integer.parseInt(args[0]);	// The number of Elevators in the system is passed via
 		int initialFloor1 = Integer.parseInt(args[1]);	
 		
-		LinkedList<byte[]> ElevatorTable = new LinkedList<byte[]>();
-		Elevator Elevator0 = new Elevator(0, initialFloor0, ElevatorTable);
-		Elevator Elevator1 = new Elevator(1, initialFloor1, ElevatorTable);
+		List<byte[]> ElevatorTable1 = new ArrayList<byte[]>();
+		Elevator Elevator0 = new Elevator(0, initialFloor0, ElevatorTable1);
+		Elevator Elevator1 = new Elevator(1, initialFloor1, ElevatorTable1);
 		
 		try {
 			ElevatorSendRecieveReceiveSocket = new DatagramSocket();
@@ -239,27 +234,28 @@ public class Elevator extends Thread {
 		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
 		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
-		Elevator0.sendPacket(ElevatorTable.get(0));
-		Elevator1.sendPacket(ElevatorTable.get(1));
+		sendPacket(ElevatorTable1.get(0));
+		sendPacket(ElevatorTable1.get(1));
 		
+		
+		ElevatorTable1.clear();
+		
+		Thread receive = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
+			public void run() {
+				try {
+					while(!Elevator0.isInterrupted()) {
+						Elevator0.receivePacket();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+		
+		receive.start();
 		Elevator0.start();
 		Elevator1.start();
 		
-		while(true) {
-			Elevator0.receivePacket();
-<<<<<<< HEAD
-/*			if(Elevator0.isInterrupt == true) {
-				System.out.println("here");
-				Elevator0.sendPacket(Elevator0.responsePacketRequest(2,0));
-				Elevator0.isInterrupt = false;
-			}
-			if(Elevator1.isInterrupt == true) {
-				System.out.println("here");
-				Elevator1.sendPacket(Elevator1.responsePacketRequest(2,0));
-				Elevator1.isInterrupt = false;
-			}*/
-=======
->>>>>>> parent of 69f91d0... commit
-		}
 	}
 }
