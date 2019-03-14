@@ -192,29 +192,28 @@ public class Elevator extends Thread {
 				}
 
 				byte data[] = new byte[7];
-
 				data = ElevatorTable.get(0);
-				toDoID = data[1];
+
 				instruction = data[6];
 
-				if(toDoID == nameOfElevator) {
-					if(instruction == 2 || instruction == 1) {
-						runElevator(motorDirection);
-						try {
-							sendPacket(responsePacketRequest(2,0));
-							break;
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}				
-					} else if (instruction == 0) {
-						openCloseDoor((byte)DOOR_OPEN);
-						this.interrupt();
-					}
-					ElevatorTable.clear();
-					ElevatorTable.notifyAll();
-				}			
+				if(instruction == 2 || instruction == 1) {
+					runElevator(motorDirection);
+					try {
+						sendPacket(responsePacketRequest(2,0));
+						break;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}				
+				} else if (instruction == 0) {
+					openCloseDoor((byte)DOOR_OPEN);
+					this.interrupt();
+				}
+				ElevatorTable.clear();
+				ElevatorTable.notifyAll();
+
 			}
 		}
+		System.out.println("Elevator " + nameOfElevator + " Thread ended");
 	}
 
 	
@@ -257,12 +256,22 @@ public class Elevator extends Thread {
 			}
 		});
 		
-		
 		receive.start();
-	
-		Elevator0.start();
-		Elevator1.start();
+		byte data[] = new byte[7];
 
+		
+
+		while(true) {
+			if(!ElevatorTable1.isEmpty()) {
+				data = ElevatorTable1.remove(0);
+				toDoID = data[1];
+				if(toDoID == 0) {
+					Elevator0.start();
+				}else if(toDoID == 1) {
+					Elevator1.start();
+				}
+			}
+		}
 		
 	}
 }
