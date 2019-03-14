@@ -62,7 +62,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor); // sensor = current floor
-				Thread.sleep(3000);
+				Thread.sleep(1000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -179,12 +179,13 @@ public class Elevator extends Thread {
 
 	
 	public void run() {
-		while(true) {
+		while(!isInterrupted()) {
 			synchronized(ElevatorTable) {
+
 				while(ElevatorTable.isEmpty()) {
 					try {
-						System.out.println("here");
-						ElevatorTable.wait();
+						//System.out.println("here");
+						ElevatorTable.wait(1);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -201,11 +202,13 @@ public class Elevator extends Thread {
 						runElevator(motorDirection);
 						try {
 							sendPacket(responsePacketRequest(2,0));
+							break;
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}				
-					} else if (instruction == 3 || instruction == 4 || instruction == 5) {
+					} else if (instruction == 0) {
 						openCloseDoor((byte)DOOR_OPEN);
+						this.interrupt();
 					}
 					ElevatorTable.clear();
 					ElevatorTable.notifyAll();
@@ -213,6 +216,7 @@ public class Elevator extends Thread {
 			}
 		}
 	}
+
 	
 	
 	public static void main(String args[]) throws InterruptedException {
@@ -243,7 +247,7 @@ public class Elevator extends Thread {
 		Thread receive = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
 			public void run() {
 				try {
-					while(!Elevator0.isInterrupted()) {
+					while(!interrupted()) {
 						Elevator0.receivePacket();
 					}
 				} catch (InterruptedException e) {
@@ -253,9 +257,12 @@ public class Elevator extends Thread {
 			}
 		});
 		
+		
 		receive.start();
+	
 		Elevator0.start();
 		Elevator1.start();
+
 		
 	}
 }
