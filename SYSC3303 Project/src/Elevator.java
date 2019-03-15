@@ -19,8 +19,8 @@ public class Elevator extends Thread {
 
 	/* UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES*/
 	public static final byte HOLD = 0x00;// Elevator is in hold state
-	public static final byte UP = 0x02;// Elevator is going up
-	public static final byte DOWN = 0x01;// Elevator is going down
+	public static final byte UP = 0x01;// Elevator is going up
+	public static final byte DOWN = 0x02;// Elevator is going down
 	public static final int Elevator_ID = 21;// for identifying the packet's source as Elevator
 	public static final int DOOR_OPEN = 1;// the door is open when ==1
 	public static final int DOOR_DURATION = 4;// duration that doors stay open for
@@ -30,10 +30,10 @@ public class Elevator extends Thread {
 	/* Variables used in this class*/
 	private static int sensor;
 	private int nameOfElevator;
-	private byte toDoID;
-	private static byte instruction;
+	private int toDoID;
+	private byte instruction;
 	private int initialFloor;
-	private byte motorDirection;
+	//private byte motorDirection;
 
 	/* Table to synchronize threads */
 	public List<byte[]> ElevatorTable =new ArrayList<byte[]>();
@@ -179,11 +179,12 @@ public class Elevator extends Thread {
 
 	
 	public void run() {
+		System.out.println("Elevator number --> " +nameOfElevator);
 		while(!isInterrupted()) {
 			synchronized(ElevatorTable) {
 				while(ElevatorTable.isEmpty()) {
 					try {	
-						ElevatorTable.wait(10);
+						ElevatorTable.wait(1);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -191,16 +192,15 @@ public class Elevator extends Thread {
 				
 				//System.out.println(ElevatorTable.get(0));
 				byte data[] = new byte[7];
-				data = ElevatorTable.get(0);
-				
+				data = ElevatorTable.remove(0);
+				toDoID = (int)data[1];
+				System.out.println("Elevator number" +toDoID);
 				instruction = data[6];
-				if(toDoID == this.nameOfElevator) {
-					
+				if(toDoID == nameOfElevator) {
+					//System.out.println("Elevator number" +toDoID);
 					if(instruction == 2 || instruction == 1) {
 						System.out.println(instruction);
 						this.runElevator(instruction);
-						
-						
 						try {
 							sendPacket(responsePacketRequest(2,0));
 							//break;
@@ -211,7 +211,6 @@ public class Elevator extends Thread {
 						openCloseDoor((byte)DOOR_OPEN);
 						this.interrupt();
 					}
-					ElevatorTable.remove(0);
 					ElevatorTable.notifyAll();
 
 				}
@@ -246,11 +245,10 @@ public class Elevator extends Thread {
 		
 		
 		ElevatorTable1.clear();
-
 		Elevator1.start();
 		Elevator0.start();
 		
-
+		
 		try {
 			while(!interrupted()) {
 				Elevator0.receivePacket();
