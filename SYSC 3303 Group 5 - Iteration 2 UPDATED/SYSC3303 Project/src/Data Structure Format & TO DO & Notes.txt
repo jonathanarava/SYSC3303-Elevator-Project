@@ -1,0 +1,68 @@
+Data Structure:
+-[0]Packet ID: floor (69) or elevator (21)
+-[1]element #: floor[0], floor[1] -> 0 and 1, or elevator[1], elevator [2] -> 1 and 2
+-[2]request or status update: floor is always request, elevator can be status update or request
+-[3]elevator floor#: for status updates
+-[4]floor request: up or down
+-[5]command: sent from the scheduler
+
+	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	private static final byte HOLD = 0x00;//elevator is in hold state
+	private static final byte UP = 0x02;//elevator is going up
+	private static final byte DOWN = 0x01;//elevator is going down
+	private static final int ELEVATOR_ID=21;//for identifying the packet's source as elevator
+	private static final int FLOOR_ID=69;//for identifying the packet's source as floor
+	private static final int SCHEDULER_ID=54;//for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN=1;//the door is open when ==1
+	private static final int DOOR_DURATION=4;//duration that doors stay open for
+	private static final int REQUEST=1;//for identifying the packet sent to scheduler as a request
+	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
+
+
+
+
+ID (identify whether it is a floor, elevator, or scheduler), floor# or elevator# (identify which floor/elevator), request or Status update(always),current floor of the elevator, floor request (up/down), Destination Request(null),command(what is coming back from scheduler)]
+
+Scheduler Commands:
+-sending to elevator
+1:start motor up
+2:start motor down
+3:make a stop
+4:put on hold
+-sending to floor
+5:update floor's displays (current floor of the elvator, and direction of the elevator)
+	-should automatically update all the floors
+
+
+Naming Convention:
+-ALL CAPS: should be constants
+-firstLowerCaseThenFirstLetterOfEachUpperCase: 
+
+
+
+NOTES:
+General:
+-add/ set constants that are shared by all classes (copy/paste works just fine as long as we update all classes every time)
+	int or byte HOLD=___, UP=___, DOWN=___
+	ELEVATOR_ID=___, FLOOR_ID=___, SCHEDULER_ID=___
+	
+-set constants:
+	-travel time between floors: 1 second right?
+	from scheduler: 
+	TIME_PER_FLOOR=1;
+	-stop time: 5 seconds right? (including doors opening and closing)
+	from scheduler: 
+	DOOR_OPEN=4;
+-HOLD compared with STOP states: HOLD is an elevator state (no requests, no stops) and STOP is a motor State
+
+Floor Specific:
+	-why is there a parameter for the responsePacket method? 
+		-I took out the parameter as well as the if statement since floors should only ever be sending requests
+
+Scheduling Specific:
+	-scheduler: creatNumElevators, createNumFloors values are no longer passed from main()'s parameter since scheduler is no longer responsible for launching/creating threads
+		-TO DO: receive packets from the intermediate classes on startup to initialize those variables
+			-change variable names to numElevators, numFloors
+	-stops: currently being fulfilled (current direction and next; does not include those that have already been missed)
+	-requests: not going to be fulfilled in the current round (ie. already missed that floor for the current direction)	
+
