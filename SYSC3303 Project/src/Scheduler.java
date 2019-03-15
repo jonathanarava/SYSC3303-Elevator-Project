@@ -512,13 +512,13 @@ public class Scheduler extends Thread {
 			}
 		}
 
-		sendData[0] = 54;
+/*		sendData[0] = 54;
 		sendData[1] = 21;
 		sendData[2] = 1;
 		sendData[3] = packetData[3];
 		sendData[4] = 0;
 //sendData[5] = 2; floor request from elevator hardcoded to be 3
-		sendData[6] = UP;
+		sendData[6] = UP;*/
 
 		// System.out.println("Send Data: " + Arrays.toString(sendData));
 		// System.out.println("Packet Data: " + Arrays.toString(packetData));

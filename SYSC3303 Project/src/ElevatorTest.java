@@ -31,23 +31,23 @@ class ElevatorTest {
 
 	@Test
 	public void testinitializeElevator() {
-		elevator = new Elevator("one");
+		elevator = new Elevator(1, 0, 8);
 		assertNotNull(elevator);
-
 	}
 
 	@Test
 	public void testResponsePacket() {
-		Elevator elevator = new Elevator();
+		Elevator elevator = new Elevator(1, 0, 8);
 
-		floorRequest = 2;
-		byte[] testarray = new byte[4];
-		testarray[0] = 0; // write 0
-		testarray[1] = 2; // floorRequest = 2
-		testarray[2] = 1; // sensor = 1
-		testarray[3] = 0; // write 0
-
-		assertArrayEquals(testarray, elevator.responsePacket(floorRequest));
+		floorRequest = 8;
+		byte[] testarray = new byte[5];
+		testarray[0] = 1; // REQUEST
+		testarray[1] = 0; // CURRENT FLOOR
+		testarray[2] = 0; // NOT USED
+		testarray[3] = 8; // DESTINATION FLOOR
+		testarray[3] = 0; // NOT USED
+		assertArrayEquals(testarray, elevator.responsePacketRequest(floorRequest));
+		
 	}
 
 	@Test

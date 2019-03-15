@@ -30,10 +30,6 @@ public class Elevator extends Thread {
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	public Elevator() {
-		//For Junit testing only
-	}
-
 	public Elevator(int name, int initiateFloor, int destFloor) {
 		this.name = name;// mandatory for having it actually declared as a thread object
 		sensor = initiateFloor;
@@ -49,16 +45,6 @@ public class Elevator extends Thread {
 		// use a numbering scheme for the naming
 
 		// allocate sockets, packets
-		/*
-		 * try { //ClientRWSocket = new DatagramSocket(23);//initialize ClientRWSocket
-		 * for reading and writing to the Intermediate server //port 23 is the
-		 * well-known port number of Intermediate } catch (SocketException se) {//if
-		 * DatagramSocket creation fails an exception is thrown se.printStackTrace();
-		 * System.exit(1); } //run checking loop indefinitely //status of elevator floor
-		 * number, input of floor requests, direction of elevator, motor input, door
-		 * input //only waits for packet reception? check data of packet and change
-		 * accordingly
-		 */
 	}
 
 	public byte[] responsePacketRequest(int requestUpdate) {
