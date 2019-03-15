@@ -154,14 +154,10 @@ public class ElevatorIntermediate {
 			elevatorArray[1].motorDirection = data[6];
 			break;
 		case 2:
-			elevatorArray[2].hasRequest = true;
 			elevatorArray[2].motorDirection = data[6];
-			elevatorArray[2].isUpdate = true;
 			break;
 		case 3:
-			elevatorArray[3].hasRequest = true;
 			elevatorArray[3].motorDirection = data[6];
-			elevatorArray[3].isUpdate = true;
 			break;
 		}
 		// elevatorArray[0].openCloseDoor(data[2]);
