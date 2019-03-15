@@ -28,7 +28,7 @@ public class Elevator extends Thread {
 	public static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 	
 	/* Variables used in this class*/
-	private static int sensor;
+	private int sensor;
 	private int nameOfElevator;
 	private int toDoID;
 	private byte instruction;
@@ -44,7 +44,7 @@ public class Elevator extends Thread {
 		this.ElevatorTable = ElevatorTable;
 	}
 	
-	public static int currentFloor(int floorSensor) { // method to initialize where the Elevator starts
+	public int currentFloor(int floorSensor) { // method to initialize where the Elevator starts
 		sensor = floorSensor;
 		return sensor;
 	}
@@ -58,28 +58,28 @@ public class Elevator extends Thread {
 		this.initialFloor = initialFloor;
 	}
 	
-	public synchronized int runElevator(byte motorDirection) {
+	public int runElevator(byte motorDirection) {
 		if (motorDirection == UP || motorDirection == DOWN) {
-			try {
+			//try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(1000);
+				//Thread.sleep(3000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
-					currentFloor(sensor); // updates the current floor
+					setInitialFloor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
 					System.out.println("Elevator going down");
 					sensor--; // decrements the floor
-					currentFloor(sensor); // updates the current floor
+					setInitialFloor(sensor); // updates the current floor
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			//} catch (InterruptedException e) {
+			//	e.printStackTrace();
+			//}
 		} else if (motorDirection == HOLD) {
-			currentFloor(sensor); // updates current floor - in this case nothing changes
+			setInitialFloor(sensor); // updates current floor - in this case nothing changes
 		}
 		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
-		return currentFloor(sensor); // returns and updates the final current of the floor - in this case destination floor
+		return getInitialFloor(); // returns and updates the final current of the floor - in this case destination floor
 	}
 	
 	public byte[] responsePacketRequest(int requestUpdate, int floorRequest) {
@@ -98,13 +98,13 @@ public class Elevator extends Thread {
 		// request/ update
 		if (requestUpdate == REQUEST) {
 			requestElevator.write(REQUEST); // request/
-			requestElevator.write((byte) currentFloor(sensor)); // current floor
+			requestElevator.write((byte) getInitialFloor()); // current floor
 			requestElevator.write(0); // up or down
 			requestElevator.write(floorRequest); // dest floor
 			requestElevator.write(0); // instruction
 		} else if (requestUpdate == UPDATE) {
 			requestElevator.write(UPDATE); // update
-			requestElevator.write((byte) currentFloor(sensor)); // current floor
+			requestElevator.write((byte) getInitialFloor()); // current floor
 			requestElevator.write(0); // up or down
 			requestElevator.write(floorRequest); // dest floor
 			requestElevator.write(0); // instruction
@@ -192,15 +192,21 @@ public class Elevator extends Thread {
 				
 				//System.out.println(ElevatorTable.get(0));
 				byte data[] = new byte[7];
-				data = ElevatorTable.remove(0);
+				data = ElevatorTable.get(0);
 				toDoID = (int)data[1];
-				System.out.println("Elevator number" +toDoID);
+				//System.out.println("Elevator number" +toDoID);
 				instruction = data[6];
+				
 				if(toDoID == nameOfElevator) {
-					//System.out.println("Elevator number" +toDoID);
+					//System.out.println("Elevator number" +toDoID + " working");
 					if(instruction == 2 || instruction == 1) {
-						System.out.println(instruction);
+						//System.out.println(instruction);
 						this.runElevator(instruction);
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
 						try {
 							sendPacket(responsePacketRequest(2,0));
 							//break;
@@ -211,6 +217,7 @@ public class Elevator extends Thread {
 						openCloseDoor((byte)DOOR_OPEN);
 						this.interrupt();
 					}
+					ElevatorTable.remove(0);
 					ElevatorTable.notifyAll();
 
 				}
