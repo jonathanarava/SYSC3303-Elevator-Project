@@ -242,6 +242,7 @@ public class Scheduler {
 		int stopRequest;// =packetData[5]; //a request to give to an elevator for stopping at a given
 		// floor (from elevator or floor)
 		// public static int floorRequesting;
+		
 
 		int[] responseTime;// response time of individual elevators to got to a floor request
 		int indexOfFastestElevator = 0;// index of array for which elevator is fastest
@@ -272,6 +273,7 @@ public class Scheduler {
 		//
 		elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent from
 		// elevator as status update)
+		floorRequestDirection=packetData[4];//which direction the requesting floor wants to go
 		stopRequest = packetData[5];// a request to stop at a given floor (-1 if no request)
 		if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
 			// elevatorNum=__;//which elevator it is in
@@ -292,6 +294,8 @@ public class Scheduler {
 						// remove the stop from goingup linked list
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
+						//elevatorSendPacket(sendData);
+						
 						if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 							// check if there are more requests
 							if (elevatorRequestsUp[packetElementIndex].isEmpty()) {// no missed floors for going Up
@@ -331,6 +335,7 @@ public class Scheduler {
 						// remove the stop from goingup linked list
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
+						elevatorSendPacket(sendData);
 						if (elevatorStopsDown[packetElementIndex].isEmpty()) {
 							// check if there are more requests
 							if (elevatorRequestsDown[packetElementIndex].isEmpty()) {// no missed floors for going

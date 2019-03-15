@@ -4,7 +4,8 @@ Data Structure:
 -[2]request or status update: floor is always request, elevator can be status update or request
 -[3]elevator floor#: for status updates
 -[4]floor request: up or down
--[5]command: sent from the scheduler
+-[5]elevator request: which floor 
+-[6]command: sent from the scheduler
 
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;//elevator is in hold state
