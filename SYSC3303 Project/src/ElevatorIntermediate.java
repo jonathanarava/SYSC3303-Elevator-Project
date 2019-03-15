@@ -149,21 +149,9 @@ public class ElevatorIntermediate {
 		switch (data[1]) {
 		case 0:
 			elevatorArray[0].motorDirection = data[6];
-			if(data[6] == 1 || data[6] == 2) {
-				elevatorArray[0].hasRequest = true;
-			}
-			else if(data[6] == 5) {
-				elevatorArray[0].isUpdate = true;
-			}
 			break;
 		case 1:
 			elevatorArray[1].motorDirection = data[6];
-			if(data[6] == 1 || data[6] == 2) {
-				elevatorArray[1].hasRequest = true;
-			}
-			else if(data[1] == 5) {
-				elevatorArray[1].isUpdate = true;
-			}
 			break;
 		case 2:
 			elevatorArray[2].hasRequest = true;
@@ -183,6 +171,12 @@ public class ElevatorIntermediate {
 		// receivePacket.getLength(),receivePacket.getAddress(),
 		// receivePacket.getPort());
 		// }
+	}
+	
+	public static void delay(int delayValue) {
+		for(int i=0; i<delayValue;) {
+			i++;
+		}
 	}
 
 	public static void main(String args[]) throws IOException {// 2 arguments: args[0] is the number of Elevators in the
@@ -223,6 +217,8 @@ public class ElevatorIntermediate {
 		while (true) {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
+			
+			//delay(1000);
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 

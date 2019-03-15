@@ -12,7 +12,7 @@ public class Elevator extends Thread {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x04;// elevator is in hold state
-	private static final byte DISPLAYUPDATE = 0x05;
+	private static final byte UPDATEDISPLAY = 0x05;
 	private static final byte UP = 0x01;// elevator is going up
 	private static final byte DOWN = 0x02;// elevator is going down
 	private static final byte STOP = 0x03;
@@ -25,7 +25,7 @@ public class Elevator extends Thread {
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 
 	public byte motorDirection; // make getters and setters:
-	public boolean hasRequest = false; // make getters and setters: This Boolean will be set to true when the Elevator
+	public boolean hasRequest = true; // make getters and setters: This Boolean will be set to true when the Elevator
 										// Intermediate wants a specific elevator thread to do something.
 										// if hasRequest is true, then the Elevator thread will not send another
 										// request. Ie, he needs to take care of the job he is told to do by the
@@ -35,7 +35,7 @@ public class Elevator extends Thread {
 	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 	
 	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
-	public boolean respond = true;
+	public boolean isGoingUp;
 	
 	public int elevatorNumber;
 	public int RealTimefloorRequest;
@@ -117,12 +117,22 @@ public class Elevator extends Thread {
 
 		return sensor;
 	}
+	
+	public void updateDisplay() {
+		System.out.println("On Floor: " + sensor);
+		if(isGoingUp) {
+			System.out.println("Going Up");
+		}
+		else if(!isGoingUp) {
+			System.out.println("Going Down");
+		}
+	}
 
 	public int runElevator() {
 		// sensor = setSensor; //sensor is at current floor
 		if (motorDirection == UP || motorDirection == DOWN) {
 			//try {
-				System.out.println("At floor: " + sensor); // sensor = current floor
+
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
@@ -131,13 +141,15 @@ public class Elevator extends Thread {
 				}
 				if (motorDirection == UP) {
 					System.out.println("Elevator is going up...");
+					isGoingUp = true;
 					sensor++; // increment the floor
 					setSensor(sensor); // updates the current floor
 				} else if (motorDirection == DOWN) {
 					System.out.println("Elevator is going down...");
+					isGoingUp = false;
 					sensor--; // decrements the floor
 					setSensor(sensor); // updates the current floor
-				} else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == DISPLAYUPDATE ) {
+				} else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == UPDATEDISPLAY ) {
 					
 				}
 			//} catch (InterruptedException e) {
@@ -145,11 +157,9 @@ public class Elevator extends Thread {
 			//}
 		} else if (motorDirection == HOLD) {
 			setSensor(sensor); // brings the elevator back to holding state. 
-		} else if(motorDirection == DISPLAYUPDATE) {
+		} else if(motorDirection == UPDATEDISPLAY) {
 			setSensor(sensor);	// update the display so the current floor is shown
 		}
-		
-		System.out.println("Came to floor: " + sensor); // prints out the current floor - in this case destination floor
 		return setSensor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -174,24 +184,33 @@ public class Elevator extends Thread {
 	public void run() {
 		while (true) {
 								// while(true) to activate all elevator threads in this system
-			while(respond) {
-				if (!hasRequest) {
-					sendPacket(1);
-					break;
-				}
+			while(hasRequest) {
+				sendPacket(1);
+				hasRequest = !hasRequest;
 			}
 			 
-			while(!respond) {
-				if (hasRequest) {
+			while(!hasRequest) {
+				System.out.println("Reached here");
+				if (motorDirection == UP || motorDirection == DOWN) {
 					runElevator();
 					sendPacket(2);
-					hasRequest = false;
-				} else if (isUpdate) {
+				} else if (motorDirection == UPDATEDISPLAY) {
+					updateDisplay();
+					sendPacket(2);
 					//set the lights sensors and stuff to proper value
 					isUpdate = false;
-				} break;
+				} else if (motorDirection == STOP) {
+					sendPacket(2);
+				} else if (motorDirection == HOLD) {
+					while(!hasRequest) {
+						try {
+							wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			} 
-			respond = !respond;
 		}
 	}
 
