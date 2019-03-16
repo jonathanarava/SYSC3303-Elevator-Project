@@ -69,12 +69,6 @@ public class Scheduler extends Thread {
 	// command (door closes automatically after alloted time)
 
 	// Declare Motor States:
-	/*
-	 * public static final ___ HOLD=__; public static final ___ UP=__; public static
-	 * final ___ DOWN=__; public static final ___ ELEVATOR_ID=___; public static
-	 * final ___ FLOOR_ID=___; public static final ___ SCHEDULER_ID=___; public
-	 * static final ___ STATUS=___; public static final ___ REQUEST=___;
-	 */
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
@@ -138,24 +132,6 @@ public class Scheduler extends Thread {
 		return schedulerElevatorReceivePacket;
 	}
 
-	public static void elevatorSendPacket(byte[] sendData) {
-		/* SENDING ELEVATOR PACKET HERE */
-
-		byte[] responseByteArray = new byte[7];
-		responseByteArray = sendData;
-
-		// responseByteArray = createSendingData(elevatorOrFloor, currentFloor,
-		// upOrDown, instruction);
-		System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
-		try {
-			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
-
 	public static void floorReceivePacket() {
 		/* FLOOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
@@ -181,54 +157,118 @@ public class Scheduler extends Thread {
 		destFloor = data[5];
 	}
 
-	public static void floorSendPacket() {
-		/* FLOOR SENDING PACKET HERE */
+	public static int[] calculateResponseTimes(int destination, int requestDirection) {// destination is the floor that
+		// is making the request
+		// elevatorLowestRequestFloor
+		// elevatorHighestRequestFloor
+		// TIME_PER_FLOOR
+		// DOOR_DURATION
+		// UP
+		// DOWN
+		// HOLD
+		int[] responseTime = new int[numElevators];
+		int distance = 0;// number of floors traveled before arriving at the destination
+		int stops = 0;// number of stops that need to be made before the destination (floor that's making the request)
+		int highest;// highest requested
+		int lowest;// lowest requested
+		int current;// current floor
+		int status;// elevator's status
+		int next;// next stop
 
-		byte[] responseByteArray = new byte[5];
-		responseByteArray = createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
-		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		try {
-			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-					InetAddress.getLocalHost(), PORTNUM);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		for (int i = 0; i < numElevators; i++) {
+			// check and set status, highest, current, and lowest floors,
+			highest = elevatorHighestRequestFloor[i];
+			lowest = elevatorLowestRequestFloor[i];
+			current = elevatorCurrentFloor[i];
+			status = elevatorStatus[i];
+			next = elevatorNextStop[i];
+			if (status == HOLD) {// elevator in hold
+				// distance=|destination-current|
+				distance = destination - elevatorCurrentFloor[i];
+				stops = 0;// stops=0 since by definition hold means there were no prior requests or stops
 
-		try {
-			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			} else if (status == UP) {// elevator going up
+				if (requestDirection == UP) {// if requesting to go up
+					// if along the way
+					if (destination >= next) {
+						distance = destination - current;
+					}
+					// distance=destination-current
+					// stops=stops between destination and current
+					else {
+						distance = (highest - current) + (highest - lowest) + (destination - lowest);
+						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
+								+ stopsBetween(elevatorRequestsUp[i], lowest, destination, UP);
+					}
+					// else if missed
+					// distance=(top-current)+(top-bottom)+(destination-bottom)
+					// stops=upStops+downStops+upRequests before destination
+				} else if (requestDirection == DOWN) {// if requesting to go down
+					distance = (highest - current) + (highest - destination);
+					stops = elevatorStopsUp[i].size() + stopsBetween(elevatorStopsDown[i], highest, destination, DOWN);
+					// distance=(Top-current)+(top-destination)
+					// stops=upStops+downStops between destination and top
+				}
+			} else if (elevatorStatus[i] == DOWN) {// elevator going down
+				if (requestDirection == UP) {// if requesting to go up
+					distance = (current - lowest) + (destination - lowest);
+					stops = elevatorStopsDown[i].size() + stopsBetween(elevatorStopsUp[i], lowest, destination, UP);
+					// distance=(current-Bottom)+(destination-Bottom)
+					// stops=downStops+upStops between destination and botom
+				} else if (requestDirection == DOWN) {// if requesting to go down
+					if (destination <= elevatorNextStop[i]) {
+						distance = current - destination;
+						stops = stopsBetween(elevatorStopsDown[i], current, destination, DOWN);
+					} else {
+						distance = (current - lowest) + (highest - lowest) + (highest - destination);
+						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
+								+ stopsBetween(elevatorRequestsDown[i], highest, destination, DOWN);
+					}
+					// if along the way
+					// distance=current-destination
+					// stops=stops between destinatino and current
+					// else if missed
+					// distance=(current-Bottom)+(top-bottom)+(top-destination)
+					// stops=upStops+downStops+downRequests before destination
+				}
+			} else {
+				// catastrophic error
+				System.out.println("mismatch between motor status variables, status is " + elevatorStatus[i]
+						+ " should only be HOLD: " + HOLD + " , UP: " + UP + " , and DOWN: " + DOWN);
+			}
+			responseTime[i] = distance * TIME_PER_FLOOR + stops * DOOR_DURATION;
+
 		}
+		return responseTime;
+
 	}
 
-	public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
-
-		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
-		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
-		sendingOutputStream.write(target); // (exact floor or elevator to receive)
-		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
-		// somewhat redundant usage since floors would only receive updates and
-		// elevators would only receive requests
-		if (instruction == 5) {// update displays of the floors
-			sendingOutputStream.write(currentFloor); // (current floor of elevator)
-			sendingOutputStream.write(direction); // (direction of elevator)
-		} else {
-			sendingOutputStream.write(0); // not needed (current floor of elevator)
-			sendingOutputStream.write(0); // not needed (direction of elevator)
+	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {// calculates
+		// how many stops between between the destination and current floor for use in responseTime calculation
+		int stops = 0;
+		if (direction == UP) {
+			for (int i = current; i < destination; i++) {
+				if (floors.contains(current)) {
+					stops++;
+				}
+			}
+		} else if (direction == DOWN) {
+			for (int i = current; i > destination; i--) {
+				if (floors.contains(current)) {
+					stops++;
+				}
+			}
 		}
-		sendingOutputStream.write(0); // not needed (destination request)
-		sendingOutputStream.write(instruction); // scheduler instruction
-		sendData = sendingOutputStream.toByteArray();
-		return sendData;
+		return stops;
 	}
-
+	
 	// variable definitions used to unpack/ coordinate/ allocate actions
-	void SchedulingAlgorithm(DatagramPacket schedulerElevatorReceivePacket) {
+	public byte[] SchedulingAlgorithm(DatagramPacket Packet) {
+		
 		byte[] packetData = schedulerElevatorReceivePacket.getData();
 		int packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of
 		// elevators and floors
 		// should have been the name given to threads' constructor at creation
-		//
 		int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 		// 21=elevator, 69=floor
 		int packetIsStatus = packetData[2];// whether it is a status update from elevator or a request (elevator or
@@ -512,126 +552,82 @@ public class Scheduler extends Thread {
 			}
 		}
 
-/*		sendData[0] = 54;
+	/*	sendData[0] = 54;
 		sendData[1] = 21;
 		sendData[2] = 1;
 		sendData[3] = packetData[3];
 		sendData[4] = 0;
-//sendData[5] = 2; floor request from elevator hardcoded to be 3
-		sendData[6] = UP;*/
+		//sendData[5] = 2; floor request from elevator hardcoded to be 3
+		sendData[6] = UP;
 
-		// System.out.println("Send Data: " + Arrays.toString(sendData));
-		// System.out.println("Packet Data: " + Arrays.toString(packetData));
-		elevatorSendPacket(sendData);
+		System.out.println("Send Data: " + Arrays.toString(sendData));
+		System.out.println("Packet Data: " + Arrays.toString(packetData));  */
+		
+		return sendData;
 	}
 
-	public static int[] calculateResponseTimes(int destination, int requestDirection) {// destination is the floor that
-		// is making the request
-		// elevatorLowestRequestFloor
-		// elevatorHighestRequestFloor
-		// TIME_PER_FLOOR
-		// DOOR_DURATION
-		// UP
-		// DOWN
-		// HOLD
-		int[] responseTime = new int[numElevators];
-		int distance = 0;// number of floors traveled before arriving at the destination
-		int stops = 0;// number of stops that need to be made before the destination (floor that's making the request)
-		int highest;// highest requested
-		int lowest;// lowest requested
-		int current;// current floor
-		int status;// elevator's status
-		int next;// next stop
+	public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
 
-		for (int i = 0; i < numElevators; i++) {
-			// check and set status, highest, current, and lowest floors,
-			highest = elevatorHighestRequestFloor[i];
-			lowest = elevatorLowestRequestFloor[i];
-			current = elevatorCurrentFloor[i];
-			status = elevatorStatus[i];
-			next = elevatorNextStop[i];
-			if (status == HOLD) {// elevator in hold
-				// distance=|destination-current|
-				distance = destination - elevatorCurrentFloor[i];
-				stops = 0;// stops=0 since by definition hold means there were no prior requests or stops
-
-			} else if (status == UP) {// elevator going up
-				if (requestDirection == UP) {// if requesting to go up
-					// if along the way
-					if (destination >= next) {
-						distance = destination - current;
-					}
-					// distance=destination-current
-					// stops=stops between destination and current
-					else {
-						distance = (highest - current) + (highest - lowest) + (destination - lowest);
-						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
-								+ stopsBetween(elevatorRequestsUp[i], lowest, destination, UP);
-					}
-					// else if missed
-					// distance=(top-current)+(top-bottom)+(destination-bottom)
-					// stops=upStops+downStops+upRequests before destination
-				} else if (requestDirection == DOWN) {// if requesting to go down
-					distance = (highest - current) + (highest - destination);
-					stops = elevatorStopsUp[i].size() + stopsBetween(elevatorStopsDown[i], highest, destination, DOWN);
-					// distance=(Top-current)+(top-destination)
-					// stops=upStops+downStops between destination and top
-				}
-			} else if (elevatorStatus[i] == DOWN) {// elevator going down
-				if (requestDirection == UP) {// if requesting to go up
-					distance = (current - lowest) + (destination - lowest);
-					stops = elevatorStopsDown[i].size() + stopsBetween(elevatorStopsUp[i], lowest, destination, UP);
-					// distance=(current-Bottom)+(destination-Bottom)
-					// stops=downStops+upStops between destination and botom
-				} else if (requestDirection == DOWN) {// if requesting to go down
-					if (destination <= elevatorNextStop[i]) {
-						distance = current - destination;
-						stops = stopsBetween(elevatorStopsDown[i], current, destination, DOWN);
-					} else {
-						distance = (current - lowest) + (highest - lowest) + (highest - destination);
-						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
-								+ stopsBetween(elevatorRequestsDown[i], highest, destination, DOWN);
-					}
-					// if along the way
-					// distance=current-destination
-					// stops=stops between destinatino and current
-					// else if missed
-					// distance=(current-Bottom)+(top-bottom)+(top-destination)
-					// stops=upStops+downStops+downRequests before destination
-				}
-			} else {
-				// catastrophic error
-				System.out.println("mismatch between motor status variables, status is " + elevatorStatus[i]
-						+ " should only be HOLD: " + HOLD + " , UP: " + UP + " , and DOWN: " + DOWN);
-			}
-			responseTime[i] = distance * TIME_PER_FLOOR + stops * DOOR_DURATION;
-
+		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
+		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
+		sendingOutputStream.write(target); // (exact floor or elevator to receive)
+		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
+		// somewhat redundant usage since floors would only receive updates and
+		// elevators would only receive requests
+		if (instruction == 5) {// update displays of the floors
+			sendingOutputStream.write(currentFloor); // (current floor of elevator)
+			sendingOutputStream.write(direction); // (direction of elevator)
+		} else {
+			sendingOutputStream.write(0); // not needed (current floor of elevator)
+			sendingOutputStream.write(0); // not needed (direction of elevator)
 		}
-		return responseTime;
-
+		sendingOutputStream.write(0); // not needed (destination request)
+		sendingOutputStream.write(instruction); // scheduler instruction
+		sendData = sendingOutputStream.toByteArray();
+		return sendData;
 	}
 
-	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {// calculates
-		// how many stops between between the destination and current floor for use in responseTime calculation
-		int stops = 0;
-		if (direction == UP) {
-			for (int i = current; i < destination; i++) {
-				if (floors.contains(current)) {
-					stops++;
-				}
-			}
-		} else if (direction == DOWN) {
-			for (int i = current; i > destination; i--) {
-				if (floors.contains(current)) {
-					stops++;
-				}
-			}
+	public static void elevatorSendPacket(byte[] sendData) {
+		/* SENDING ELEVATOR PACKET HERE */
+
+		byte[] responseByteArray = new byte[7];
+		responseByteArray = sendData;
+
+		// responseByteArray = createSendingData(elevatorOrFloor, currentFloor,
+		// upOrDown, instruction);
+		System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
+		try {
+			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		return stops;
+	}
+	
+	public static void floorSendPacket() {
+		/* FLOOR SENDING PACKET HERE */
+
+		byte[] responseByteArray = new byte[5];
+		responseByteArray = createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
+		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		try {
+			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+					InetAddress.getLocalHost(), PORTNUM);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	/*------------------------------------------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
+		
 		Scheduler Scheduler = new Scheduler();
 		Scheduler.linkedListInitialization();
 
@@ -661,11 +657,12 @@ public class Scheduler extends Thread {
 		 
 		for (;;) {
 
-			// connection to elevator class
+			// Receives the Packet from Elevator
 			DatagramPacket packetRecieved = Scheduler.elevatorReceivePacket();
-			// Schedules the queuing (scheduling algorithm) of what request needs to be done
-			// and also sends the packet to elevatorIntermediate at the end
-			Scheduler.SchedulingAlgorithm(packetRecieved);
+			// Sorts the received Packet and returns the byte array to be sent
+			sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
+			// Sends the Packet to Elevator
+			elevatorSendPacket(sendData);
 
 		}
 	}
