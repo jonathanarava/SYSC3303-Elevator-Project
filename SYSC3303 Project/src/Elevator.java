@@ -114,7 +114,6 @@ public class Elevator extends Thread {
 	 */
 	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
-
 		return sensor;
 	}
 	
@@ -204,7 +203,7 @@ public class Elevator extends Thread {
 				} else if (motorDirection == HOLD) {
 					while(!hasRequest) {
 						try {
-							wait();
+							wait(1);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}

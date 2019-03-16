@@ -175,8 +175,8 @@ public class ElevatorIntermediate {
 		}
 	}
 
-	public static void main(String args[]) throws IOException {// 2 arguments: args[0] is the number of Elevators in the
-																// system and
+	public static void main(String args[]) throws IOException {
+		//2 arguments: args[0] is the number of Elevators in the system 
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set

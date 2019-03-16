@@ -110,7 +110,7 @@ public class Scheduler {
 		}
 	}
 
-	public static DatagramPacket elevatorReceivePacket() {
+	public static byte[] elevatorReceivePacket() {
 		/* ELEVATOR RECEIVING PACKET HERE */
 		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
@@ -130,15 +130,19 @@ public class Scheduler {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		
 		/* Separating byte array received */
-
 		elevatorOrFloor = data[0];
 		elevatorOrFloorID = data[1];
 		requestOrUpdate = data[2];
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
-		return schedulerElevatorReceivePacket;
+		
+		/* Converts the received packet from Datagram Packet to Byte[] */
+		byte[] packetData = schedulerElevatorReceivePacket.getData();
+		
+		return packetData;
 	}
 	public static void floorReceivePacket() {
 		/* FLOOR RECEIVING PACKET HERE */
@@ -166,8 +170,8 @@ public class Scheduler {
 	}
 
 
-	public byte[] SchedulingAlgorithm(DatagramPacket Packet) {
-		byte[] packetData = schedulerElevatorReceivePacket.getData();
+	public byte[] SchedulingAlgorithm(byte[] packetData) {
+		//byte[] packetData = schedulerElevatorReceivePacket.getData();
 		int packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of
 		// elevators and floors
 		// should have been the name given to threads' constructor at creation
@@ -196,9 +200,9 @@ public class Scheduler {
 		// elevator:
 
 		// update unpack/ coordinate/ allocate action variables
-		packetData = schedulerElevatorReceivePacket.getData();
-		packetAddress = schedulerElevatorReceivePacket.getAddress();
-		packetPort = schedulerElevatorReceivePacket.getPort();
+	//packetData = schedulerElevatorReceivePacket.getData();
+	//packetAddress = schedulerElevatorReceivePacket.getAddress();
+	//packetPort = schedulerElevatorReceivePacket.getPort();
 
 		// packetElementIndex = packetData[1];// index to find/ retrieve specific
 		// element from our array of elevators
@@ -665,7 +669,7 @@ public class Scheduler {
 		for (;;) {
 
 			// Receives the Packet
-			DatagramPacket packetRecieved = elevatorReceivePacket();
+			byte[] packetRecieved = elevatorReceivePacket();
 			// Sorts the received Packet and returns the byte array to be sent
 			sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
 			// Sends the Packet to Elevator
