@@ -294,7 +294,7 @@ public class Scheduler {
 						// remove the stop from goingup linked list
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
-						//elevatorSendPacket(sendData);
+						elevatorSendPacket(sendData);
 						
 						if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 							// check if there are more requests
