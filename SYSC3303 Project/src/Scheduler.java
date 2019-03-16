@@ -97,7 +97,9 @@ public class Scheduler {
 			elevatorStopsDown[i] = new LinkedList<Integer>();
 		}
 	}
-
+	
+	// Below Constructor for Junit Testing
+	public Scheduler(boolean a) {}
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
@@ -463,18 +465,6 @@ public class Scheduler {
 				}
 			}
 		}
-
-		
-	/*	sendData[0] = 54;
-		sendData[1] = 21;
-		sendData[2] = 1;
-		sendData[3] = packetData[3];
-		sendData[4] = 0;
-		sendData[5] = 2; floor request from elevator hardcoded to be 3
-		sendData[6] = UP;
-
-		System.out.println("Send Data: " + Arrays.toString(sendData));
-		System.out.println("Packet Data: " + Arrays.toString(packetData)); */
 		
 		return sendData;
 	}
