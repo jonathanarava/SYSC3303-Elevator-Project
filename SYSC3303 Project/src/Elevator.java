@@ -169,6 +169,16 @@ public class Elevator extends Thread {
 			elevatorTable.notifyAll();
 		}
 	}
+	
+	public synchronized void waitForRequest() {
+		while(!hasRequest) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void run() {
 		while (true) {
@@ -199,17 +209,10 @@ public class Elevator extends Thread {
 				} else if (motorDirection == STOP) {
 					movingDirection = STOP;
 					sendPacket(2);
-					System.out.println("Reached Stop state in elevator");
 				} else if (motorDirection == HOLD) {
 					movingDirection = HOLD;
 					System.out.println("Reached Hold state in elevator");
-					while(!hasRequest) {
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
+					waitForRequest();
 				}
 			} 
 		}
