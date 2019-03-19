@@ -174,12 +174,12 @@ public class Scheduler {
 
 	public byte[] SchedulingAlgorithm(byte[] packetData) {
 		//byte[] packetData = schedulerElevatorReceivePacket.getData();
+		int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
+		// 21=elevator, 69=floor
 		int packetElementIndex = packetData[1];// index to find/ retrieve specific element from our array of
 		// elevators and floors
 		// should have been the name given to threads' constructor at creation
 		//
-		int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
-		// 21=elevator, 69=floor
 		int packetIsStatus = packetData[2];// whether it is a status update from elevator or a request (elevator or
 		// floor but handled differently)
 		// 1=request, 2=status update
@@ -267,7 +267,7 @@ public class Scheduler {
 							sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 						}
 					} else {// not a floor that we need to stop at
-						// do nothing
+						// Look at this. 
 					}
 
 				} else {// elevator is going down

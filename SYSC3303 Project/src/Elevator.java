@@ -34,6 +34,8 @@ public class Elevator extends Thread {
 										// hasRequest == true means that the elevator should move up or down a floor.
 	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 	
+	private int movingDirection;	//0x01 is moving up, 0x02 is moving down, 0x03 is stop
+	
 	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
 	public boolean isGoingUp;
 	
@@ -129,36 +131,27 @@ public class Elevator extends Thread {
 
 	public int runElevator() {
 		// sensor = setSensor; //sensor is at current floor
-		if (motorDirection == UP || motorDirection == DOWN) {
-			//try {
-
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (motorDirection == UP) {
-					System.out.println("Elevator is going up...");
-					isGoingUp = true;
-					sensor++; // increment the floor
-					setSensor(sensor); // updates the current floor
-				} else if (motorDirection == DOWN) {
-					System.out.println("Elevator is going down...");
-					isGoingUp = false;
-					sensor--; // decrements the floor
-					setSensor(sensor); // updates the current floor
-				} else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == UPDATEDISPLAY ) {
-					
-				}
-			//} catch (InterruptedException e) {
-				//e.printStackTrace();
+/*
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			*/
+			if (movingDirection == UP) {
+				System.out.println("Elevator is going up...");
+				isGoingUp = true;
+				sensor++; // increment the floor
+				setSensor(sensor); // updates the current floor
+			} else if (movingDirection == DOWN) {
+				System.out.println("Elevator is going down...");
+				isGoingUp = false;
+				sensor--; // decrements the floor
+				setSensor(sensor); // updates the current floor
+			} //else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == UPDATEDISPLAY ) {
+				
 			//}
-		} else if (motorDirection == HOLD) {
-			setSensor(sensor); // brings the elevator back to holding state. 
-		} else if(motorDirection == UPDATEDISPLAY) {
-			setSensor(sensor);	// update the display so the current floor is shown
-		}
 		return setSensor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -189,16 +182,25 @@ public class Elevator extends Thread {
 			}
 			 
 			while(!hasRequest) {
-				System.out.println("Reached here");
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				if (motorDirection == UP || motorDirection == DOWN) {
+					movingDirection = motorDirection;
 					runElevator();
 					sendPacket(2);
 				} else if (motorDirection == UPDATEDISPLAY) {
+					if(movingDirection == UP || movingDirection == DOWN) {
+						runElevator();
+					}
 					updateDisplay();
 					sendPacket(2);
 					//set the lights sensors and stuff to proper value
 					isUpdate = false;
 				} else if (motorDirection == STOP) {
+					movingDirection = STOP;
 					sendPacket(2);
 				} else if (motorDirection == HOLD) {
 					while(!hasRequest) {
