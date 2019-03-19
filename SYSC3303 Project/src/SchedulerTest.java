@@ -16,48 +16,53 @@ class SchedulerTest {
 	@Test 
 	void SchedulerAlgotestUP() {
 		Scheduler.linkedListInitialization();
-				
+		System.out.println("UP: ");		
 		// Input from Elevator to Scheduler
 		byte[] inputArray = new byte[] {(byte)21,(byte) 0,(byte) 1,(byte) 0,(byte) 0,(byte) 3,(byte) 0 };
-		System.out.println(Arrays.toString(inputArray));
+		System.out.println("Input Array: " + Arrays.toString(inputArray));
 
 		// Expected Output
 		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 1};
 		// Actual Output
 		byte[] actual = Scheduler.SchedulingAlgorithm(inputArray);
-		System.out.println(Arrays.toString(actual));
+		System.out.println("Expected Array: " + Arrays.toString(expected));
+		System.out.println("Actual Array: " +Arrays.toString(actual)+ "\n");
 
 		Assert.assertArrayEquals(expected, actual);
 	}
 	
 	@Test 
 	void SchedulerAlgotestDOWN() {
-		Scheduler.linkedListInitialization();		
+		Scheduler.linkedListInitialization();	
+		System.out.println("DOWN: ");
 		// Input from Elevator to Scheduler
 		byte[] inputArray = new byte[] {(byte)21,(byte) 0,(byte) 1,(byte) 4,(byte) 0,(byte) 1,(byte) 0 };
-		System.out.println(Arrays.toString(inputArray));
+		System.out.println("Input Array: " + Arrays.toString(inputArray));
 		
 		// Expected Output
 		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 2};
 		// Actual Output
 		byte[] actual = Scheduler.SchedulingAlgorithm(inputArray);
-		System.out.println(Arrays.toString(actual));
+		System.out.println("Expected Array: " + Arrays.toString(expected));
+		System.out.println("Actual Array: " +Arrays.toString(actual)+ "\n");
 		
 		Assert.assertArrayEquals(expected, actual);
 	}
 	
 	@Test 
 	void SchedulerAlgotestHOLD() {
-		Scheduler.linkedListInitialization();		
+		Scheduler.linkedListInitialization();
+		System.out.println("HOLD: ");
 		// Input from Elevator to Scheduler
 		byte[] inputArray = new byte[] {(byte)21,(byte) 0,(byte) 0,(byte) 1,(byte) 0,(byte) 1,(byte) 0 };
-		System.out.println(Arrays.toString(inputArray));
+		System.out.println("Input Array: " +Arrays.toString(inputArray));
 
 		// Expected Output
-		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 4};
+		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0};
 		// Actual Output
 		byte[] actual = Scheduler.SchedulingAlgorithm(inputArray);
-		System.out.println(Arrays.toString(actual));
+		System.out.println("Expected Array: " + Arrays.toString(expected));
+		System.out.println("Actual Array: " +Arrays.toString(actual)+ "\n");
 		
 		Assert.assertArrayEquals(expected, actual);
 	}
