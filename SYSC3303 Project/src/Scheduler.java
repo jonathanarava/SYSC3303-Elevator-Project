@@ -202,9 +202,9 @@ public class Scheduler {
 		// elevator:
 
 		// update unpack/ coordinate/ allocate action variables
-	//packetData = schedulerElevatorReceivePacket.getData();
-	//packetAddress = schedulerElevatorReceivePacket.getAddress();
-	//packetPort = schedulerElevatorReceivePacket.getPort();
+		//packetData = schedulerElevatorReceivePacket.getData();
+		//packetAddress = schedulerElevatorReceivePacket.getAddress();
+		//packetPort = schedulerElevatorReceivePacket.getPort();
 
 		// packetElementIndex = packetData[1];// index to find/ retrieve specific
 		// element from our array of elevators
@@ -357,9 +357,8 @@ public class Scheduler {
 								// else add it
 								// do nothing, don't want duplicates
 							} else {
-								elevatorStopsDown[packetElementIndex].add(stopRequest);// add to the stopsDown
-								// linkedlist for the
-								// current elevator
+								// add to the stopsDown linkedlist for the current elevator
+								elevatorStopsDown[packetElementIndex].add(stopRequest);
 							}
 
 						} else {// the stop has already been missed
@@ -395,8 +394,7 @@ public class Scheduler {
 				}
 			}
 
-			// RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN
-			// DIRECTION (UP/DOWN)
+			// RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN DIRECTION (UP/DOWN)
 			if (elevatorStatus[indexOfFastestElevator] != HOLD) {// not in hold
 				if (elevatorStatus[indexOfFastestElevator] == UP) {// elevator is going up
 					if (floorRequestDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
@@ -442,7 +440,7 @@ public class Scheduler {
 								// requests
 							}
 						}
-					} else {// eleveator is currently fulfilling Up stops
+					} else {// elevator is currently fulfilling Up stops
 						if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElementIndex)) {
 							// already have that stop requested, don't want to duplicate
 						} else {
@@ -452,8 +450,7 @@ public class Scheduler {
 					}
 				}
 			} else {// holding, can fulfill immediately
-				// can assume no stops or requests exist, don't need to check for duplicates
-				// if above
+				// can assume no stops or requests exist, don't need to check for duplicates if above
 				if (packetElementIndex > elevatorLocation) {// the floor requesting is above the elevator's current
 					// location
 					elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);
