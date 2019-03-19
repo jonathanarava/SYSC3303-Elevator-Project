@@ -29,6 +29,8 @@ public class ElevatorIntermediate {
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
+	
+	private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
 	private static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
@@ -213,6 +215,10 @@ public class ElevatorIntermediate {
 		while (true) {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
+			
+			
+			// Synchronize Intermediate send and Receive with the Scheduler's send and receive. 
+
 			
 			//delay(1000);
 		}

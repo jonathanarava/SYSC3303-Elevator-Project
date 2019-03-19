@@ -210,6 +210,7 @@ public class Elevator extends Thread {
 					movingDirection = STOP;
 					sendPacket(2);
 				} else if (motorDirection == HOLD) {
+					// Figure out why the Elevator is not reaching the hold state. 
 					movingDirection = HOLD;
 					System.out.println("Reached Hold state in elevator");
 					waitForRequest();

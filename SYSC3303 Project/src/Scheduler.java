@@ -258,12 +258,14 @@ public class Scheduler {
 							// check if there are more stops down
 							if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 								// create and send sendPacket to hold the motor
+								
 								try {
 									Thread.currentThread().sleep(500);
 								} catch (InterruptedException e) {						// THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
 									// TODO Auto-generated catch block					// UNLESS YOU KNOW WHAT YOU'RE DOING
 									e.printStackTrace();
 								}
+								
 								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
 								elevatorSendPacket(sendData);
 								elevatorStopsUp[packetElementIndex].clear();
