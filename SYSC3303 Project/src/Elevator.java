@@ -199,6 +199,7 @@ public class Elevator extends Thread {
 				} else if (motorDirection == STOP) {
 					movingDirection = STOP;
 					sendPacket(2);
+					System.out.println("Reached Stop state in elevator");
 				} else if (motorDirection == HOLD) {
 					movingDirection = HOLD;
 					System.out.println("Reached Hold state in elevator");
