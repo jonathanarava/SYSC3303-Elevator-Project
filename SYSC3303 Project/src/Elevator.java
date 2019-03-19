@@ -257,7 +257,7 @@ public class Elevator extends Thread {
 		
 		
 		try {
-			while(!interrupted()) {
+			while(true) {
 				Elevator0.receivePacket();
 			}
 		} catch (InterruptedException e) {
