@@ -130,7 +130,6 @@ public class Elevator extends Thread {
 	}
 
 	public int runElevator() {
-		// sensor = setSensor; //sensor is at current floor
 /*
 			try {
 				Thread.sleep(1000);
@@ -149,9 +148,7 @@ public class Elevator extends Thread {
 				isGoingUp = false;
 				sensor--; // decrements the floor
 				setSensor(sensor); // updates the current floor
-			} //else if (motorDirection == HOLD || motorDirection == STOP || motorDirection == UPDATEDISPLAY ) {
-				
-			//}
+			}
 		return setSensor(sensor); // returns and updates the final current of the floor - in this case destination
 		// floor
 	}
@@ -203,6 +200,7 @@ public class Elevator extends Thread {
 					movingDirection = STOP;
 					sendPacket(2);
 				} else if (motorDirection == HOLD) {
+					movingDirection = HOLD;
 					while(!hasRequest) {
 						try {
 							wait(1);
