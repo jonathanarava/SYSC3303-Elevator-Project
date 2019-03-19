@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.lang.Integer;
 import java.lang.*;
 
 public class Scheduler {
@@ -79,6 +80,7 @@ public class Scheduler {
 	public static final int EL_SENDPORTNUM = 159;
 	
 	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte STOP = 0x03;// elevator is 
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
@@ -241,6 +243,9 @@ public class Scheduler {
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
 						elevatorSendPacket(sendData);
+						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
+						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
+			
 						
 						if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 							// check if there are more requests
@@ -268,6 +273,7 @@ public class Scheduler {
 						}
 					} else {// not a floor that we need to stop at
 						// Look at this. 
+						System.out.println("reached else of UP because the linked list is empty");
 					}
 
 				} else {// elevator is going down
@@ -370,18 +376,25 @@ public class Scheduler {
 					// can assume no stops or requests exist, don't need to check for duplicates
 					if (elevatorLocation < stopRequest) {// we are below the destination floor, we need to go up
 						elevatorStopsUp[packetElementIndex].add(stopRequest);
+						elevatorStatus[packetElementIndex] = UP;
 						// create and send sendPacket to start the motor
 						sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 					} 
-					if (elevatorLocation > stopRequest) {// we are above the destination floor, we need to go down
+					else if (elevatorLocation > stopRequest) {// we are above the destination floor, we need to go down
 						elevatorStopsDown[packetElementIndex].add(stopRequest);
+						elevatorStatus[packetElementIndex] = DOWN;
 						// create and send sendPacket to start the motor
 						sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
 					}
 					// currently in hold mode and remain in hold mode
-					if (elevatorLocation == stopRequest) {
-						sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
+					else if (elevatorLocation == stopRequest) {
+						elevatorStatus[packetElementIndex] = STOP;
+						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: hold
+						elevatorSendPacket(sendData);
+						elevatorStatus[packetElementIndex] = HOLD;
+						sendData = createSendingData(packetElementIndex, 0, 0, 4);
 					}
+					elevatorSendPacket(sendData);
 				}
 			}
 		} else {// request is from floor
