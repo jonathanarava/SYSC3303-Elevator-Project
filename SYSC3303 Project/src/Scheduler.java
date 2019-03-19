@@ -44,15 +44,15 @@ public class Scheduler extends Thread {
 
 	// lists to keep track of what requests need to be handled
 
-	private static LinkedList<Thread> queue = new LinkedList<Thread>();
+	//private static LinkedList<Thread> queue = new LinkedList<Thread>();
 	private static LinkedList<Integer> upQueue1 = new LinkedList<Integer>();
 	private static LinkedList<Integer> downQueue1 = new LinkedList<Integer>();
 	private static LinkedList<Integer> upQueue2 = new LinkedList<Integer>();
 	private static LinkedList<Integer> downQueue2 = new LinkedList<Integer>();
-	private static int[] allDestinationFloors = new int[queue.size()];
+	//private static int[] allDestinationFloors = new int[queue.size()];
 	public static Object obj = new Object();
 	public static int limit = numFloors * numElevators;
-	private static Thread newRequest;
+	//private static Thread newRequest;
 
 	public static int direction;
 
