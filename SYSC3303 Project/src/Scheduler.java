@@ -379,10 +379,10 @@ public class Scheduler {
 						// create and send sendPacket to start the motor
 						sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
 					}
+					// currently in hold mode and remain in hold mode
 					if (elevatorLocation == stopRequest) {
-						sendData = createSendingData(packetElementIndex, 0, 0, 0);// 0: hold
+						sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
 					}
-
 				}
 			}
 		} else {// request is from floor
@@ -460,7 +460,6 @@ public class Scheduler {
 					// create and send sendPacket to start motor in Down direction
 					sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
 				}
-
 				else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
 						// elevator's current location
 					elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);

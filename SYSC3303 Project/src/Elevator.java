@@ -182,7 +182,7 @@ public class Elevator extends Thread {
 
 	public void run() {
 		while (true) {
-								// while(true) to activate all elevator threads in this system
+			// while(true) to activate all elevator threads in this system
 			while(hasRequest) {
 				sendPacket(1);
 				hasRequest = !hasRequest;
@@ -212,58 +212,5 @@ public class Elevator extends Thread {
 			} 
 		}
 	}
-
-	/*
-	 * public synchronized void sendPacket() throws InterruptedException { byte[]
-	 * requestElevator = new byte[8];
-	 * 
-	 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
-	 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
-	 * instruction) (
-	 * 
-	 * System.out.print("Enter floor number: "); Scanner destination = new
-	 * Scanner(System.in); int floorRequest=1; int value = destination.nextInt(); if
-	 * ( value != 0) { floorRequest = value; } else { destination.close(); }
-	 * 
-	 * 
-	 * 
-	 * requestElevator = responsePacketRequest(1); //updateElevator =
-	 * responsePacketRequest(update);
-	 * //System.out.println(requestElevator.toString());
-	 * 
-	 * try {
-	 * 
-	 * elevatorSendPacket = new DatagramPacket(requestElevator,
-	 * requestElevator.length, InetAddress.getLocalHost(), 23);
-	 * 
-	 * } catch (UnknownHostException e) { e.printStackTrace(); System.exit(1); }
-	 * 
-	 * try { elevatorSendSocket.send(elevatorSendPacket);
-	 * System.out.println("sent"); } catch (IOException e) { e.printStackTrace();
-	 * System.exit(1); } //} }
-	 * 
-	 * public synchronized void receivePacket() { //SCHEDULER --> ELEVATOR (0,
-	 * motorDirection, motorSpinTime, open OR close door, 0)
-	 * 
-	 * byte data[] = new byte[5]; elevatorReceivePacket = new DatagramPacket(data,
-	 * data.length);
-	 * 
-	 * System.out.println("elevator_subsystem: Waiting for Packet.\n");
-	 * 
-	 * try { // Block until a datagram packet is received from receiveSocket.
-	 * elevatorSendSocket.receive(elevatorReceivePacket);
-	 * System.out.print("Received from scheduler: ");
-	 * System.out.println(Arrays.toString(data)); } catch (IOException e) {
-	 * System.out.print("IO Exception: likely:");
-	 * System.out.println("Receive Socket Timed Out.\n" + e); e.printStackTrace();
-	 * System.exit(1); }
-	 * 
-	 * runElevator(data[1]); openCloseDoor(data[2]);
-	 * 
-	 * // send packet for scheduler to know the port this elevator is allocated //
-	 * sendPacket = new DatagramPacket(data, //
-	 * receivePacket.getLength(),receivePacket.getAddress(), //
-	 * receivePacket.getPort()); //} }
-	 */
 
 }
