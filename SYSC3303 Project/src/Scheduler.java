@@ -373,10 +373,14 @@ public class Scheduler {
 						elevatorStopsUp[packetElementIndex].add(stopRequest);
 						// create and send sendPacket to start the motor
 						sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
-					} else {// we are above the destination floor, we need to go down
+					} 
+					if (elevatorLocation > stopRequest) {// we are above the destination floor, we need to go down
 						elevatorStopsDown[packetElementIndex].add(stopRequest);
 						// create and send sendPacket to start the motor
 						sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+					}
+					if (elevatorLocation == stopRequest) {
+						sendData = createSendingData(packetElementIndex, 0, 0, 0);// 0: hold
 					}
 
 				}
