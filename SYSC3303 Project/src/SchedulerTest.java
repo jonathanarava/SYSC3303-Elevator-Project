@@ -58,7 +58,7 @@ class SchedulerTest {
 		System.out.println("Input Array: " +Arrays.toString(inputArray));
 
 		// Expected Output
-		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0};
+		byte[] expected = new byte[] {(byte)54,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 0,(byte) 4};
 		// Actual Output
 		byte[] actual = Scheduler.SchedulingAlgorithm(inputArray);
 		System.out.println("Expected Array: " + Arrays.toString(expected));
