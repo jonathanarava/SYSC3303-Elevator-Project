@@ -246,8 +246,8 @@ public class Scheduler {
 						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
 						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
 			
-						
-						if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
+						if (elevatorStopsUp[packetElementIndex].size()==1) {// no more stops Up
+						//if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
 							// check if there are more requests
 							if (elevatorRequestsUp[packetElementIndex].isEmpty()) {// no missed floors for going Up
 								// do nothing
@@ -260,17 +260,22 @@ public class Scheduler {
 							if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 								// create and send sendPacket to hold the motor
 								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
+								elevatorSendPacket(sendData);
+								elevatorStopsUp[packetElementIndex].clear();
 
 							} else {// we have stops to go up, start fulfilling those
 								// create and send SendPacket for the motor to go Up
 								sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+								elevatorSendPacket(sendData);
 							}
 						} else {// finished stopping for destination floor, continue going Up to fulfill other
 								// stops
 								// create and send SendPacket to restart the motor/ have the motor in the up
 								// direction
 							sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+							elevatorSendPacket(sendData);
 						}
+						
 					} else {// not a floor that we need to stop at
 						// Look at this. 
 						System.out.println("reached else of UP because the linked list is empty");

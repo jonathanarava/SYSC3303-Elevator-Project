@@ -201,9 +201,10 @@ public class Elevator extends Thread {
 					sendPacket(2);
 				} else if (motorDirection == HOLD) {
 					movingDirection = HOLD;
+					System.out.println("Reached Hold state in elevator");
 					while(!hasRequest) {
 						try {
-							wait(1);
+							wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
