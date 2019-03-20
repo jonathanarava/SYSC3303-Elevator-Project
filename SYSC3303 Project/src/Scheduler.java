@@ -710,13 +710,13 @@ public class Scheduler {
 
 			// Receives the Packet
 			byte[] packetRecieved = elevatorReceivePacket();
-			respondStart=System.nanoTime();
+			respondStart=System.nanoTime();//start the timer
 			// Sorts the received Packet and returns the byte array to be sent
 			sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
 			// Sends the Packet to Elevator
 			//elevatorSendPacket(sendData);
-			respondEnd=System.nanoTime();
-			System.out.println("Scheduler took: "+(breadEnd-breadStart)+" nanoseconds to respond");
+			respondEnd=System.nanoTime();//end for the timer
+			System.out.println("Scheduler took: "+(respondEnd-respondStart)+" nanoseconds to respond");
 		}
 	}
 }
