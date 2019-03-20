@@ -129,28 +129,31 @@ public class Elevator extends Thread {
 		}
 	}
 
-	public int runElevator() {
-/*
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			*/
+	public void runElevator() {
+			
 			if (movingDirection == UP) {
 				System.out.println("Elevator is going up...");
 				isGoingUp = true;
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				sensor++; // increment the floor
 				setSensor(sensor); // updates the current floor
 			} else if (movingDirection == DOWN) {
 				System.out.println("Elevator is going down...");
 				isGoingUp = false;
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				sensor--; // decrements the floor
 				setSensor(sensor); // updates the current floor
 			}
-		return setSensor(sensor); // returns and updates the final current of the floor - in this case destination
-		// floor
 	}
 
 	// sets Current location of elevator through this setter
