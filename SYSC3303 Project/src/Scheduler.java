@@ -410,13 +410,15 @@ public class Scheduler {
 					}
 					// currently in hold mode and remain in hold mode
 					else if (elevatorLocation == stopRequest) {
-						elevatorStatus[packetElementIndex] = STOP;
-						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: hold
-						elevatorSendPacket(sendData);
-						elevatorStatus[packetElementIndex] = HOLD;
-						sendData = createSendingData(packetElementIndex, 0, 0, 4);
+						//Since the elevator is in hold mode and a request for the current floor (where it already is) the elevator just needs to let the person out
+						//and then resume the hold state since there aren't any other requests made
+						elevatorStatus[packetElementIndex] = STOP;//stop the elevator (temporary) 
+						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: stop the elevator turns off the motor but also utilizes the door open/ close letting the person out
+						elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
+						elevatorStatus[packetElementIndex] = HOLD;//place back into hold state
+						sendData = createSendingData(packetElementIndex, 0, 0, 4);//doesn't need an immediate send since there is nothing below to overwrite the sendData before it is sent
 					}
-					elevatorSendPacket(sendData);
+					elevatorSendPacket(sendData);//originally the only send in the method
 				}
 			}
 		} else {// request is from floor
@@ -498,9 +500,9 @@ public class Scheduler {
 					// create and send sendPacket to start motor in Up direction
 					sendData = createSendingData(packetElementIndex, 0, 0, 2);// 1: up
 				}
+				elevatorSendPacket(sendData);//send the created packet with the sendData values prescribed above
 			}
 		}
-		
 		return sendData;
 	}
 	public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
