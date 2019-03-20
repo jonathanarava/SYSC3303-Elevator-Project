@@ -211,9 +211,19 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
-		
+		elevatorHandler.setSoTimeout(500);//sets the maximum time for the receive function to self block
 		while (true) {
-			elevatorHandler.sendPacket();
+			
+			if (!elevatorTable.isEmpty()||firstRunTime) {
+				elevatorHandler.sendPacket();
+				if (firstRunTime) {
+					firstRunTime=false;
+				}
+			}
+			
+			
+			
+			//receive blocks
 			elevatorHandler.receivePacket();
 			
 			

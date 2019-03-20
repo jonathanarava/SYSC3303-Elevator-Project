@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.lang.*;
+import java.util.concurrent.TimeUnit;//for measuring time to respond
 
 public class Scheduler {
 
@@ -62,6 +63,8 @@ public class Scheduler {
 	public static int packetPort;
 
 	public static byte[] sendData = new byte[7];
+	
+	public static long respondStart,respondEnd;//variables for the measurements to respond 
 
 	// Declare timing constants
 	public static final int TIME_PER_FLOOR = 1;// time for the elevator to travel per floor
@@ -702,11 +705,13 @@ public class Scheduler {
 
 			// Receives the Packet
 			byte[] packetRecieved = elevatorReceivePacket();
+			respondStart=System.nanoTime();
 			// Sorts the received Packet and returns the byte array to be sent
 			sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
 			// Sends the Packet to Elevator
 			//elevatorSendPacket(sendData);
-
+			respondEnd=System.nanoTime();
+			System.out.println("Scheduler took: "+(breadEnd-breadStart)+" nanoseconds to respond");
 		}
 	}
 }
