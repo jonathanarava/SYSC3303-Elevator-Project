@@ -268,7 +268,7 @@ public class Scheduler {
 								// create and send sendPacket to hold the motor
 								
 								try {
-									Thread.currentThread().sleep(5);
+									Thread.currentThread().sleep(2);
 								} catch (InterruptedException e) {						// THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
 									// TODO Auto-generated catch block					// UNLESS YOU KNOW WHAT YOU'RE DOING
 									e.printStackTrace();
