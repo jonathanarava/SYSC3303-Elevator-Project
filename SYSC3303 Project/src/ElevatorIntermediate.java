@@ -54,7 +54,7 @@ public class ElevatorIntermediate {
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
-			elevatorSendSocket.setSoTimeout(500);//sets the maximum time for the receive function to self block
+			elevatorSendSocket.setSoTimeout(250);//sets the maximum time for the receive function to self block
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -124,6 +124,7 @@ public class ElevatorIntermediate {
 		byte data[] = new byte[7];
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
+			//elevatorReceiveSocket.setSoTimeout(10);			Eventually we will need this to sync send and receive with Scheduler. 
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
@@ -133,6 +134,7 @@ public class ElevatorIntermediate {
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.
+			System.out.println("waiting to receive");
 			elevatorReceiveSocket.receive(elevatorReceivePacket);
 			System.out.print("Received from scheduler: ");
 			System.out.println(Arrays.toString(data));

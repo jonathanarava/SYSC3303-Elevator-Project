@@ -37,7 +37,7 @@ public class Scheduler {
 	public static int instruction;
 
 	// number of elevators and floors. Can change here!
-	public static int numElevators = 2;
+	public static int numElevators = 4;
 	public static int numFloors = 15;
 
 	// lists to keep track of what requests need to be handled
@@ -268,7 +268,7 @@ public class Scheduler {
 								// create and send sendPacket to hold the motor
 								
 								try {
-									Thread.currentThread().sleep(500);
+									Thread.currentThread().sleep(5);
 								} catch (InterruptedException e) {						// THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
 									// TODO Auto-generated catch block					// UNLESS YOU KNOW WHAT YOU'RE DOING
 									e.printStackTrace();
