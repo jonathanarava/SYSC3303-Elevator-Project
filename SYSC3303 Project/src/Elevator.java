@@ -41,8 +41,8 @@ public class Elevator extends Thread {
 	public boolean isUpdate = false;	// This boolean is set to true in the ElevatorIntermediate, if the elevator intermediate is expecting an update from the elevator
 	public boolean isGoingUp;
 	
-	public int elevatorNumber;
-	public int RealTimefloorRequest;
+	private int elevatorNumber;
+	private int RealTimefloorRequest;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
