@@ -54,6 +54,7 @@ public class ElevatorIntermediate {
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
+			elevatorSendSocket.setSoTimeout(500);//sets the maximum time for the receive function to self block
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -61,6 +62,7 @@ public class ElevatorIntermediate {
 			se.printStackTrace();
 			System.exit(1);
 		}
+		
 	}
 
 	public synchronized void sendPacket() {
@@ -151,15 +153,19 @@ public class ElevatorIntermediate {
 		switch (data[1]) {
 		case 0:
 			elevatorArray[0].motorDirection = data[6];
+			elevatorArray[0].dealWith = true;
 			break;
 		case 1:
 			elevatorArray[1].motorDirection = data[6];
+			elevatorArray[1].dealWith = true;
 			break;
 		case 2:
 			elevatorArray[2].motorDirection = data[6];
+			elevatorArray[2].dealWith = true;
 			break;
 		case 3:
 			elevatorArray[3].motorDirection = data[6];
+			elevatorArray[3].dealWith = true;
 			break;
 		}
 		// elevatorArray[0].openCloseDoor(data[2]);
@@ -211,18 +217,14 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
-		elevatorSendSocket.setSoTimeout(500);//sets the maximum time for the receive function to self block
+		
 		while (true) {
-			
-			if (!elevatorTable.isEmpty()||firstRunTime) {
+//			if (!elevatorTable.isEmpty()||firstRunTime) {
 				elevatorHandler.sendPacket();
-				if (firstRunTime) {
-					firstRunTime=false;
-				}
-			}
-			
-			
-			
+//				if (firstRunTime) {
+//					firstRunTime=false;
+//				}
+//			}
 			//receive blocks
 			elevatorHandler.receivePacket();
 			
