@@ -78,6 +78,9 @@ public class Scheduler {
 	public static final int EL_RECEIVEPORTNUM = 369;
 	public static final int EL_SENDPORTNUM = 159;
 	
+	public static final int FL_RECEIVEPORTNUM = 488;
+	public static final int FL_SENDPORTNUM = 1199;
+	
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte STOP = 0x03;// elevator is 
 	private static final byte UP = 0x02;// elevator is going up
@@ -104,7 +107,7 @@ public class Scheduler {
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
-			schedulerSocketSendReceiveFloor = new DatagramSocket();// can be any available port, Scheduler will reply
+			schedulerSocketSendReceiveFloor = new DatagramSocket(FL_RECEIVEPORTNUM);// can be any available port, Scheduler will reply
 			// to the port
 			// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
@@ -149,13 +152,15 @@ public class Scheduler {
 	}
 	public static void floorReceivePacket() {
 		/* FLOOR RECEIVING PACKET HERE */
-		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
+		schedulerFloorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
 
 		// Block until a datagram packet is received from receiveSocket.
 		try {
 			System.out.println("waiting");
-			schedulerSocketSendReceiveElevator.receive(schedulerFloorReceivePacket);
+			schedulerSocketSendReceiveFloor.receive(schedulerFloorReceivePacket);
 			System.out.println("Request from elevator: " + Arrays.toString(data));
+			
+			
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);

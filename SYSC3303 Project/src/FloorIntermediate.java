@@ -22,8 +22,9 @@ public class FloorIntermediate {
 	private static DatagramPacket floorSendPacket, floorReceivePacket;
 	private static DatagramSocket floorSendSocket, floorReceiveSocket;
 
-	// for iteration 1 there will only be 1 elevator
-	// getting floor numbers from parameters set
+	private static final int SENDPORTNUM = 488;// SET port number for sending to the scheduler
+	private static final int RECEIVEPORTNUM = 1199;// SET port number for receiving from the scheduler
+	
 	private static int createNumFloors;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
@@ -37,7 +38,6 @@ public class FloorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = FLOOR_ID;
 
 	public FloorIntermediate() {
 		try {
