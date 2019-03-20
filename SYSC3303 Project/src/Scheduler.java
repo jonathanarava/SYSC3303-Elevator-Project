@@ -241,7 +241,7 @@ public class Scheduler {
 						// remove the stop from goingup linked list
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
-						elevatorSendPacket(sendData);
+						elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
 						//elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
 			
@@ -267,7 +267,7 @@ public class Scheduler {
 								}
 								
 								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
-								elevatorSendPacket(sendData);
+								elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 								elevatorStopsUp[packetElementIndex].clear();
 								// Sleep method
 
@@ -281,12 +281,14 @@ public class Scheduler {
 								// create and send SendPacket to restart the motor/ have the motor in the up
 								// direction
 							sendData = createSendingData(packetElementIndex, 0, 0, 1);// 1: up
-							elevatorSendPacket(sendData);
+							//IMPORTANT:
+							//this packet sending may not be necessary and could be what's causing the double sending at the very beginning
+							elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 						}
 						
 					} else {// not a floor that we need to stop at
 						// Look at this. 
-						System.out.println("reached else of UP because the linked list is empty");
+						System.out.println("reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
 					}
 
 				} else {// elevator is going down
@@ -300,7 +302,7 @@ public class Scheduler {
 						// remove the stop from goingup linked list
 						// check if there are more stops
 						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
-						elevatorSendPacket(sendData);
+						elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 						if (elevatorStopsDown[packetElementIndex].isEmpty()) {
 							// check if there are more requests
 							if (elevatorRequestsDown[packetElementIndex].isEmpty()) {// no missed floors for going
@@ -315,17 +317,24 @@ public class Scheduler {
 							if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops
 								// create and send sendPacket to hold the motor
 								sendData = createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
+								elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
+								elevatorStopsDown[packetElementIndex].clear();
 							} else {// we have stops to go up, start fulfilling those
 								// create and send SendPacket for the motor to go Down
 								sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+								elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 							}
 						} else {// finished stopping for a destination floor, continue fulfilling other stops
 							// create and send SendPacket to restart the motor/ have the motor in the down
 							// direction
 							sendData = createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+							//IMPORTANT:
+							//this packet sending may not be necessary and could be what's causing the double sending at the very beginning
+							elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 						}
 					} else {// not a floor that we need to stop at
 						// do nothing
+						System.out.println("reached else of Eleavtor Update while going Down; not a floor that is contained in the stop list");
 					}
 
 				}
