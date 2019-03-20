@@ -173,6 +173,7 @@ public class Elevator extends Thread {
 	public synchronized void waitForRequest() {
 		while(!hasRequest) {
 			try {
+				System.out.println("waiting indefinitely");
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

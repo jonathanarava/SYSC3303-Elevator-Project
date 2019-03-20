@@ -289,6 +289,8 @@ public class Scheduler {
 					} else {// not a floor that we need to stop at
 						// Look at this. 
 						System.out.println("reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
+						sendData = createSendingData(packetElementIndex, 0, 0, 5);
+						elevatorSendPacket(sendData);
 					}
 
 				} else {// elevator is going down
@@ -412,9 +414,12 @@ public class Scheduler {
 					else if (elevatorLocation == stopRequest) {
 						//Since the elevator is in hold mode and a request for the current floor (where it already is) the elevator just needs to let the person out
 						//and then resume the hold state since there aren't any other requests made
-						elevatorStatus[packetElementIndex] = STOP;//stop the elevator (temporary) 
-						sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: stop the elevator turns off the motor but also utilizes the door open/ close letting the person out
-						elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
+						
+						// ___________________ if in Hold mode, the elevator should not be moving anywhere cause that means the elevator  
+						
+						//elevatorStatus[packetElementIndex] = STOP;//stop the elevator (temporary) 
+						//sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: stop the elevator turns off the motor but also utilizes the door open/ close letting the person out
+						//elevatorSendPacket(sendData);//send the created packet immediately, otherwise will be overwritten before being sent at the very end
 						elevatorStatus[packetElementIndex] = HOLD;//place back into hold state
 						sendData = createSendingData(packetElementIndex, 0, 0, 4);//doesn't need an immediate send since there is nothing below to overwrite the sendData before it is sent
 					}
@@ -700,7 +705,7 @@ public class Scheduler {
 			// Sorts the received Packet and returns the byte array to be sent
 			sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
 			// Sends the Packet to Elevator
-			elevatorSendPacket(sendData);
+			//elevatorSendPacket(sendData);
 
 		}
 	}
