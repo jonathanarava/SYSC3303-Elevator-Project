@@ -26,8 +26,8 @@ public class Scheduler {
 	public static int PORTNUM = 69;
 	// Variables
 
-	public static byte data[] = new byte[7];
-	public static byte dataFloor[] = new byte[7];
+	public static byte data[] = new byte[8];
+	public static byte dataFloor[] = new byte[8];
 	public static int elevatorOrFloor;
 	public static int elevatorOrFloorID;
 	public static int requestOrUpdate;
@@ -35,6 +35,7 @@ public class Scheduler {
 	public static int upOrDown;
 	public static int destFloor;
 	public static int instruction;
+	public static int errorType;
 
 	// number of elevators and floors. Can change here!
 	public static int numElevators = 4;
@@ -68,7 +69,7 @@ public class Scheduler {
 
 	// Declare timing constants
 	public static final int TIME_PER_FLOOR = 1;// time for the elevator to travel per floor
-	public static final int DOOR_DURATION = 4;// time that taken for the door to open and close when given the open
+	//public static final int DOOR_DURATION = 4;// time that taken for the door to open and close when given the open
 	// command (door closes automatically after alloted time)
 
 	// Declare Motor States:
@@ -84,17 +85,44 @@ public class Scheduler {
 	public static final int FL_RECEIVEPORTNUM = 488;
 	public static final int FL_SENDPORTNUM = 1199;
 
-	private static final byte HOLD = 0x00;// elevator is in hold state
-	private static final byte STOP = 0x03;// elevator is
-	private static final byte UP = 0x02;// elevator is going up
-	private static final byte DOWN = 0x01;// elevator is going down
+	//private static final byte HOLD = 0x00;// elevator is in hold state
+	//private static final byte STOP = 0x03;// elevator is
+	//private static final byte UP = 0x02;// elevator is going up
+	//private static final byte DOWN = 0x01;// elevator is going down
+	//private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	//private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	//private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	//private static final int DOOR_OPEN = 1;// the door is open when ==1
+	// private static final int DOOR_DURATION=4;//duration that doors stay open for
+	//private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
+	
+	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	// States
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte ERROR = (byte) 0xE0;// an error has occured
+	// Errors
+	private static final byte DOOR_ERROR = (byte)0xE1;
+	private static final byte MOTOR_ERROR = (byte)0xE2;
+	// still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR = (byte)0xEF;
+	private static final byte NO_ERROR = 0x00;
+	// Object ID
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN = 1;// the door is open when ==1
-	// private static final int DOOR_DURATION=4;//duration that doors stay open for
-	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
-	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+	// Values for Running
+	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
+	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+	private static final int UNUSED = 0;// value for unused parts of data
+	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
+	//private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 
 	public void linkedListInitialization() {
 		for (int i = 0; i < numElevators; i++) {
@@ -150,6 +178,7 @@ public class Scheduler {
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
+		errorType=data[7];
 
 		/* Converts the received packet from Datagram Packet to Byte[] */
 		byte[] packetData = schedulerElevatorReceivePacket.getData();
@@ -181,6 +210,7 @@ public class Scheduler {
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
+		errorType=data[7];
 	}
 
 	public byte[] SchedulingAlgorithm(byte[] packetData) {
@@ -203,6 +233,7 @@ public class Scheduler {
 		int[] responseTime;// response time of individual elevators to got to a floor request
 		int indexOfFastestElevator = 0;// index of array for which elevator is fastest
 		int temp;// temporary for finding the fastest response time
+		byte errorType=packetData[7];
 
 		// check whether the packet was from an elevator (requests and status) or a
 		// floor(request)
@@ -365,7 +396,8 @@ public class Scheduler {
 				// }
 				// update floor number and direction displays for elevator and all floors
 				sendData = createSendingData(0, 0, 0, 5);// 5: status update
-			} else {// elevator sent a request
+			} 
+			else if (packetIsStatus == REQUEST){// elevator sent a request
 
 				// floorRequesting=packetElementIndex;//the floor# of the requesting floor
 				// proximity
@@ -453,6 +485,23 @@ public class Scheduler {
 																					// is sent
 					}
 					elevatorSendPacket(sendData);// originally the only send in the method
+				}
+			}
+			else {//ERROR
+				switch (errorType) {
+				case(DOOR_ERROR):
+					System.out.println("Door stuck open; fixing now");
+					sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: make a stop
+					elevatorSendPacket(sendData);// send the created packet
+				case(MOTOR_ERROR):
+					System.out.println("Motor error; stopping elevator and sending help");
+					sendData = createSendingData(packetElementIndex, 0, 0, 4);// 3: HOLD a stop
+					elevatorSendPacket(sendData);// send the created packet
+					//send help
+				case(OTHER_ERROR):
+					//do something
+				case(NO_ERROR):
+					//do nothing
 				}
 			}
 		} else {// request is from floor

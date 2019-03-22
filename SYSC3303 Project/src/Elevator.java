@@ -48,15 +48,17 @@ public class Elevator extends Thread {
 	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 
 	public boolean dealWith = false;
+	
 
 	private int movingDirection; // 0x01 is moving up, 0x02 is moving down, 0x03 is stop
 
 	public boolean isUpdate = false; // This boolean is set to true in the ElevatorIntermediate, if the elevator
-										// intermediate is expecting an update from the elevator
+	// intermediate is expecting an update from the elevator
 	public boolean isGoingUp;
 
 	private int elevatorNumber;
 	private int RealTimefloorRequest;
+	public byte errorType;//temporary public for testing
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
@@ -94,8 +96,8 @@ public class Elevator extends Thread {
 	 * @return byte[] to be put on the synchronized table
 	 */
 	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
-																							// the response packet to be
-																							// sent to the scheduler
+		// the response packet to be
+		// sent to the scheduler
 
 		/*
 		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
@@ -147,16 +149,16 @@ public class Elevator extends Thread {
 		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
 		requestElevator.write(RealTimefloorRequest); // dest floor
 		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-		requestElevator.write(UNUSED); // no errors
+		requestElevator.write(NO_ERROR); // no errors
 		return requestElevator.toByteArray();
 	}
 
 	// COMENTING OUT FOR TESTING REASONS, DO NOT DELETE
 	public void openCloseDoor(byte doorOpenCloseError) { 
 		//String msg; 
-		
+
 		if (doorOpenCloseError == DOOR_OPEN) { //instruction is to open the doors for DOOR_DURATION seconds
-		
+
 			//msg = "Opening Doors"; 
 			//System.out.println(msg);
 			System.out.println("Opening Doors");
@@ -200,7 +202,7 @@ public class Elevator extends Thread {
 			System.out.println("Doors Closed");
 		}
 		else {//error 
-			sendPacket(ERROR, DOOR_ERROR);
+			sendPacket(ERROR, OTHER_ERROR);
 		}
 		//check that the doors were closed and done so on time
 		if ((doorCloseTime-doorOpenTime)>DOOR_CLOSE_BY*1000000000) {
@@ -276,7 +278,7 @@ public class Elevator extends Thread {
 		while (true) {
 			// while(true) to activate all elevator threads in this system
 			while (hasRequest) {// send request
-				sendPacket(1, NO_ERROR);
+				sendPacket(REQUEST, NO_ERROR);
 				// hasRequest = !hasRequest;
 				hasRequest = false;
 			}
@@ -292,26 +294,31 @@ public class Elevator extends Thread {
 						movingDirection = motorDirection;
 						runElevator();
 						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
+						sendPacket(UPDATE, NO_ERROR);
 					} else if (motorDirection == UPDATE_DISPLAY) {
 						if (movingDirection == UP || movingDirection == DOWN) {
 							runElevator();
 						}
 						updateDisplay();
 						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
+						sendPacket(UPDATE, NO_ERROR);
 						// set the lights sensors and stuff to proper value
 						isUpdate = false;
 					} else if (motorDirection == STOP) {
 						movingDirection = STOP;
 						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
+						sendPacket(UPDATE, NO_ERROR);
 					} else if (motorDirection == HOLD) {
 						// Figure out why the Elevator is not reaching the hold state.
 						movingDirection = HOLD;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
 						waitForRequest();
+					}
+					else {//error
+						sendPacket(ERROR, errorType);
+						// set the lights sensors and stuff to proper value
+						isUpdate = false;
 					}
 				}
 			}

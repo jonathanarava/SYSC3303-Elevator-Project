@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ElevatorIntermediate {
 
-	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	/*// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
@@ -22,10 +22,39 @@ public class ElevatorIntermediate {
 	private static final int DOOR_DURATION = 4;// duration that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+*/
+	
+	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+	// States
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte ERROR = (byte) 0xE0;// an error has occured
+	// Errors
+	private static final byte DOOR_ERROR = (byte)0xE1;
+	private static final byte MOTOR_ERROR = (byte)0xE2;
+	// still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR = (byte)0xEF;
+	private static final byte NO_ERROR = 0x00;
+	// Object ID
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	// Values for Running
+	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
+	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+	private static final int UNUSED = 0;// value for unused parts of data
+	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
+	
 	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 159;
-
+	
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
@@ -222,7 +251,12 @@ public class ElevatorIntermediate {
 			// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
+			
 		}
+		//elevatorArray[2] = new Elevator(2, 0, elevatorTable, Integer.parseInt(args[2 + 1]));
+		//elevatorThreadArray[2] = new Thread(elevatorArray[2]);
+		//elevatorArray[2].sendPacket(ERROR,MOTOR_ERROR);
+		elevatorArray[2].errorType=MOTOR_ERROR;
 
 		while (true) {
 //			if (!elevatorTable.isEmpty()||firstRunTime) {
