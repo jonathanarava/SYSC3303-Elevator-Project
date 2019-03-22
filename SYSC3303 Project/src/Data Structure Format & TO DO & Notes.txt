@@ -27,6 +27,7 @@ Data Structure:
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
 	//Values for Running
 	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3 
 	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update

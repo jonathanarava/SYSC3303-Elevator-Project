@@ -17,12 +17,12 @@ public class Elevator extends Thread {
 	private static final byte STOP = 0x03;
 	private static final byte HOLD = 0x04;// elevator is in hold state
 	private static final byte UPDATE_DISPLAY = 0x05;
-	private static final byte ERROR = 0xE0;// an error has occured
+	private static final byte ERROR = (byte) 0xE0;// an error has occured
 	// Errors
-	private static final byte DOOR_ERROR = 0xE1;
-	private static final byte MOTOR_ERROR = 0xE2;
+	private static final byte DOOR_ERROR = (byte)0xE1;
+	private static final byte MOTOR_ERROR = (byte)0xE2;
 	// still error states between 0xE3 to 0xEE for use
-	private static final byte OTHER_ERROR = 0xEF;
+	private static final byte OTHER_ERROR = (byte)0xEF;
 	private static final byte NO_ERROR = 0x00;
 	// Object ID
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
@@ -30,6 +30,7 @@ public class Elevator extends Thread {
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
 	// Values for Running
 	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
 	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
@@ -92,7 +93,7 @@ public class Elevator extends Thread {
 	 * @param requestUpdateError
 	 * @return byte[] to be put on the synchronized table
 	 */
-	public byte[] createResponsePacketData(int requestUpdateErrorError, byte errorType) {// create the Data byte[] for
+	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
 																							// the response packet to be
 																							// sent to the scheduler
 
@@ -160,7 +161,7 @@ public class Elevator extends Thread {
 			//System.out.println(msg);
 			System.out.println("Opening Doors");
 			doorStatusOpen=true;//open the doors
-			doorOpenTime==System.nanoTime();//time that the doors opened
+			doorOpenTime=System.nanoTime();//time that the doors opened
 			/*try { 
 				int i = DOOR_DURATION ; 
 				while (i != 0){ 
@@ -177,7 +178,11 @@ public class Elevator extends Thread {
 			}*/
 			for (int i=DOOR_DURATION;i>0;i--) {
 				System.out.format("Seconds until elevator door closes: %d second \n", i);
-				Thread.sleep(1000); //1 sec 
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} //1 sec 
 				System.out.format("Should be calling to Close the Doors");
 			}
 			//System.out.println()
@@ -186,15 +191,19 @@ public class Elevator extends Thread {
 		else if (doorOpenCloseError == DOOR_CLOSE) {
 			System.out.println("Closing Doors");
 			doorStatusOpen=false;
-			doorCloseTime==System.nanoTime();// time when the doors closed
-			Thread.sleep(1000); 
-			System.out.println("Doors Closed")
+			doorCloseTime=System.nanoTime();// time when the doors closed
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} 
+			System.out.println("Doors Closed");
 		}
 		else {//error 
 			sendPacket(ERROR, DOOR_ERROR);
 		}
 		//check that the doors were closed and done so on time
-		if ((doorCloseTime-doorOpenTime)>DOOR_CLOSE_BY.toNanoSeconds()) {
+		if ((doorCloseTime-doorOpenTime)>DOOR_CLOSE_BY*1000000000) {
 			sendPacket(ERROR, DOOR_ERROR);
 		}
 		//return msg; 
@@ -267,7 +276,7 @@ public class Elevator extends Thread {
 		while (true) {
 			// while(true) to activate all elevator threads in this system
 			while (hasRequest) {// send request
-				sendPacket(1, NOERROR);
+				sendPacket(1, NO_ERROR);
 				// hasRequest = !hasRequest;
 				hasRequest = false;
 			}
