@@ -41,29 +41,22 @@ public class Floor extends Thread {
 	public int elevatorLocation;
 	public static int NAMING;
 	DatagramPacket floorSendPacket, floorReceivePacket;
-	DatagramSocket floorSendSocket, floorReceiveSocket;
+	DatagramSocket floorSendReceiveSocket;
 
 	String elevatorRequest = "";
-
+	int numOfFloors;
+	int[] floorsMade;
 	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
 	 * scheduler
 	 */
-	public Floor(int name) {
-		NAMING = name;// mandatory for having it actually declared as a thread object
+	public Floor(int numOfFloors) {
+		//NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
+		floorsMade = new int[numOfFloors];
 	}
 
-	/*
-	 * Gets an elevator request as an int(up or down)
-	 * 
-	 * @returns a byte[] array that can be then used to send to the Scheduler
-	 */
-	// [Floor[69] or elevator[21] id, floorID(whichFlooramI), request(always),
-	// current floor of the elevator, up or down(for floor), Destination(null),
-	// command(what is coming back from scheduler)]
-	//public byte[] responsePacket(int request) {
-	public byte[] responsePacket(){
+	public byte[] responsePacket(int NAMING){
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
@@ -97,20 +90,23 @@ public class Floor extends Thread {
 	 * inputs as a string. For now This section will be commented. Will be
 	 * implemented for other itterations
 	 */
-	public void fileReader(String fullFile) { String text = ""; int i=0;
-	List<String> strings = new ArrayList<String>();
-	try { 
-		FileReader input = new FileReader(fullFile); Scanner reader = new Scanner(input);
-		reader.useDelimiter("[\n]");
+	public void fileReader(String fullFile) { 
+		String text = ""; int i=0;
+		List<String> strings = new ArrayList<String>();
+		try { 
+			FileReader input = new FileReader(fullFile); Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
 
-		while (reader.hasNext()){
-			text = reader.next();
-			if (i<=1) {
-				i++;
-			} else if(i>=2) {
-				strings.add(text);
-			}
+			while (reader.hasNext()){
+				text = reader.next();
+				if (i<=1) {
+					i++;
+				} else if(i>=2) {
+					strings.add(text);
+				}
 
 			}
-		}catch(Exception e) { e.printStackTrace(); } }
+		}catch(Exception e) { e.printStackTrace(); }
+	}
 }
+
