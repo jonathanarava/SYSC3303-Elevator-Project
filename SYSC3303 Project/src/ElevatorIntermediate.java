@@ -25,11 +25,10 @@ public class ElevatorIntermediate {
 
 	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 159;
-	
+
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	
 	private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
@@ -54,7 +53,7 @@ public class ElevatorIntermediate {
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
-			elevatorSendSocket.setSoTimeout(250);//sets the maximum time for the receive function to self block
+			elevatorSendSocket.setSoTimeout(250);// sets the maximum time for the receive function to self block
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -62,7 +61,7 @@ public class ElevatorIntermediate {
 			se.printStackTrace();
 			System.exit(1);
 		}
-		
+
 	}
 
 	public synchronized void sendPacket() {
@@ -100,7 +99,8 @@ public class ElevatorIntermediate {
 			if (elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(), SENDPORTNUM);
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), 7, InetAddress.getLocalHost(),
+							SENDPORTNUM);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -124,12 +124,13 @@ public class ElevatorIntermediate {
 		byte data[] = new byte[7];
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
-			//elevatorReceiveSocket.setSoTimeout(10);			Eventually we will need this to sync send and receive with Scheduler. 
+			// elevatorReceiveSocket.setSoTimeout(10); Eventually we will need this to sync
+			// send and receive with Scheduler.
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
-		
+
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 		try {
@@ -151,7 +152,7 @@ public class ElevatorIntermediate {
 		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
 		 * instruction) (
 		 */
-		
+
 		switch (data[1]) {
 		case 0:
 			elevatorArray[0].motorDirection = data[6];
@@ -178,15 +179,15 @@ public class ElevatorIntermediate {
 		// receivePacket.getPort());
 		// }
 	}
-	
+
 	public static void delay(int delayValue) {
-		for(int i=0; i<delayValue;) {
+		for (int i = 0; i < delayValue;) {
 			i++;
 		}
 	}
 
 	public static void main(String args[]) throws IOException {
-		//2 arguments: args[0] is the number of Elevators in the system 
+		// 2 arguments: args[0] is the number of Elevators in the system
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
@@ -214,27 +215,29 @@ public class ElevatorIntermediate {
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i, 0, elevatorTable,Integer.parseInt(args[i+1])); // i names the elevator, 0 initializes the floor it
-																	// starts on
+			elevatorArray[i] = new Elevator(i, 0, elevatorTable, Integer.parseInt(args[i + 1])); // i names the
+																									// elevator, 0
+																									// initializes the
+																									// floor it
+			// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
-		
+
 		while (true) {
 //			if (!elevatorTable.isEmpty()||firstRunTime) {
-				elevatorHandler.sendPacket();
+			elevatorHandler.sendPacket();
 //				if (firstRunTime) {
 //					firstRunTime=false;
 //				}
 //			}
-			//receive blocks
+			// receive blocks
 			elevatorHandler.receivePacket();
-			
-			
-			// Synchronize Intermediate send and Receive with the Scheduler's send and receive. 
 
-			
-			//delay(1000);
+			// Synchronize Intermediate send and Receive with the Scheduler's send and
+			// receive.
+
+			// delay(1000);
 		}
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
 

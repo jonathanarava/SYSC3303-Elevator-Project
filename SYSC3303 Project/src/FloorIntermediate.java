@@ -24,7 +24,7 @@ public class FloorIntermediate {
 
 	private static final int SENDPORTNUM = 488;// SET port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 1199;// SET port number for receiving from the scheduler
-	
+
 	private static int createNumFloors;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
