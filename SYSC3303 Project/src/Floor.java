@@ -47,7 +47,7 @@ public class Floor extends Thread {
 
 	String elevatorRequest = "";
 	int numOfFloors;
-	int[] floorsMade;
+	static int[] floorsMade;
 	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
 	 * scheduler
@@ -77,11 +77,13 @@ public class Floor extends Thread {
 		return requestElevator.toByteArray();
 	}
 
-	/*public void LEDOnOrOff(byte up_or_down, ) {
-		while (schedulerInstruction != true) {
-			if (NAMING =)
+	/* NEED DISCUSSION WITH GROUP HERE*/
+	public static void LEDOnOrOff(byte instruction) {
+		for (int i = 0; i<=floorsMade.length; i++) {
+			floorsMade[i] = instruction;		
 		}
-	}*/
+		System.out.println("DISPLAY OF ALL FLOORS SHOWING --> " + floorsMade[0]);
+	}
 
 	/*
 	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are

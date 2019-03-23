@@ -25,7 +25,7 @@ public class FloorIntermediate {
 	private static DatagramSocket floorSendReceiveSocket;
 
 
-	// arrays to keep track of the number of elevators, eliminates naming confusion
+	// variables to control if a new request has come in and needs to be dealt with
 	private static int name;
 	private static boolean hasRequest;
 	private static int up_or_down;
@@ -44,6 +44,7 @@ public class FloorIntermediate {
 		}
 	}
 
+												/* SENDS BYTE ARRAY PASSED USING THIS METHOD*/
 	public void sendPacket(byte[] requestPacket) {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
@@ -64,6 +65,7 @@ public class FloorIntermediate {
 		}
 	}
 	
+											/* RECEIVES BYTE ARRAY PASSED USING THIS METHOD*/
 	public void receivePacket() {
 		byte data[] = new byte[7];
 		floorReceivePacket = new DatagramPacket(data, data.length);
@@ -79,20 +81,21 @@ public class FloorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		 Floor.LEDOnOrOff(data[6]);
 	}
 
 
 	public static void main(String args[]) throws IOException {
 		
-		// for iteration 1 there will only be 1 elevator
-		// getting floor numbers from parameters set
-		int createNumFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
+		int createNumFloors = Integer.parseInt(args[0]);// The number of Floors in the system is passed via argument[0]
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		Floor floor = new Floor(createNumFloors);
 		
-		floor.fileReader("M://hello.txt");
+		floor.fileReader("M://hello.txt");				// reads the file and populates the linked list with request.
 		
 		while (true) {
+			/* Logic here is used to determine if the linked list is not empty and if so empty it by removing and sending it
+			 * as a packet to the scheduler*/
 			if(floor.fileRequests.isEmpty()) {
 				hasRequest = false;
 			} else {
@@ -117,6 +120,8 @@ public class FloorIntermediate {
 					e.printStackTrace();
 				}
 			}
+			
+			// Receives packets here
 			floorHandler.receivePacket();
 		}
 	}
