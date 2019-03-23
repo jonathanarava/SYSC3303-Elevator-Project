@@ -69,13 +69,6 @@ public class Floor extends Thread {
 		} else {
 			requestElevator.write(2);
 		}
-			
-				/*if (request == REQUEST) {
-			requestElevator.write(1); // request/update. not used by floor
-		} else {
-			requestElevator.write(0); // request/update. not used by floor
-		}*/
-
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
 		requestElevator.write(0); // Destination floor (null)
@@ -98,7 +91,8 @@ public class Floor extends Thread {
 	 * implemented for other itterations
 	 */
 	public void fileReader(String fullFile) { 
-		String text = ""; int i=0;
+		String text = "";
+		int i=0;
 		try { 
 			FileReader input = new FileReader(fullFile);
 			Scanner reader = new Scanner(input);
@@ -110,6 +104,7 @@ public class Floor extends Thread {
 					i++;
 				} else if(i>=2) {
 					fileRequests.add(text);
+					i++;
 				}
 			}
 		}catch(Exception e) { e.printStackTrace(); }

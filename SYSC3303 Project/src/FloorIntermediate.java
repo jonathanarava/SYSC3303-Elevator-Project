@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class FloorIntermediate {
 
@@ -32,7 +33,7 @@ public class FloorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	public static final int RECEIVEPORTNUM = 23;
+	public static final int SENDPORTNUM = 488;
 
 	public FloorIntermediate() {
 		try {
@@ -44,11 +45,12 @@ public class FloorIntermediate {
 	}
 
 	public void sendPacket(byte[] requestPacket) {
-		byte[] requestFloor = new byte[7];
 		int lengthOfByteArray = requestPacket.length;
-		
+		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
-			floorSendPacket = new DatagramPacket(requestFloor, lengthOfByteArray, InetAddress.getLocalHost(), 369);
+			
+			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, InetAddress.getLocalHost(), SENDPORTNUM);
+			
 			System.out.print("I've sent\n");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -63,6 +65,8 @@ public class FloorIntermediate {
 	}
 	
 	public void receivePacket() {
+		byte data[] = new byte[7];
+		floorReceivePacket = new DatagramPacket(data, data.length);
 		try {
 			System.out.println("Waiting...\n"); // so we know we're waiting
 			floorSendReceiveSocket.receive(floorReceivePacket);
@@ -86,11 +90,9 @@ public class FloorIntermediate {
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		Floor floor = new Floor(createNumFloors);
 		
-		//floor.fileReader("M://hello.txt");
+		floor.fileReader("M://hello.txt");
 		
 		while (true) {
-			floorHandler.receivePacket();
-			
 			if(floor.fileRequests.isEmpty()) {
 				hasRequest = false;
 			} else {
@@ -98,16 +100,24 @@ public class FloorIntermediate {
 				String command = floor.fileRequests.remove(0);
 				String segment[] = command.split(" ");
 				name = Integer.parseInt(segment[1]);
-				if(segment[2].equals("UP")) {
+				if(segment[2].equals("Up")) {
 					up_or_down = UP;
-				} else if(segment[2].equals("DOWN")) {
+				} else if(segment[2].equals("Down")) {
 					up_or_down = DOWN;
 				}
 			}
 			
-			if(hasRequest) {
+			if(hasRequest == true) {
 				floorHandler.sendPacket(floor.responsePacket(name, up_or_down));
+			} else {
+				floorHandler.sendPacket(floor.responsePacket(0, 0));
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+			floorHandler.receivePacket();
 		}
 	}
 }
