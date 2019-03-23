@@ -25,13 +25,15 @@ public class Floor extends Thread {
 	private static final int UPDATE=2;//for identifying the packet sent to scheduler as a status update
 	private static final int FLOOR = 69;
 
+	
+	List<String> fileRequests = new ArrayList<String>();
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided
 	 * Time from EPOCH in an int, Floor where the elevator is requested in an
 	 * Int(1-4) Which direction the Button was pressed in a String(Up or Down) What
 	 * floor was requested inside the elevator in an int(1-4)
 	 */
-	public int up_or_down;
+
 
 	// This String List will contain ALL of the real time input information that is
 	// Given to the system.
@@ -56,14 +58,19 @@ public class Floor extends Thread {
 		floorsMade = new int[numOfFloors];
 	}
 
-	public byte[] responsePacket(int NAMING){
+	public byte[] responsePacket(int NAMING, int up_or_down){
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(FLOOR);  // To Say That I am a floor(69) elevator has ID(21)
 		requestElevator.write(NAMING); // floor ID
-		requestElevator.write(REQUEST); // request/update. floor only makes requests
-		/*if (request == REQUEST) {
+		if(up_or_down != 0) {
+			requestElevator.write(REQUEST); // request/update. floor only makes requests
+		} else {
+			requestElevator.write(2);
+		}
+			
+				/*if (request == REQUEST) {
 			requestElevator.write(1); // request/update. not used by floor
 		} else {
 			requestElevator.write(0); // request/update. not used by floor
@@ -92,9 +99,9 @@ public class Floor extends Thread {
 	 */
 	public void fileReader(String fullFile) { 
 		String text = ""; int i=0;
-		List<String> strings = new ArrayList<String>();
 		try { 
-			FileReader input = new FileReader(fullFile); Scanner reader = new Scanner(input);
+			FileReader input = new FileReader(fullFile);
+			Scanner reader = new Scanner(input);
 			reader.useDelimiter("[\n]");
 
 			while (reader.hasNext()){
@@ -102,9 +109,8 @@ public class Floor extends Thread {
 				if (i<=1) {
 					i++;
 				} else if(i>=2) {
-					strings.add(text);
+					fileRequests.add(text);
 				}
-
 			}
 		}catch(Exception e) { e.printStackTrace(); }
 	}
