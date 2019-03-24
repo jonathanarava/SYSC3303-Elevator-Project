@@ -113,7 +113,7 @@ public class Scheduler extends Thread {
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 		try {
-			schedulerSocketSendReceiveFloor.send(schedulerElevatorSendPacket);
+			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -123,13 +123,13 @@ public class Scheduler extends Thread {
 	public static void floorReceivePacket() {
 
 		/* FLOOR RECEIVING PACKET HERE */
-		schedulerElevatorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
+		schedulerFloorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
 
 		// Block until a datagram packet is received from receiveSocket.
 		try {
 			System.out.println("waiting");
 			schedulerSocketSendReceiveFloor.receive(schedulerFloorReceivePacket);
-			System.out.println("Request from elevator: " + Arrays.toString(data));
+			System.out.println("Request from Floor: " + Arrays.toString(dataFloor));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
@@ -138,12 +138,12 @@ public class Scheduler extends Thread {
 		}
 
 		/* Separating byte array received */
-		elevatorOrFloor = data[0];
-		elevatorOrFloorID = data[1];
-		requestOrUpdate = data[2];
-		currentFloor = data[3];
-		upOrDown = data[4];
-		destFloor = data[5];
+		elevatorOrFloor = dataFloor[0];
+		elevatorOrFloorID = dataFloor[1];
+		requestOrUpdate = dataFloor[2];
+		currentFloor = dataFloor[3];
+		upOrDown = dataFloor[4];
+		destFloor = dataFloor[5];
 	}
 
 	public static void floorSendPacket(byte[] responseByteArray) {
@@ -154,14 +154,9 @@ public class Scheduler extends Thread {
 		 * 
 		 * responseByteArray = responsePacket(currentFloor, destFloor);
 		 */
-		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		try {
-			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-					InetAddress.getLocalHost(), PORTNUM);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("Response to Floor " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
@@ -206,7 +201,7 @@ public class Scheduler extends Thread {
 						System.out.println("here adding to queue 1");
 						addToUpQueue(upQueue1,0);
 					} else if (destFloor - currentFloor < 0) {
-						addToDownQueue(downQueue1);
+						addToDownQueue(downQueue1,0);
 					}
 				}
 			} else if (elevatorOrFloorID == 1) {
@@ -216,7 +211,7 @@ public class Scheduler extends Thread {
 						addToUpQueue(upQueue2,1);
 						// goingUpList(upQueue2, destFloor);
 					} else if (destFloor - currentFloor < 0) {
-						addToDownQueue(downQueue2);
+						addToDownQueue(downQueue2,1);
 						// goingDownList(downQueue2, destFloor);
 					}
 				}
@@ -256,40 +251,36 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	public void addToDownQueue(LinkedList<Integer> downQueue) {
+	public void addToDownQueue(LinkedList<Integer> downQueue, int ID) {
 		for (int i = 0; i <= downQueue.size(); i++) {
-			if (downQueue.isEmpty()) {
-				downQueue.addFirst(destFloor);
-				break;
-			}
-			if ((destFloor <= downQueue.get(i))) {
-				downQueue.add(i, destFloor);
-				break;
-			} else if (i == downQueue.size()) {
-				downQueue.addLast(destFloor);
-				break;
+			if (ID == 0) {
+				if (downQueue1.isEmpty()) {
+					downQueue1.addFirst(destFloor);
+					break;
+				}
+				if ((destFloor <= downQueue.get(i))) {
+					downQueue1.add(i, destFloor);
+					break;
+				} else if (i == downQueue.size()) {
+					downQueue1.addLast(destFloor);
+					break;
+				}
+			} else if (ID == 1) {
+				if (downQueue2.isEmpty()) {
+					downQueue2.addFirst(destFloor);
+					break;
+				}
+				if ((destFloor <= downQueue.get(i))) {
+					downQueue2.add(i, destFloor);
+					break;
+				} else if (i == downQueue.size()) {
+					downQueue2.addLast(destFloor);
+					break;
+				}
 			}
 		}
 	}
-
-	/*
-	 * private synchronized void goingUpList(LinkedList<Integer> queueType, int
-	 * destFloor2) { synchronized(queueType) { if(ID == 1) {
-	 * 
-	 * } else if (ID == 2) {
-	 * 
-	 * } } }
-	 * 
-	 * private synchronized void goingDownList(LinkedList<Integer> queueType, int
-	 * destFloor2) { synchronized(queueType) { while(queueType.size()==0) { try {
-	 * queueType.wait(); } catch (InterruptedException e) { e.printStackTrace(); } }
-	 * } }
-	 * 
-	 * private synchronized void elevatorPacketHandler(int ID) {
-	 * 
-	 * }
-	 */
-
+	
 	public final void interruptThread(Thread t) {
 		t.interrupt();
 	}
@@ -316,9 +307,6 @@ public class Scheduler extends Thread {
 			byte[] responseByteArray = responsePacket(0, currentFloor, first);
 			if (currentFloor == first) {
 				upQueue1.removeFirst();
-				if(upQueue1.isEmpty()) {
-					responseByteArray = responsePacket(0, currentFloor, -1);
-				}
 			}
 			Scheduler.elevatorSendPacket(responseByteArray);
 		}
@@ -350,6 +338,16 @@ public class Scheduler extends Thread {
 			if (currentFloor == first) {
 				downQueue2.removeFirst();
 			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+		
+		if(upQueue1.isEmpty() && downQueue1.isEmpty()) {
+			byte[] responseByteArray = responsePacket(0, currentFloor, -1);
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+		
+		if(upQueue2.isEmpty() && downQueue2.isEmpty()) {
+			byte[] responseByteArray = responsePacket(1, currentFloor, -1);
 			Scheduler.elevatorSendPacket(responseByteArray);
 		}
 	}

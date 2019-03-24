@@ -90,7 +90,7 @@ public class FloorIntermediate {
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		Floor floor = new Floor(createNumFloors);
 		
-		//floor.fileReader("M://hello.txt");
+		floor.fileReader("M://hello.txt");
 		
 		while (true) {
 			if(floor.fileRequests.isEmpty()) {

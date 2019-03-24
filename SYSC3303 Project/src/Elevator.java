@@ -52,11 +52,11 @@ public class Elevator extends Thread {
 	
 
 	public int getInitialFloor() {
-		return initialFloor;
+		return sensor;
 	}
 
 	public void setInitialFloor(int initialFloor) {
-		this.initialFloor = initialFloor;
+		sensor = initialFloor;
 	}
 	
 	public int runElevator(byte motorDirection) {
@@ -201,9 +201,9 @@ public class Elevator extends Thread {
 							}
 						} else if (instruction == 4) {
 							System.out.println(instruction + "  ---> " + nameOfElevator);
-							openCloseDoor((byte)DOOR_OPEN);
-							System.out.printf("No more requests. Elevator %d has stopped\n", nameOfElevator);
-							this.interrupt();
+							//openCloseDoor((byte)DOOR_OPEN);
+							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
+							//this.interrupt();
 						}
 					}
 					this.runningStatus = false;
