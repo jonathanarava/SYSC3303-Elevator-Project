@@ -35,8 +35,9 @@ public class Scheduler extends Thread {
 	public static int destFloor;
 
 	private static final byte HOLD = 0x00;// elevator is in hold state
-	private static final byte UP = 0x02;// elevator is going up
-	private static final byte DOWN = 0x01;// elevator is going down
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x04;// elevator has finished all requests. 
 
 	// number of elevators and floors. Can change here!
 	public static int numElevators = 2;
@@ -108,7 +109,7 @@ public class Scheduler extends Thread {
 		 * 
 		 * responseByteArray = responseByteArray;
 		 */
-		System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
+		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 		try {
@@ -181,12 +182,14 @@ public class Scheduler extends Thread {
 		requestElevator.write(0);
 		requestElevator.write(0);
 
-		if ((floorRequest1 - currentFloor1) < 0) {
-			requestElevator.write(1); // downwards
+		if(floorRequest1 == -1) {
+			requestElevator.write(STOP);
+		} else if ((floorRequest1 - currentFloor1) < 0) {
+			requestElevator.write(DOWN); // downwards
 		} else if ((floorRequest1 - currentFloor1) > 0) {
-			requestElevator.write(2); // upwards
-		} else {
-			requestElevator.write(0); // motorDirection
+			requestElevator.write(UP); // upwards
+		} else if((floorRequest1 - currentFloor1) == 0) {
+			requestElevator.write(HOLD); // motorDirection
 		}
 
 		// 0,2,0,1,0 (0, direction, openClose, motorSpin,0)
@@ -200,20 +203,19 @@ public class Scheduler extends Thread {
 			if (elevatorOrFloorID == 0) {
 				if (requestOrUpdate == 1) {
 					if (destFloor - currentFloor > 0) {
-						
-						addToUpQueue(upQueue1);
-						// goingUpList(upQueue1, destFloor);
+						System.out.println("here adding to queue 1");
+						addToUpQueue(upQueue1,0);
 					} else if (destFloor - currentFloor < 0) {
 						addToDownQueue(downQueue1);
-						// goingDownList(downQueue1, destFloor);
 					}
 				}
 			} else if (elevatorOrFloorID == 1) {
 				if (requestOrUpdate == 1) {
-					if (destFloor - currentFloor < 0) {
-						addToUpQueue(upQueue2);
+					if (destFloor - currentFloor > 0) {
+						System.out.println("here adding to queue 2");
+						addToUpQueue(upQueue2,1);
 						// goingUpList(upQueue2, destFloor);
-					} else if (destFloor - currentFloor > 0) {
+					} else if (destFloor - currentFloor < 0) {
 						addToDownQueue(downQueue2);
 						// goingDownList(downQueue2, destFloor);
 					}
@@ -224,18 +226,32 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	public void addToUpQueue(LinkedList<Integer> upQueue) {
+	public void addToUpQueue(LinkedList<Integer> upQueue, int ID) {
 		for (int i = 0; i <= upQueue.size(); i++) {
-			if (upQueue.isEmpty()) {
-				upQueue.addFirst(destFloor);
-				break;
-			}
-			if ((destFloor <= upQueue.get(i))) {
-				upQueue.add(i, destFloor);
-				break;
-			} else if (i == upQueue.size()) {
-				upQueue.addLast(destFloor);
-				break;
+			if (ID == 0) {
+				if (upQueue1.isEmpty()) {
+					upQueue1.addFirst(destFloor);
+					break;
+				}
+				if ((destFloor <= upQueue.get(i))) {
+					upQueue1.add(i, destFloor);
+					break;
+				} else if (i == upQueue.size()) {
+					upQueue1.addLast(destFloor);
+					break;
+				}
+			} else if (ID == 1) {
+				if (upQueue2.isEmpty()) {
+					upQueue2.addFirst(destFloor);
+					break;
+				}
+				if ((destFloor <= upQueue.get(i))) {
+					upQueue2.add(i, destFloor);
+					break;
+				} else if (i == upQueue.size()) {
+					upQueue2.addLast(destFloor);
+					break;
+				}
 			}
 		}
 	}
@@ -252,7 +268,6 @@ public class Scheduler extends Thread {
 			} else if (i == downQueue.size()) {
 				downQueue.addLast(destFloor);
 				break;
-
 			}
 		}
 	}
@@ -283,10 +298,10 @@ public class Scheduler extends Thread {
 	}
 
 	public static int Direction(int destFloor, int currentFloor) {
-		if (destFloor - currentFloor < 0) {
+		if (destFloor - currentFloor < 0 && upQueue1.isEmpty() && upQueue2.isEmpty()) {
 			direction = DOWN;
 		}
-		if (destFloor - currentFloor > 0) {
+		if (destFloor - currentFloor > 0 && downQueue1.isEmpty() && downQueue2.isEmpty()) {
 			direction = UP;
 		}
 		if (destFloor - currentFloor == 0) {
@@ -294,57 +309,71 @@ public class Scheduler extends Thread {
 		}
 		return direction;
 	}
+	
+	public static void schedulingAlgo() {
+		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0) {
+			int first = upQueue1.getFirst();
+			byte[] responseByteArray = responsePacket(0, currentFloor, first);
+			if (currentFloor == first) {
+				upQueue1.removeFirst();
+				if(upQueue1.isEmpty()) {
+					responseByteArray = responsePacket(0, currentFloor, -1);
+				}
+			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+
+		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1) {
+			int first = upQueue2.getFirst();
+			byte[] responseByteArray = responsePacket(1, currentFloor, first);
+			if (currentFloor == first) {
+				upQueue2.removeFirst();
+				if(upQueue2.isEmpty()) {
+					responseByteArray = responsePacket(1, currentFloor, -1);
+				}
+			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+
+		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0) {
+			int first = downQueue1.getFirst();
+			byte[] responseByteArray = responsePacket(0, currentFloor, first);
+			if (currentFloor == first) {
+				downQueue1.removeFirst();
+			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+
+		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1) {
+			int first = downQueue2.getFirst();
+			byte[] responseByteArray = responsePacket(1, currentFloor, first);
+			if (currentFloor == first) {
+				downQueue2.removeFirst();
+			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+	}
 
 	public static void main(String args[]) throws InterruptedException {
 
 		Scheduler packet = new Scheduler();
 
-		ArrayList<LinkedList<Integer>> x = new ArrayList<>();
+/*		ArrayList<LinkedList<Integer>> x = new ArrayList<>();
 		x.add(0, upQueue1);
-		x.add(1, downQueue1);
-		x.add(2, upQueue2);
+		x.add(1, upQueue2);
+		x.add(2, downQueue1);
 		x.add(3, downQueue2);
-
+*/
+		
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
-			Direction(destFloor, currentFloor);
 
 			if (requestOrUpdate == 1) {
 				packet.packetDealer();
+				Direction(destFloor, currentFloor);
 			}
 			
-
-		for (int i = 0; i <= 2; i = i + 2) {
-				//System.out.println(i);
-				switch (direction) {
-
-				case UP:
-					if (!(x.get(i).isEmpty())) {
-						LinkedList<Integer> firstUpRequest = x.get(i);
-						int first = firstUpRequest.getFirst();
-						byte[] responseByteArray = responsePacket(i, currentFloor, first);
-						if (currentFloor == first) {
-							upQueue1.removeFirst();
-						}
-						Scheduler.elevatorSendPacket(responseByteArray);
-					}
-
-					break;
-				case DOWN:
-					if (!(x.get(i + 1).isEmpty())) {
-						LinkedList<Integer> firstDownRequest = x.get(i + 1);
-						int first1 = firstDownRequest.getFirst();
-						byte[] responseByteArrayd1 = responsePacket(i, currentFloor, first1);
-						if (currentFloor == first1) {
-							downQueue1.removeFirst();
-						}
-						Scheduler.elevatorSendPacket(responseByteArrayd1);
-					}
-					break;
-				default:
-					break;
-				}
-			}
+			schedulingAlgo();
 		}
 	}
 }
