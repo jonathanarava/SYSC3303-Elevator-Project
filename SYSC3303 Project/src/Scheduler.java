@@ -60,7 +60,7 @@ public class Scheduler extends Thread {
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(369);
-			schedulerSocketSendReceiveFloor = new DatagramSocket();// can be any available port, Scheduler will reply
+			schedulerSocketSendReceiveFloor = new DatagramSocket(488);// can be any available port, Scheduler will reply
 			// to the port
 			// that's been received
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
@@ -115,7 +115,6 @@ public class Scheduler extends Thread {
 		try {
 			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -156,12 +155,11 @@ public class Scheduler extends Thread {
 		 */
 		System.out.println("Response to Floor " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
+				schedulerFloorReceivePacket.getAddress(), schedulerFloorReceivePacket.getPort());
 
 		try {
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -220,6 +218,17 @@ public class Scheduler extends Thread {
 			floorPacketHandler();
 		}
 	}
+	
+	private static void floorPacketHandler() {
+		if (requestOrUpdate == 1) {
+			if(upOrDown == UP) {
+				
+			} else if (upOrDown == DOWN) {
+				
+			}
+		}
+	}
+
 
 	public void addToUpQueue(LinkedList<Integer> upQueue, int ID) {
 		for (int i = 0; i <= upQueue.size(); i++) {
@@ -285,8 +294,6 @@ public class Scheduler extends Thread {
 		t.interrupt();
 	}
 
-	private static void floorPacketHandler() {
-	}
 
 	public static int Direction(int destFloor, int currentFloor) {
 		if (destFloor - currentFloor < 0 && upQueue1.isEmpty() && upQueue2.isEmpty()) {
@@ -355,13 +362,17 @@ public class Scheduler extends Thread {
 	public static void main(String args[]) throws InterruptedException {
 
 		Scheduler packet = new Scheduler();
-
-/*		ArrayList<LinkedList<Integer>> x = new ArrayList<>();
-		x.add(0, upQueue1);
-		x.add(1, upQueue2);
-		x.add(2, downQueue1);
-		x.add(3, downQueue2);
-*/
+		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,1};
+		Thread floor = new Thread() {
+			public void run() {
+				while (true) {
+					floorReceivePacket();
+					floorSendPacket(responseByteArray);
+				}
+			}
+		};
+		
+		floor.start();
 		
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
