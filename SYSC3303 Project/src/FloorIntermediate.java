@@ -70,7 +70,7 @@ public class FloorIntermediate {
 		try {
 			System.out.println("Waiting...\n"); // so we know we're waiting
 			floorSendReceiveSocket.receive(floorReceivePacket);
-			System.out.println("Got it");
+			System.out.println("Received from scheduler --> " + Arrays.toString(data));
 		}
 
 		catch (IOException e) {
@@ -90,7 +90,7 @@ public class FloorIntermediate {
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		Floor floor = new Floor(createNumFloors);
 		
-		floor.fileReader("M://hello.txt");
+		//floor.fileReader("M://hello.txt");
 		
 		while (true) {
 			if(floor.fileRequests.isEmpty()) {
@@ -112,7 +112,7 @@ public class FloorIntermediate {
 			} else {
 				floorHandler.sendPacket(floor.responsePacket(0, 0));
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(4000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
