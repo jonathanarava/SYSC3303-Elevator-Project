@@ -200,7 +200,7 @@ public class Elevator extends Thread {
 								e.printStackTrace();
 							}
 						} else if (instruction == 4) {
-							System.out.println(instruction + "  ---> " + nameOfElevator);
+							//System.out.println(instruction + "  ---> " + nameOfElevator);
 							//openCloseDoor((byte)DOOR_OPEN);
 							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
 							//this.interrupt();
@@ -276,8 +276,8 @@ public class Elevator extends Thread {
 		ElevatorTable1.clear();
 		//tableUpdate.start();
 		
-		Elevator1.start();
 		Elevator0.start();
+		Elevator1.start();
 		
 		
 
@@ -285,18 +285,19 @@ public class Elevator extends Thread {
 			while(true) {
 				byte[] x = new byte[7];
 				x = Elevator0.receivePacket();
-				if (x[1] == 0) {
+				ElevatorTable1.add(x);
+				if (x[1] == 0 && Elevator0.runningStatus == false) {
 					Elevator0.ElevatorTable.remove(0);
 					Elevator0.toDoID = x[1];
 					Elevator0.instruction = x[6];
 					Elevator0.runningStatus = true;
-				} else if(x[1] == 1) {
+				}
+				if(x[1] == 1 && Elevator1.runningStatus == false) {
 					Elevator1.ElevatorTable.remove(0);
 					Elevator1.toDoID = x[1];
 					Elevator1.instruction = x[6];
 					Elevator1.runningStatus = true;
-				}
-				ElevatorTable1.add(x);
+				} 
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

@@ -33,6 +33,12 @@ public class Scheduler extends Thread {
 	public static int currentFloor;
 	public static int upOrDown;
 	public static int destFloor;
+	
+	public static int elevatorOrFloorID1;
+	public static int requestOrUpdate1;
+	public static int currentFloor1;
+	public static int upOrDown1;
+	public static int destFloor1;
 
 	private static final byte HOLD = 0x00;// elevator is in hold state
 	private static final byte UP = 0x01;// elevator is going up
@@ -139,11 +145,11 @@ public static LinkedList<Integer> direction = new LinkedList<Integer>();
 
 		/* Separating byte array received */
 		elevatorOrFloor = dataFloor[0];
-		elevatorOrFloorID = dataFloor[1];
-		requestOrUpdate = dataFloor[2];
-		currentFloor = dataFloor[3];
-		upOrDown = dataFloor[4];
-		destFloor = dataFloor[5];
+		elevatorOrFloorID1 = dataFloor[1];
+		requestOrUpdate1 = dataFloor[2];
+		currentFloor1 = dataFloor[3];
+		upOrDown1 = dataFloor[4];
+		destFloor1 = dataFloor[5];
 	}
 
 	public static void floorSendPacket(byte[] responseByteArray) {
@@ -223,7 +229,9 @@ public static LinkedList<Integer> direction = new LinkedList<Integer>();
 	private static void floorPacketHandler() {
 		if (requestOrUpdate == 1) {
 			if(upOrDown == UP) {
-				
+				if(upQueue1.get(0) == elevatorOrFloorID) {
+					
+				}
 			} else if (upOrDown == DOWN) {
 				
 			}
