@@ -55,7 +55,8 @@ public class Scheduler extends Thread {
 	public static int limit = numFloors * numElevators;
 	//private static Thread newRequest;
 
-	public static int direction;
+public static LinkedList<Integer> direction = new LinkedList<Integer>();
+	private static boolean upQueueActive = false;
 
 	public Scheduler() {
 		try {
@@ -295,21 +296,37 @@ public class Scheduler extends Thread {
 	}
 
 
-	public static int Direction(int destFloor, int currentFloor) {
-		if (destFloor - currentFloor < 0 && upQueue1.isEmpty() && upQueue2.isEmpty()) {
-			direction = DOWN;
+	public static LinkedList<Integer> Direction(int ID, int destFloor, int currentFloor) {
+		
+		synchronized(direction) {
+			
 		}
-		if (destFloor - currentFloor > 0 && downQueue1.isEmpty() && downQueue2.isEmpty()) {
-			direction = UP;
-		}
-		if (destFloor - currentFloor == 0) {
-			direction = HOLD;
+		if(ID == 0) {
+			if (destFloor - currentFloor < 0 && upQueue1.isEmpty()) {
+				direction.add(0, (int) DOWN);
+			}
+			if (destFloor - currentFloor > 0 && downQueue1.isEmpty()) {
+				direction.add(0, (int) UP);
+			}
+			if (destFloor - currentFloor == 0) {
+				direction.add(0, (int) HOLD);
+			}
+		} else if (ID == 1) {
+			if (destFloor - currentFloor < 0 && upQueue2.isEmpty()) {
+				direction.add(1, (int) DOWN);
+			}
+			if (destFloor - currentFloor > 0 && downQueue2.isEmpty()) {
+				direction.add(1, (int) UP);
+			}
+			if (destFloor - currentFloor == 0) {
+				direction.add(1, (int) HOLD);
+			}
 		}
 		return direction;
 	}
 	
 	public static void schedulingAlgo() {
-		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0) {
+		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0 && direction.get(0) == UP) {
 			int first = upQueue1.getFirst();
 			byte[] responseByteArray = responsePacket(0, currentFloor, first);
 			if (currentFloor == first) {
@@ -317,8 +334,17 @@ public class Scheduler extends Thread {
 			}
 			Scheduler.elevatorSendPacket(responseByteArray);
 		}
-
-		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1) {
+		
+		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0 && direction.get(0)  == DOWN) {
+			int first = downQueue1.getFirst();
+			byte[] responseByteArray = responsePacket(0, currentFloor, first);
+			if (currentFloor == first) {
+				downQueue1.removeFirst();
+			}
+			Scheduler.elevatorSendPacket(responseByteArray);
+		}
+		
+		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && direction.get(1)  == UP) {
 			int first = upQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -330,16 +356,7 @@ public class Scheduler extends Thread {
 			Scheduler.elevatorSendPacket(responseByteArray);
 		}
 
-		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0) {
-			int first = downQueue1.getFirst();
-			byte[] responseByteArray = responsePacket(0, currentFloor, first);
-			if (currentFloor == first) {
-				downQueue1.removeFirst();
-			}
-			Scheduler.elevatorSendPacket(responseByteArray);
-		}
-
-		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1) {
+		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && direction.get(1) == DOWN) {
 			int first = downQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -367,6 +384,12 @@ public class Scheduler extends Thread {
 			public void run() {
 				while (true) {
 					floorReceivePacket();
+					if (requestOrUpdate == 1) {
+						packet.packetDealer();
+						Direction(elevatorOrFloorID, destFloor, currentFloor);
+					}
+					
+					schedulingAlgo();
 					floorSendPacket(responseByteArray);
 				}
 			}
@@ -379,7 +402,7 @@ public class Scheduler extends Thread {
 
 			if (requestOrUpdate == 1) {
 				packet.packetDealer();
-				Direction(destFloor, currentFloor);
+				Direction(elevatorOrFloorID, destFloor, currentFloor);
 			}
 			
 			schedulingAlgo();
