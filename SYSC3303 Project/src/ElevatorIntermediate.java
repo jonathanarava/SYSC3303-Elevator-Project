@@ -22,7 +22,18 @@ public class ElevatorIntermediate {
 	private static final int DOOR_DURATION = 4;// duration that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+	private static final int INITIALIZE=8;//for first communication with the scheduler
+	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 
+	/*//FROM SCHEDULE
+	public static final int EL_RECEIVEPORTNUM = 369;
+	public static final int EL_SENDPORTNUM = 159;
+
+	public static final int FL_RECEIVEPORTNUM = 488;
+	public static final int FL_SENDPORTNUM = 1199;
+	*/
+	
 	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 159;
 
@@ -214,6 +225,8 @@ public class ElevatorIntermediate {
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
+		elevatorTable.add());
+		elevatorHandler.sendPacket();
 		for (int i = 0; i < createNumElevators; i++) {
 			elevatorArray[i] = new Elevator(i, 0, elevatorTable, Integer.parseInt(args[i + 1])); // i names the
 																									// elevator, 0
