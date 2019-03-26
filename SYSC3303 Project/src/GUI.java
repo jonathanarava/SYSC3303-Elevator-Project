@@ -5,31 +5,32 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 public class GUI {
-	
-int numOfElevators = 5000;
+
+// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
+int numOfElevators = 4;
 	
 GUI(){
+	//	INITIALIZATIONS
+	//Frame initialization
 	JFrame frame = new JFrame("Elevator GUI");
-	JButton button,button1, button2, button3,button4;
+	//Button(s) initialization
+	JButton button;
+	//Layout Initialization
 	FlowLayout experimentLayout = new FlowLayout();
-	frame.setLayout(experimentLayout);
-	// 
+	frame.setLayout(experimentLayout);	// Set frame layout to FlowLayout
+	
+	// Dynamically creates the number of buttons depending on numOfElevators initialized in elevator intermediate class
 	for(int i = 0; i< numOfElevators; i++) {
 		button = new JButton("Elevator " + i);	
 		frame.add(button);
 	}
-	button1 = new JButton("right");
-	button2 = new JButton("top");
-	button3 = new JButton("bottom");
-	button4 = new JButton("center");
-	//frame.add(button,BorderLayout.WEST);
-	frame.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-	//frame.add(button1, BorderLayout.EAST);
-	//frame.add(button2, BorderLayout.NORTH);
-	//frame.add(button3, BorderLayout.SOUTH);
-	//frame.add(button4, BorderLayout.CENTER);
 	
-	frame.setSize(500,300);  
+	//Set Layout to frame
+	frame.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+	
+	//Frame dimensions
+	frame.setSize(500,300); 
+	
 	frame.setVisible(true);  
 	}
 	public  static void main(String[] args){
