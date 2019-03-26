@@ -35,6 +35,9 @@ public class Elevator extends Thread {
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
 	private static final int UNUSED = 0;// value for unused parts of data
+	private static final int INITIALIZE=8;//for first communication with the scheduler
+	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
 	public byte motorDirection; // make getters and setters:
