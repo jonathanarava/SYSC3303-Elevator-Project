@@ -62,6 +62,7 @@ public class Scheduler {
 	public static InetAddress packetAddress;
 	public static int packetPort;
 
+
 	public static byte[] sendData = new byte[7];
 
 	public static long respondStart, respondEnd;// variables for the measurements to respond
@@ -96,6 +97,12 @@ public class Scheduler {
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 	private static final int INITIALIZE=8;//for first communication with the scheduler
+
+
+
+	private static boolean elevatorInitialized=false;
+	private static boolean floorInitialized=false;
+
 
 	public void linkedListInitialization() {
 		for (int i = 0; i < numElevators; i++) {
@@ -280,8 +287,13 @@ public class Scheduler {
 		stopRequest = packetData[5];// a request to stop at a given floor (-1 if no request)
 		if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
 			if (packetIsStatus==INITIALIZE) {
-				createSendingData(0,0,0, INITIALIZE);
-				elevatorFloorSendPacket(ELEVATOR_ID);
+				elevatorInitialized=true;
+				if (floorInitialized==true) {
+					createSendingData(0,0,0, INITIALIZE);
+					elevatorFloorSendPacket(ELEVATOR_ID);
+					createSendingData(0,0,0, INITIALIZE);
+					elevatorFloorSendPacket(FLOOR_ID);
+				}
 			}
 
 			// elevatorNum=__;//which elevator it is in
@@ -514,8 +526,13 @@ public class Scheduler {
 			}
 		} else {// FROM FLOOR
 			if (packetIsStatus==INITIALIZE) {//for initializing contact with elevatorIntermediate or floorIntermediate
-				createSendingData(0,0,0, INITIALIZE);
-				elevatorFloorSendPacket(FLOOR_ID);
+				floorInitialized=true;
+				if (elevatorInitialized==true) {
+					createSendingData(0,0,0, INITIALIZE);
+					elevatorFloorSendPacket(ELEVATOR_ID);
+					createSendingData(0,0,0, INITIALIZE);
+					elevatorFloorSendPacket(FLOOR_ID);
+				}
 			}
 			else {
 				responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);
