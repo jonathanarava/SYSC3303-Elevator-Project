@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.lang.Object;
 
 public class ElevatorIntermediate {
 
@@ -32,8 +33,8 @@ public class ElevatorIntermediate {
 
 	public static final int FL_RECEIVEPORTNUM = 488;
 	public static final int FL_SENDPORTNUM = 1199;
-	*/
-	
+	 */
+
 	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 159;
 
@@ -50,6 +51,7 @@ public class ElevatorIntermediate {
 	private static Thread elevatorThreadArray[];
 
 	private byte[] requestElevator = new byte[3];
+	private boolean intialized=false;
 
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	/*
@@ -163,25 +165,33 @@ public class ElevatorIntermediate {
 		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
 		 * instruction) (
 		 */
-
-		switch (data[1]) {
-		case 0:
-			elevatorArray[0].motorDirection = data[6];
-			elevatorArray[0].dealWith = true;
-			break;
-		case 1:
-			elevatorArray[1].motorDirection = data[6];
-			elevatorArray[1].dealWith = true;
-			break;
-		case 2:
-			elevatorArray[2].motorDirection = data[6];
-			elevatorArray[2].dealWith = true;
-			break;
-		case 3:
-			elevatorArray[3].motorDirection = data[6];
-			elevatorArray[3].dealWith = true;
-			break;
+		if (data[6]==INITIALIZE) {
+			intialized=true;
 		}
+//		System.out.println("elevatorArray.length: "+elevatorArray.length);
+//		System.out.println("elevatorArray[0]: "+elevatorArray[0]);//elevatorArray.length);
+//		System.out.println("elevatorArray[1]: "+elevatorArray[1]);//elevatorArray.length);
+		if (elevatorArray!=null) {
+			switch (data[1]) {
+			case 0:
+				elevatorArray[0].motorDirection = data[6];
+				elevatorArray[0].dealWith = true;
+				break;
+			case 1:
+				elevatorArray[1].motorDirection = data[6];
+				elevatorArray[1].dealWith = true;
+				break;
+			case 2:
+				elevatorArray[2].motorDirection = data[6];
+				elevatorArray[2].dealWith = true;
+				break;
+			case 3:
+				elevatorArray[3].motorDirection = data[6];
+				elevatorArray[3].dealWith = true;
+				break;
+			}
+		}
+		
 		// elevatorArray[0].openCloseDoor(data[2]);
 
 		// send packet for scheduler to know the port this elevator is allocated
@@ -203,7 +213,7 @@ public class ElevatorIntermediate {
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
-														// argument[0]
+		// argument[0]
 
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
@@ -212,9 +222,7 @@ public class ElevatorIntermediate {
 		// also be difficult, just using the ones which are available
 		int elevatorPortNumbers[] = new int[createNumElevators];
 
-		// arrays to keep track of the number of elevators, eliminates naming confusion
-		elevatorArray = new Elevator[createNumElevators];
-		elevatorThreadArray = new Thread[createNumElevators];
+		
 
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
@@ -225,25 +233,34 @@ public class ElevatorIntermediate {
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
-		elevatorTable.add());
+		elevatorTable.add(ELEVATOR_INITIALIZE_PACKET_DATA);
+		//INITIALIZE THE SCHEDULER
 		elevatorHandler.sendPacket();
+		//wait for the scheduler to have access to Elevators and Floors
+		elevatorHandler.receivePacket();
+		
+//NEEDS TO BE AFTER INITIALIZATION
+// arrays to keep track of the number of elevators, eliminates naming confusion
+		elevatorArray = new Elevator[createNumElevators];
+		elevatorThreadArray = new Thread[createNumElevators];
+		
 		for (int i = 0; i < createNumElevators; i++) {
 			elevatorArray[i] = new Elevator(i, 0, elevatorTable, Integer.parseInt(args[i + 1])); // i names the
-																									// elevator, 0
-																									// initializes the
-																									// floor it
+			// elevator, 0
+			// initializes the
+			// floor it
 			// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
 
 		while (true) {
-//			if (!elevatorTable.isEmpty()||firstRunTime) {
+			//			if (!elevatorTable.isEmpty()||firstRunTime) {
 			elevatorHandler.sendPacket();
-//				if (firstRunTime) {
-//					firstRunTime=false;
-//				}
-//			}
+			//				if (firstRunTime) {
+			//					firstRunTime=false;
+			//				}
+			//			}
 			// receive blocks
 			elevatorHandler.receivePacket();
 
