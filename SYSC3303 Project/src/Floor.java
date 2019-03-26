@@ -83,6 +83,7 @@ public class Floor extends Thread {
 		}
 	}*/
 
+
 	/*
 	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are
 	 * discarded(due to the formatting given in project requirements) Takes the

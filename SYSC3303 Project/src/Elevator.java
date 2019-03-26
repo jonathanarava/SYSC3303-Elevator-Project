@@ -63,7 +63,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(1000);
+				Thread.sleep(4000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -121,7 +121,7 @@ public class Elevator extends Thread {
 			try {
 				int i = 4;
 				while (i != 0) {
-					System.out.format("Seconds until Elevator door closes: %d second \n", i);
+					System.out.format("Seconds until Elevator %d door closes: %d second \n", nameOfElevator,i);
 					i--;
 					Thread.sleep(1000);
 				}
@@ -193,6 +193,7 @@ public class Elevator extends Thread {
 								e.printStackTrace();
 							}				
 						} else if (instruction == 0) {
+							System.out.printf("------------------------------ OPENING DOOR FOR ELEVATOR %d -----------------", nameOfElevator);
 							openCloseDoor((byte)DOOR_OPEN);
 							try {
 								sendPacket(responsePacketRequest(UPDATE,0));
@@ -200,10 +201,12 @@ public class Elevator extends Thread {
 								e.printStackTrace();
 							}
 						} else if (instruction == 4) {
-							//System.out.println(instruction + "  ---> " + nameOfElevator);
+							System.out.println(instruction + "  ---> ELEVATOR " + nameOfElevator);
 							//openCloseDoor((byte)DOOR_OPEN);
 							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
 							//this.interrupt();
+						} else if(instruction == 5) {
+							
 						}
 					}
 					this.runningStatus = false;
@@ -235,47 +238,8 @@ public class Elevator extends Thread {
 		
 		sendPacket(ElevatorTable1.get(0));
 		sendPacket(ElevatorTable1.get(1));
-		
-/*		Thread tableUpdate = new Thread(new Runnable() {				// thread to run the agent method to produce the ingredients 
-			public void run() {
-				try {
-					synchronized(ElevatorTable1) {
-						while(ElevatorTable1.isEmpty()) {
-							ElevatorTable1.wait(1);
-						}
-
-						byte[]data = new byte[7];
-						data = ElevatorTable1.get(0);
-
-						if (data[1] == 0) {
-							Elevator1.runningStatus = false;
-						} else if(data[1]==1 && Elevator1.getState() == Thread.State.TIMED_WAITING) {
-							Elevator1.runningStatus = true;
-							System.out.println("runningStatus of E1 made true");
-						} else {
-							System.out.println("here1");
-						}
-
-						if(data[1]==1) {
-							Elevator0.runningStatus = false;
-						} else if(data[1]==0 && Elevator0.getState() == Thread.State.TIMED_WAITING) {
-							Elevator0.runningStatus = true;
-							System.out.println("runningStatus of E0 made true");
-						} else {
-							System.out.println("here2 " + Elevator0.getState());
-						}
-						
-						ElevatorTable1.notifyAll();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		});*/
-		
 		ElevatorTable1.clear();
-		//tableUpdate.start();
-		
+
 		Elevator0.start();
 		Elevator1.start();
 		
@@ -294,9 +258,10 @@ public class Elevator extends Thread {
 				}
 				if(x[1] == 1 && Elevator1.runningStatus == false) {
 					Elevator1.ElevatorTable.remove(0);
+					Elevator1.runningStatus = true;
 					Elevator1.toDoID = x[1];
 					Elevator1.instruction = x[6];
-					Elevator1.runningStatus = true;
+
 				} 
 			}
 		} catch (InterruptedException e) {

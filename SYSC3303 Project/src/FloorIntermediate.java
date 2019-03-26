@@ -34,6 +34,8 @@ public class FloorIntermediate {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int SENDPORTNUM = 488;
+	private Object nameOfElevator;
+	private byte ID;
 
 	public FloorIntermediate() {
 		try {
@@ -79,9 +81,32 @@ public class FloorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		ID = data[1];
+		nameOfElevator = data[2];
+		openCloseDoor(data[6]);
 	}
 
-
+	public String openCloseDoor(byte door) {
+		String msg;
+		if (door == DOOR_OPEN) {
+			msg = "Doors are open.";
+			System.out.println(msg);
+			try {
+				int i = 4;
+				while (i != 0) {
+					System.out.format("Seconds until Floor %d door closes: %d second \n", ID,i);
+					i--;
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			msg = "Doors are closed.";
+			System.out.println(msg);
+		}
+		return msg;
+	}
 	public static void main(String args[]) throws IOException {
 		
 		// for iteration 1 there will only be 1 elevator
@@ -90,8 +115,9 @@ public class FloorIntermediate {
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		Floor floor = new Floor(createNumFloors);
 		
-		floor.fileReader("M://hello.txt");
-		
+		//floor.fileReader("M://hello.txt");
+		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0};
+		floorHandler.sendPacket(responseByteArray);
 		while (true) {
 			if(floor.fileRequests.isEmpty()) {
 				hasRequest = false;
@@ -109,14 +135,7 @@ public class FloorIntermediate {
 			
 			if(hasRequest == true) {
 				floorHandler.sendPacket(floor.responsePacket(name, up_or_down));
-			} else {
-				floorHandler.sendPacket(floor.responsePacket(0, 0));
-				try {
-					Thread.sleep(4000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			} 
 			floorHandler.receivePacket();
 		}
 	}
