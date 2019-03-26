@@ -82,7 +82,7 @@ public class FloorIntermediate {
 //	private static int name;
 //	private static boolean hasRequest;
 //	private static int up_or_down;
-	
+	private boolean intialized=false;
 	private static int numFloors;
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
@@ -177,7 +177,6 @@ public class FloorIntermediate {
 //			e.printStackTrace();
 //			System.exit(1);
 //		}
-
 		try {
 			// Block until a datagram packet is received from receiveSocket.
 			System.out.println("waiting to receive");
@@ -195,13 +194,17 @@ public class FloorIntermediate {
 		elevatorLocation=data[3];
 		elevatorDirection=data[4];
 		schedulerInstruction=data[6];
-		if (schedulerInstruction==UPDATE) {
+		if (schedulerInstruction==INITIALIZE) {
+			intialized=true;
+		}
+		else if(schedulerInstruction==UPDATE) {
 			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
 			//send updates to all the floors
 			for (int i = 0; i < numFloors; i++) {
 				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
 			}
 		}
+		
 		else {
 			//something's gone wrong, floors should only ever be receiving updates
 			System.out.println("error in receivePacket(), not an UPDATE for Floor: "+ elevatorLocation);
@@ -225,6 +228,11 @@ public class FloorIntermediate {
 		numFloors = Integer.parseInt(args[0]);
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
+		
+		//FOR INITIATION
+		floorTable.add(FLOOR_INITIALIZE_PACKET_DATA);
+		floorHandler.sendPacket();
+		floorHandler.receivePacket();
 		for (int i = 0; i < numFloors; i++) {
 			floorArray[i] = new Floor(i, floorTable);//0, floorTable, Integer.parseInt(args[i + 1])); // i names the
 			// elevator, 0
