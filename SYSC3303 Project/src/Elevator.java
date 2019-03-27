@@ -141,8 +141,9 @@ public class Elevator extends Thread {
 		data = toSend;
 		
 		try {
+			InetAddress address = InetAddress.getByName("134.117.59.128");
 			System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
-			ElevatorSendPacket = new DatagramPacket(data, 7, InetAddress.getLocalHost(), 369);
+			ElevatorSendPacket = new DatagramPacket(data, 7, address, 369);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);
