@@ -26,8 +26,8 @@ public class Scheduler {
 	public static int PORTNUM = 69;
 	// Variables
 
-	public static byte data[] = new byte[7];
-	public static byte dataFloor[] = new byte[7];
+	public static byte data[] = new byte[8];
+	public static byte dataFloor[] = new byte[8];
 	public static int elevatorOrFloor;
 	public static int elevatorOrFloorID;
 	public static int requestOrUpdate;
@@ -97,7 +97,9 @@ public class Scheduler {
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 	private static final int INITIALIZE=8;//for first communication with the scheduler
-
+	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final int UNUSED=0;// value for unused parts of data 
 
 
 	private static boolean elevatorInitialized=false;
@@ -250,6 +252,7 @@ public class Scheduler {
 		// 1=request, 2=status update
 		int elevatorLocation = packetData[3];// where the elevator is currently located (sensor information sent
 		// from elevator as status update)
+		int elevatorDirection=packetData[4];
 		int stopRequest;// =packetData[5]; //a request to give to an elevator for stopping at a given
 		// floor (from elevator or floor)
 		// public static int floorRequesting;
@@ -369,7 +372,7 @@ public class Scheduler {
 							// Look at this.
 							System.out.println(
 									"reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
-							createSendingData(packetElementIndex, 0, 0, 5);
+							createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);
 							elevatorFloorSendPacket(ELEVATOR_ID);
 							elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
 						}
@@ -430,7 +433,8 @@ public class Scheduler {
 
 					// }
 					// update floor number and direction displays for elevator and all floors
-					createSendingData(0, 0, 0, 5);// 5: status update
+					//createSendingData(0, 0, elevatorDirection, 5);// 5: status update
+					createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);
 					elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
 					elevatorFloorSendPacket(ELEVATOR_ID);
 				} else {// elevator sent a request
@@ -627,18 +631,19 @@ public class Scheduler {
 		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
 		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
 		sendingOutputStream.write(target); // (exact floor or elevator to receive)
-		sendingOutputStream.write(0); // not needed (request or status update: for sending to scheduler)
+		sendingOutputStream.write(UNUSED); // not needed (request or status update: for sending from scheduler)
 		// somewhat redundant usage since floors would only receive updates and
 		// elevators would only receive requests
 		if (instruction == 5) {// update displays of the floors
 			sendingOutputStream.write(currentFloor); // (current floor of elevator)
 			sendingOutputStream.write(direction); // (direction of elevator)
 		} else {
-			sendingOutputStream.write(0); // not needed (current floor of elevator)
-			sendingOutputStream.write(0); // not needed (direction of elevator)
+			sendingOutputStream.write(UNUSED); // not needed (current floor of elevator)
+			sendingOutputStream.write(UNUSED); // not needed (direction of elevator)
 		}
-		sendingOutputStream.write(0); // not needed (destination request)
+		sendingOutputStream.write(UNUSED); // not needed (destination request)
 		sendingOutputStream.write(instruction); // scheduler instruction
+		sendingOutputStream.write(UNUSED); // error's only received by scheduler and not sent
 		sendData = sendingOutputStream.toByteArray();
 		//return sendData;
 	}
@@ -750,12 +755,12 @@ public class Scheduler {
 
 	public static void elevatorFloorSendPacket(int sendTo) {////SENDING ELEVATOR PACKET HERE 
 
-		byte[] responseByteArray = new byte[7];
-		responseByteArray = sendData;
+		//byte[] responseByteArray = new byte[7];
+		//responseByteArray = sendData;
 
 		if (sendTo==ELEVATOR_ID) {
-			System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-			schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+			System.out.println("Response to Elevator " + data[1] + ": " + Arrays.toString(sendData) + "\n");
+			schedulerElevatorSendPacket = new DatagramPacket(sendData, sendData.length,
 					schedulerElevatorReceivePacket.getAddress(), EL_SENDPORTNUM);
 			try {
 				schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
@@ -764,8 +769,8 @@ public class Scheduler {
 			}
 		}
 		else if(sendTo==FLOOR_ID) {
-			System.out.println("Response to elevator " + data[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-			schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+			System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(sendData) + "\n");
+			schedulerFloorSendPacket = new DatagramPacket(sendData, sendData.length,
 					schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
 			try {
 				schedulerSocketSendReceiveElevator.send(schedulerFloorSendPacket);
