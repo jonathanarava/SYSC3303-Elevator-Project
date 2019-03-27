@@ -432,9 +432,30 @@ public class Scheduler extends Thread {
 					packet.floorReceivePacket();
 					if (requestOrUpdate1 == 1) {
 						packet.packetDealer();
-					} 
+					}
+					while(true) {
+						if (packet.semaphoreRemove0 == true) {
+							byte[] floorResponseByteArray = floorResponsePacket(ele0, 0);
+							packet.floorSendPacket(floorResponseByteArray);
+							packet.semaphoreRemove0 = false;
+							break;
+						}
+						if (packet.getSemaphore1()) {
+							System.out.println("here");
+							byte[] floorResponseByteArray = floorResponsePacket(ele1, 1);
+							packet.floorSendPacket(floorResponseByteArray);
+							packet.semaphoreRemove1 = false;
+							break;
+						}
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
 			}
-		}
 		};
 		
 		Thread floorSend = new Thread() {
@@ -462,7 +483,7 @@ public class Scheduler extends Thread {
 		};
 
 		floor.start();
-		floorSend.start();
+		//floorSend.start();
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
 
