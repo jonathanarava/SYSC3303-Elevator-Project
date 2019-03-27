@@ -60,8 +60,8 @@ public class Scheduler extends Thread {
 	public static LinkedList<Integer> direction = new LinkedList<Integer>();
 	private static int ele0;
 	private static int ele1;
-	private static boolean semaphoreRemove0 = false;
-	private static boolean semaphoreRemove1 = false;
+	private boolean semaphoreRemove0 = false;
+	private boolean semaphoreRemove1 = false;
 	
 
 	public Scheduler() {
@@ -109,13 +109,6 @@ public class Scheduler extends Thread {
 	}
 
 	public static void elevatorSendPacket(byte[] responseByteArray) {
-		/* SENDING ELEVATOR PACKET HERE */
-
-		/*
-		 * byte[] responseByteArray = new byte[7];
-		 * 
-		 * responseByteArray = responseByteArray;
-		 */
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
@@ -153,18 +146,12 @@ public class Scheduler extends Thread {
 	}
 
 	public static void floorSendPacket(byte[] responseByteArray) {
-		/* FLOOR SENDING PACKET HERE */
-
-		/*
-		 * byte[] responseByteArray = new byte[5];
-		 * 
-		 * responseByteArray = responsePacket(currentFloor, destFloor);
-		 */
 		System.out.println("Response to Floor " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerFloorReceivePacket.getAddress(), schedulerFloorReceivePacket.getPort());
-
+		System.out.println("STOPPED HERE");
 		try {
+	
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
 			System.out.println("floor send here");
 		} catch (IOException e1) {
@@ -430,6 +417,10 @@ public class Scheduler extends Thread {
 			return;
 		}
 	}
+	
+	public boolean getSemaphore1() {
+		return semaphoreRemove1; 
+	}
 
 	public static void main(String args[]) throws InterruptedException {
 
@@ -438,7 +429,10 @@ public class Scheduler extends Thread {
 		Thread floor = new Thread() {
 			public void run() {
 				while (true) {
-					floorReceivePacket();
+					packet.floorReceivePacket();
+					if (requestOrUpdate1 == 1) {
+						packet.packetDealer();
+					} 
 			}
 		}
 		};
@@ -446,19 +440,22 @@ public class Scheduler extends Thread {
 		Thread floorSend = new Thread() {
 			public void run() {
 				while(true) {
-					if (requestOrUpdate1 == 1) {
-						packet.packetDealer();
-					} 
-					if (semaphoreRemove0 == true) {
+					if (packet.semaphoreRemove0 == true) {
 						byte[] floorResponseByteArray = floorResponsePacket(ele0, 0);
-						floorSendPacket(floorResponseByteArray);
-						semaphoreRemove0 = false;
+						packet.floorSendPacket(floorResponseByteArray);
+						packet.semaphoreRemove0 = false;
 					}
-					if (semaphoreRemove1 == true) {
+					if (packet.getSemaphore1()) {
 						System.out.println("here");
 						byte[] floorResponseByteArray = floorResponsePacket(ele1, 1);
-						floorSendPacket(floorResponseByteArray);
-						semaphoreRemove1 = false;
+						packet.floorSendPacket(floorResponseByteArray);
+						packet.semaphoreRemove1 = false;
+					}
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
