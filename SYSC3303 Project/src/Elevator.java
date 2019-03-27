@@ -113,7 +113,7 @@ public class Elevator extends Thread {
 
 		// request or update data
 		if (requestUpdateError == REQUEST) {
-			requestElevator.write(REQUEST); // request
+			//requestElevator.write(REQUEST); // request
 			// requestElevator.write((byte) setSensor(sensor)); // current floor
 			// requestElevator.write(0); // up or down (not used, only for Floors)
 			// requestElevator.write(RealTimefloorRequest); // dest floor
@@ -121,22 +121,22 @@ public class Elevator extends Thread {
 			// (not used, only from the scheduler)
 			// added error to data structure, not included here
 		} else if (requestUpdateError == UPDATE) {
-			requestElevator.write(UPDATE); // update
+			//requestElevator.write(UPDATE); // update
 			// requestElevator.write((byte) setSensor(sensor)); // current floor
 			// requestElevator.write(0); // up or down (not used, only for Floors)
 			// requestElevator.write(RealTimefloorRequest); // dest floor
 			// requestElevator.write(0); // instruction
 			// added error to data structure, not included here
 		} else if (requestUpdateError == ERROR) {
-			requestElevator.write(ERROR); // update
+			//requestElevator.write(ERROR); // update
 			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
 			requestElevator.write(RealTimefloorRequest); // dest floor
-			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
 			requestElevator.write(errorType); // error ID
 			return requestElevator.toByteArray();
 		} else {// something's gone wrong with the call to this method
-			requestElevator.write(ERROR);
+			//requestElevator.write(ERROR);
 			System.out.println(elevatorNumber
 					+ " Elevator ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
 			requestElevator.write((byte) setSensor(sensor)); // current floor
@@ -149,7 +149,7 @@ public class Elevator extends Thread {
 		requestElevator.write((byte) setSensor(sensor)); // current floor
 		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
 		requestElevator.write(RealTimefloorRequest); // dest floor
-		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+		requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
 	}
