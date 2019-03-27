@@ -110,7 +110,6 @@ public class FloorIntermediate extends Thread {
 		if(semaphoreOpen) {
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
-					System.out.println("here1");
 					this.openDoor(ID, i);
 					sendPacket(Floor.responsePacket(ID, 0));
 					this.semaphoreOpen = false;
@@ -121,7 +120,6 @@ public class FloorIntermediate extends Thread {
 			//System.out.println("here");
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
-					System.out.println("here");
 					sendPacket(Floor.responsePacket(ID, 0));
 					this.openDoor(ID, i);
 					this.semaphoreOpen1 = false;
@@ -145,15 +143,12 @@ public class FloorIntermediate extends Thread {
 
 		Floor floor = new Floor(createNumFloors);
 		
-		//floor.fileReader("M://hello.txt");
-		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
-		
-
+		floor.fileReader("M://hello.txt");
+		//byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
 
 		FloorIntermediate F1 = new FloorIntermediate(0);
 		FloorIntermediate F2 = new FloorIntermediate(1);
-		F1.sendPacket(responseByteArray);
-
+		//F1.sendPacket(responseByteArray);
 		
 		byte [] received = new byte[7];
 		while (true) {
@@ -174,7 +169,6 @@ public class FloorIntermediate extends Thread {
 			if(hasRequest == true) {
 				F1.sendPacket(Floor.responsePacket(name, up_or_down));
 			} 
-			
 			
 			received = receivePacket();
 			int eleID = received[2];
