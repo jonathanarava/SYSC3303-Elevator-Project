@@ -52,8 +52,8 @@ public class FloorIntermediate {
 		private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 		private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
 		private static final int INITIALIZE=8;//for first communication with the scheduler
-		private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-		private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+		//private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+		//private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 		private static final int UNUSED = 0;// value for unused parts of data
 		private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
@@ -84,6 +84,7 @@ public class FloorIntermediate {
 //	private static int up_or_down;
 	private boolean intialized=false;
 	private static int numFloors;
+	private static byte initializationData[];
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -135,7 +136,7 @@ public class FloorIntermediate {
 			if (floorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(floorTable.get(0)));
-					floorSendPacket = new DatagramPacket(floorTable.get(0), 7, InetAddress.getLocalHost(),
+					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -155,7 +156,7 @@ public class FloorIntermediate {
 	}
 
 	public synchronized void receivePacket() {
-		byte data[] = new byte[7];
+		byte data[] = new byte[8];
 		int elevatorDirection;//which direction the elevator is going or holding (data[__])
 		int elevatorLocation;//where the floor is (data[__])
 		int schedulerInstruction;//the instruction sent from the scheduler (data[6]
@@ -192,7 +193,10 @@ public class FloorIntermediate {
 		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
 		
 		elevatorLocation=data[3];
+		System.out.println("FloorIntermediate's elevatorLocation: "+elevatorLocation);
+		
 		elevatorDirection=data[4];
+		System.out.println("FloorIntermediate's elevatorDirection: "+elevatorDirection);
 		schedulerInstruction=data[6];
 		if (schedulerInstruction==INITIALIZE) {
 			intialized=true;
@@ -200,7 +204,7 @@ public class FloorIntermediate {
 		else if(schedulerInstruction==UPDATE) {
 			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
 			//send updates to all the floors
-			for (int i = 0; i < numFloors; i++) {
+			for (int i = 0; i < numFloors; i++){
 				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
 			}
 		}
@@ -213,6 +217,25 @@ public class FloorIntermediate {
 
 	}
 
+	private static void floorInitialization() {
+		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
+		initializationOutputStream.write(FLOOR_ID); // Identifying as the scheduler
+		initializationOutputStream.write(numFloors); // (exact floor or elevator to receive)
+		initializationOutputStream.write(INITIALIZE); // not needed (request or status update: for sending from scheduler)
+		// somewhat redundant usage since floors would only receive updates and
+		// elevators would only receive requests
+
+		initializationOutputStream.write(UNUSED); // not needed (current floor of elevator)
+		initializationOutputStream.write(UNUSED); // not needed (direction of elevator)
+
+		initializationOutputStream.write(UNUSED); // not needed (destination request)
+		initializationOutputStream.write(UNUSED); // scheduler instruction
+		initializationOutputStream.write(UNUSED); // error's only received by scheduler and not sent
+
+		initializationData=initializationOutputStream.toByteArray();
+		floorTable.add(initializationData);
+
+	}
 
 	public static void main(String args[]) {// throws IOException {
 
@@ -230,7 +253,7 @@ public class FloorIntermediate {
 		floorThreadArray = new Thread[numFloors];
 		
 		//FOR INITIATION
-		floorTable.add(FLOOR_INITIALIZE_PACKET_DATA);
+		floorInitialization();
 		floorHandler.sendPacket();
 		floorHandler.receivePacket();
 		for (int i = 0; i < numFloors; i++) {
