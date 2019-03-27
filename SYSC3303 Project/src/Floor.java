@@ -56,6 +56,9 @@ public class Floor extends Thread {
 		//NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
 		floorsMade = new int[numOfFloors];
+		for(int i=0; i<numOfFloors; i++) {
+			floorsMade[i] = i;
+		}
 	}
 
 	public static byte[] responsePacket(int NAMING, int up_or_down){

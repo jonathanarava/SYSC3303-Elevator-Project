@@ -63,7 +63,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(2000);
+				Thread.sleep(4000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor

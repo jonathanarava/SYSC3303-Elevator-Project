@@ -39,12 +39,13 @@ public class FloorIntermediate extends Thread {
 	private byte instruction;
 	private boolean semaphoreOpen = false;
 	private int elevatorID;
+	private boolean semaphoreOpen1;
 
 	public FloorIntermediate(int ID) {
 		elevatorID = ID;
 	}
 
-	public synchronized static void sendPacket(byte[] requestPacket) {
+	public synchronized void sendPacket(byte[] requestPacket) {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
@@ -90,7 +91,7 @@ public class FloorIntermediate extends Thread {
 			try {
 				int j = 4;
 				while (j != 0) {
-					System.out.format("Seconds until Floor %d door closes: %d second \n", ID,i);
+					System.out.format("Seconds until Floor %d door closes for ELEVATOR %d: %d second \n", ID, i, j);
 					j--;
 					Thread.sleep(1000);
 				}
@@ -105,39 +106,30 @@ public class FloorIntermediate extends Thread {
 	}
 	
 	public void run() {
-
 		System.out.println("waiting");
-		while (true) {
-			if(semaphoreOpen) {
-				if(elevatorID == 1) {
-					for(int i = 0; i < Floor.floorsMade.length; i++) {
-						if(ID == Floor.floorsMade[i]) {
-							System.out.println("here1");
-							this.openDoor(ID, i);
-							sendPacket(Floor.responsePacket(ID, 0));
-							this.semaphoreOpen = false;
-							break;
-						}
-					}
-				} else if (elevatorID == 0) {
-					for(int i = 0; i < Floor.floorsMade.length; i++) {
-						if(ID == Floor.floorsMade[i]) {
-							System.out.println("here0");
-							this.openDoor(ID, i);
-							sendPacket(Floor.responsePacket(ID, 0));
-							this.semaphoreOpen = false;
-							break;
-						}
-					}
+		if(semaphoreOpen) {
+			for(int i = 0; i < Floor.floorsMade.length; i++) {
+				if(ID == Floor.floorsMade[i]) {
+					System.out.println("here1");
+					this.openDoor(ID, i);
+					sendPacket(Floor.responsePacket(ID, 0));
+					this.semaphoreOpen = false;
+					break;
 				}
 			}
-/*			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
+		}else if (semaphoreOpen1) {
+			//System.out.println("here");
+			for(int i = 0; i < Floor.floorsMade.length; i++) {
+				if(ID == Floor.floorsMade[i]) {
+					System.out.println("here");
+					sendPacket(Floor.responsePacket(ID, 0));
+					this.openDoor(ID, i);
+					this.semaphoreOpen1 = false;
+					break;
+				}
+			}
 		}
+
 	}
 
 	public static void main(String args[]) throws IOException {
@@ -155,16 +147,13 @@ public class FloorIntermediate extends Thread {
 		
 		//floor.fileReader("M://hello.txt");
 		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
-		sendPacket(responseByteArray);
-		Thread floors[] = new Thread[2];
-		for (int i = 0; i < 2; i++) {
+		
 
-		}
+
 		FloorIntermediate F1 = new FloorIntermediate(0);
 		FloorIntermediate F2 = new FloorIntermediate(1);
-		
-		F1.start();
-		F2.start();
+		F1.sendPacket(responseByteArray);
+
 		
 		byte [] received = new byte[7];
 		while (true) {
@@ -183,8 +172,10 @@ public class FloorIntermediate extends Thread {
 			}
 			
 			if(hasRequest == true) {
-				sendPacket(Floor.responsePacket(name, up_or_down));
+				F1.sendPacket(Floor.responsePacket(name, up_or_down));
 			} 
+			
+			
 			received = receivePacket();
 			int eleID = received[2];
 			if(eleID == 0) {
@@ -192,13 +183,14 @@ public class FloorIntermediate extends Thread {
 				F1.elevatorID = received[2];
 				F1.instruction = received[6];
 				F1.semaphoreOpen  = true;
+				F1.start();
 			} else if (eleID == 1) {
 				F2.ID = received[1];
 				F2.elevatorID = received[2];
 				F2.instruction = received[6];
-				F2.semaphoreOpen  = true;
+				F2.semaphoreOpen1  = true;
+				F2.start();
 			}
-			
 		}
 	}
 }

@@ -416,6 +416,10 @@ public class Scheduler extends Thread {
 		}
 	}
 	
+	public boolean getSemaphore0() {
+		return semaphoreRemove0; 
+	}
+	
 	public boolean getSemaphore1() {
 		return semaphoreRemove1; 
 	}
@@ -432,7 +436,7 @@ public class Scheduler extends Thread {
 						packet.packetDealer();
 					}
 					while(true) {
-						if (packet.semaphoreRemove0 == true) {
+						if (packet.getSemaphore0()) {
 							byte[] floorResponseByteArray = floorResponsePacket(ele0, 0);
 							packet.floorSendPacket(floorResponseByteArray);
 							packet.semaphoreRemove0 = false;
