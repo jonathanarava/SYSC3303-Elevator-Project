@@ -245,6 +245,7 @@ public class Floor extends Thread {
 		}
 		else {
 			System.out.println("Something's gone wrong in updateDisplay() direction argument for Floor: "+name);
+			System.out.println("direction given is: "+goingDirection);
 		}
 	}
 
