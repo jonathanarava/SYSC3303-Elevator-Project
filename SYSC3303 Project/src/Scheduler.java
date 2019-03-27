@@ -36,35 +36,36 @@ public class Scheduler {
 	public static int destFloor;
 	public static int instruction;
 
-	// number of elevators and floors. Can change here!
-	public static int numElevators = 4;
-	public static int numFloors = 15;
+	// SETTING THE NUMBER OF ELEVATORS AND FLOORS PRESENT IN THE SYSTEM
+	public static int numElevators;// = 4;
+	public static int numFloors;// = 15;
 
 	// lists to keep track of what requests need to be handled
 	public static Object obj = new Object();
 	public static int limit = numFloors * numElevators;
 
 	// scheduling alogrithm variable declaration
-	public static int elevatorCurrentFloor[] = new int[numElevators];
-	public static int elevatorStatus[] = new int[numElevators];
-	public static int elevatorNextStop[] = new int[numElevators];
+	public static int elevatorCurrentFloor[];// = new int[numElevators];
+	public static int elevatorStatus[];// = new int[numElevators];
+	public static int elevatorNextStop[];// = new int[numElevators];
 
-	public static int elevatorNumStops[] = new int[numElevators];
-	public static int elevatorHighestRequestFloor[] = new int[numElevators];
-	public static int elevatorLowestRequestFloor[] = new int[numElevators];
+	public static int elevatorNumStops[];// = new int[numElevators];
+	public static int elevatorHighestRequestFloor[];// = new int[numElevators];
+	public static int elevatorLowestRequestFloor[];// = new int[numElevators];
 
 	// temporary sorting algorithm variables
 	public static int floorRequestDirection;
-	public static LinkedList<Integer>[] elevatorRequestsUp = new LinkedList[numElevators];
-	public static LinkedList<Integer>[] elevatorStopsUp = new LinkedList[numElevators];
-	public static LinkedList<Integer>[] elevatorRequestsDown = new LinkedList[numElevators];
-	public static LinkedList<Integer>[] elevatorStopsDown = new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorRequestsUp;// = new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorStopsUp;// = new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorRequestsDown;// = new LinkedList[numElevators];
+	public static LinkedList<Integer>[] elevatorStopsDown;// = new LinkedList[numElevators];
 	public static InetAddress packetAddress;
 	public static int packetPort;
 
 
-	public static byte[] sendData = new byte[7];
-
+	public static byte[] sendData = new byte[8];
+	public static byte[] receiveData;
+	
 	public static long respondStart, respondEnd;// variables for the measurements to respond
 
 	// Declare timing constants
@@ -97,17 +98,25 @@ public class Scheduler {
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
 	private static final int INITIALIZE=8;//for first communication with the scheduler
-	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	//private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	//private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final int UNUSED=0;// value for unused parts of data 
 
-
+	//for use at initialization, both elevatorIntermediate and floorIntermediate need to send their initialization packets
+	//-otherwise the update packets sent will not have a valid socket address to do so with
+	//-when both have been received, both of the below variables will be TRUE, thus then the scheduler will send a response packet
+	//		notifying each that they may continue
 	private static boolean elevatorInitialized=false;
 	private static boolean floorInitialized=false;
 
 
-	public void linkedListInitialization() {
+	private static void linkedListInitialization() {
+		elevatorRequestsUp = new LinkedList[numElevators];
+		elevatorStopsUp= new LinkedList[numElevators];
+		elevatorRequestsDown = new LinkedList[numElevators];
+		elevatorStopsDown = new LinkedList[numElevators];
 		for (int i = 0; i < numElevators; i++) {
+			//System.out.println("linkedListInitialization for loop variable i: "+i);
 			elevatorRequestsUp[i] = new LinkedList<Integer>();
 			elevatorStopsUp[i] = new LinkedList<Integer>();
 			elevatorRequestsDown[i] = new LinkedList<Integer>();
@@ -115,8 +124,9 @@ public class Scheduler {
 		}
 	}
 
-	// Below Constructor for Junit Testing
+	
 	public Scheduler(boolean a) {
+		// Constructor for Junit Testing
 	}
 
 	public Scheduler() {
@@ -132,8 +142,10 @@ public class Scheduler {
 		}
 	}
 
-	public static byte[] elevatorFloorReceivePacket() {
-		// ELEVATOR RECEIVING PACKET HERE 
+	public static void elevatorFloorReceivePacket() {
+		//public static byte[] elevatorFloorReceivePacket() {
+	
+		// ELEVATOR AND FLOOR RECEIVING PACKET HERE 
 		DatagramPacket temporaryReceivePacket=new DatagramPacket(data, data.length);
 		// System.out.println("Server: Waiting for Packet.\n");
 
@@ -141,7 +153,7 @@ public class Scheduler {
 		try {
 			System.out.println("waiting");
 			schedulerSocketSendReceiveElevator.receive(temporaryReceivePacket);
-			System.out.println("Request from elevator: " + Arrays.toString(data));
+			//System.out.println("Request from elevator: " + Arrays.toString(data));
 
 			// schedulerSocketReceiveElevator.close();
 			// schedulerSocketSendReceiveElevator.close()
@@ -156,25 +168,27 @@ public class Scheduler {
 		// Separating byte array received 
 		elevatorOrFloor = data[0];
 		if (elevatorOrFloor==ELEVATOR_ID) {
+			System.out.println("Request from elevator: " + Arrays.toString(data));
 			schedulerElevatorReceivePacket=temporaryReceivePacket;
 		}
 		else if(elevatorOrFloor==FLOOR_ID) {
+			System.out.println("Request from floor: " + Arrays.toString(data));
 			schedulerFloorReceivePacket=temporaryReceivePacket;
 		}
 		else {
 			//Error packet?
 			//actual issue otherwise
 		}
+
+		// Converts the received packet from Datagram Packet to Byte[] 
+		//byte[] packetData = temporaryReceivePacket.getData();
+		receiveData = temporaryReceivePacket.getData();
 		elevatorOrFloorID = data[1];
 		requestOrUpdate = data[2];
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
-
-		// Converts the received packet from Datagram Packet to Byte[] 
-		byte[] packetData = temporaryReceivePacket.getData();
-
-		return packetData;
+		//return packetData;
 	}
 	/*public static byte[] elevatorReceivePacket() {
 		// ELEVATOR RECEIVING PACKET HERE 
@@ -236,9 +250,31 @@ public class Scheduler {
 		upOrDown = data[4];
 		destFloor = data[5];
 	}*/
+	private static void schedulerInitilization() {
+		elevatorCurrentFloor = new int[numElevators];
+		elevatorStatus = new int[numElevators];
+		elevatorNextStop = new int[numElevators];
 
+		elevatorNumStops = new int[numElevators];
+		elevatorHighestRequestFloor = new int[numElevators];
+		elevatorLowestRequestFloor = new int[numElevators];
+		
+		/*for (int i = 0; i < numElevators; i++) {
+			elevatorRequestsUp[i] = new LinkedList<Integer>();
+			elevatorStopsUp[i] = new LinkedList<Integer>();
+			elevatorRequestsDown[i] = new LinkedList<Integer>();
+			elevatorStopsDown[i] = new LinkedList<Integer>();
+		}*/
+
+		createSendingData(0,0,0, INITIALIZE);
+		elevatorFloorSendPacket(ELEVATOR_ID);
+		createSendingData(0,0,0, INITIALIZE);
+		elevatorFloorSendPacket(FLOOR_ID);
+		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n");
+	}
 	//public byte[] SchedulingAlgorithm(byte[] packetData) {
 	private static void SchedulingAlgorithm(byte[] packetData) {//should be private and shouldn't needa return a global variable
+
 		// byte[] packetData = schedulerElevatorReceivePacket.getData();
 		int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 		// 21=elevator, 69=floor
@@ -290,11 +326,11 @@ public class Scheduler {
 		if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
 			if (packetIsStatus==INITIALIZE) {
 				elevatorInitialized=true;
+				numElevators=packetElementIndex;
+				linkedListInitialization();
+				System.out.println("Received Elevator Initialization \n");
 				if (floorInitialized==true) {
-					createSendingData(0,0,0, INITIALIZE);
-					elevatorFloorSendPacket(ELEVATOR_ID);
-					createSendingData(0,0,0, INITIALIZE);
-					elevatorFloorSendPacket(FLOOR_ID);
+					schedulerInitilization();
 				}
 			}
 
@@ -530,17 +566,16 @@ public class Scheduler {
 		} else {// FROM FLOOR
 			if (packetIsStatus==INITIALIZE) {//for initializing contact with elevatorIntermediate or floorIntermediate
 				floorInitialized=true;
+				System.out.println("Floor initialization received\n");
+				numFloors=packetElementIndex;
 				if (elevatorInitialized==true) {
-					createSendingData(0,0,0, INITIALIZE);
-					elevatorFloorSendPacket(ELEVATOR_ID);
-					createSendingData(0,0,0, INITIALIZE);
-					elevatorFloorSendPacket(FLOOR_ID);
+					schedulerInitilization();
 				}
 			}
 			else {
-				responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);
-				temp = responseTime[0];
-				for (int i = 1; i < responseTime.length; i++) {
+				responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);//response times of the elevators to reach the floor in the requested direction
+				temp = responseTime[0];//set to the first elevator at first
+				for (int i = 1; i < responseTime.length; i++) {//find the quickest (smallest) response time
 					if (responseTime[i] < temp) {
 						temp = responseTime[i];
 						indexOfFastestElevator = i;
@@ -615,7 +650,7 @@ public class Scheduler {
 						// elevator's current location
 						elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Up direction
-						createSendingData(packetElementIndex, 0, 0, 2);// 1: up
+						createSendingData(packetElementIndex, 0, 0, 1);// 1: up
 					}
 					elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
 				}
@@ -820,8 +855,8 @@ public class Scheduler {
 
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		Scheduler Scheduler = new Scheduler();
-		Scheduler.linkedListInitialization();
+		Scheduler schedulerHandler = new Scheduler();
+		//Scheduler.linkedListInitialization();
 
 		/*
 		 * //elevatorStopsUp[0].add(3); //elevatorStopsDown[1].add(2);
@@ -848,11 +883,13 @@ public class Scheduler {
 		for (;;) {
 
 			// Receives the Packet
-			byte[] packetRecieved = elevatorFloorReceivePacket();
+			//byte[] packetRecieved = //SHOULD BE DATARECEIVED
+			elevatorFloorReceivePacket();
 			respondStart = System.nanoTime();// start the timer
 			// Sorts the received Packet and returns the byte array to be sent
-			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
-			SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
+			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
+			//schedulerHandler.SchedulingAlgorithm(packetRecieved);
+			schedulerHandler.SchedulingAlgorithm(receiveData);
 			// Sends the Packet to Elevator
 			// elevatorSendPacket(sendData);
 			respondEnd = System.nanoTime();// end for the timer
