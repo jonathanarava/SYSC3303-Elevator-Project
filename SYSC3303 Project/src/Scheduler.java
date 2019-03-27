@@ -2,7 +2,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -110,8 +112,15 @@ public class Scheduler extends Thread {
 
 	public static void elevatorSendPacket(byte[] responseByteArray) {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
+		try {
+			InetAddress address = InetAddress.getByName("134.117.59.127");
+			schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+					address, schedulerElevatorReceivePacket.getPort());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		try {
 			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
 		} catch (IOException e1) {
@@ -460,31 +469,8 @@ public class Scheduler extends Thread {
 			}
 		};
 		
-		Thread floorSend = new Thread() {
-			public void run() {
-				while(true) {
-					if (packet.semaphoreRemove0 == true) {
-						byte[] floorResponseByteArray = floorResponsePacket(ele0, 0);
-						packet.floorSendPacket(floorResponseByteArray);
-						packet.semaphoreRemove0 = false;
-						break;
-					}
-					if (packet.getSemaphore1()) {
-						System.out.println("here");
-						byte[] floorResponseByteArray = floorResponsePacket(ele1, 1);
-						packet.floorSendPacket(floorResponseByteArray);
-						packet.semaphoreRemove1 = false;
-						break;
-					}
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		};
+		direction.add(0, (int) HOLD);
+		direction.add(1, (int) HOLD);
 
 		floor.start();
 		//floorSend.start();
