@@ -239,7 +239,6 @@ public class Scheduler {
 
 	//public byte[] SchedulingAlgorithm(byte[] packetData) {
 	private static void SchedulingAlgorithm(byte[] packetData) {//should be private and shouldn't needa return a global variable
-
 		// byte[] packetData = schedulerElevatorReceivePacket.getData();
 		int packetSentFrom = packetData[0];// elevator, floor, or other(testing/ error)
 		// 21=elevator, 69=floor
@@ -853,7 +852,7 @@ public class Scheduler {
 			respondStart = System.nanoTime();// start the timer
 			// Sorts the received Packet and returns the byte array to be sent
 			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);
-			Scheduler.SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
+			SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
 			// Sends the Packet to Elevator
 			// elevatorSendPacket(sendData);
 			respondEnd = System.nanoTime();// end for the timer
