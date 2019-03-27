@@ -79,7 +79,7 @@ public class Elevator extends Thread {
 		} else if (motorDirection == HOLD) {
 			setInitialFloor(sensor); // updates current floor - in this case nothing changes
 		}
-		System.out.println("current floor: " + sensor); // prints out the current floor - in this case destination floor
+		System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // prints out the current floor - in this case destination floor
 		return getInitialFloor(); // returns and updates the final current of the floor - in this case destination floor
 	}
 	
@@ -117,7 +117,7 @@ public class Elevator extends Thread {
 		String msg;
 		if (door == DOOR_OPEN) {
 			msg = "Doors are open.";
-			System.out.println(msg);
+			System.out.println("\n" + msg);
 			try {
 				int i = 4;
 				while (i != 0) {
@@ -142,7 +142,7 @@ public class Elevator extends Thread {
 		
 		try {
 			InetAddress address = InetAddress.getByName("134.117.59.128");
-			System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
+			//System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
 			ElevatorSendPacket = new DatagramPacket(data, 7, address, 369);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -164,8 +164,8 @@ public class Elevator extends Thread {
 		try {
 			// Block until a datagram packet is received from receiveSocket.
 			ElevatorSendRecieveReceiveSocket.receive(ElevatorReceivePacket);
-			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
+			//System.out.print("Received from scheduler: ");
+			//System.out.println(Arrays.toString(data));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
@@ -194,6 +194,7 @@ public class Elevator extends Thread {
 								e.printStackTrace();
 							}				
 						} else if (instruction == 0) {
+							System.out.println();
 							System.out.printf("------------------------------ OPENING DOOR FOR ELEVATOR %d -----------------", nameOfElevator);
 							openCloseDoor((byte)DOOR_OPEN);
 							try {
@@ -202,10 +203,8 @@ public class Elevator extends Thread {
 								e.printStackTrace();
 							}
 						} else if (instruction == 4) {
-							System.out.println(instruction + "  ---> ELEVATOR " + nameOfElevator);
-							//openCloseDoor((byte)DOOR_OPEN);
+							//System.out.println(instruction + "  ---> ELEVATOR " + nameOfElevator);
 							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
-							//this.interrupt();
 						} else if(instruction == 5) {
 							
 						}
@@ -234,12 +233,14 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
+		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
+		sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
+/*		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
 		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
 		sendPacket(ElevatorTable1.get(0));
 		sendPacket(ElevatorTable1.get(1));
-		ElevatorTable1.clear();
+		ElevatorTable1.clear();*/
 
 		Elevator0.start();
 		Elevator1.start();
@@ -251,6 +252,7 @@ public class Elevator extends Thread {
 				byte[] x = new byte[7];
 				byte[] data = new byte[7];
 				byte[] data1 = new byte[7];
+				long startTime = System.nanoTime();
 				x = Elevator0.receivePacket();
 				ElevatorTable1.add(x);
 				if (x[1] == 0 && Elevator0.runningStatus == false) {
@@ -260,13 +262,16 @@ public class Elevator extends Thread {
 					Elevator0.runningStatus = true;
 				}
 				if(x[1] == 1 && Elevator1.runningStatus == false) {
-					System.out.print("Running ELEVATOR 1 here: ");
-					System.out.println(Arrays.toString(Elevator1.ElevatorTable.get(0)));
 					data1 = Elevator1.ElevatorTable.remove(0);
 					Elevator1.toDoID = data1[1];
 					Elevator1.instruction = data1[6];
 					Elevator1.runningStatus = true;
+				
 				} 
+				long endTime = System.nanoTime();
+				long timeElapsed = endTime - startTime;
+				System.out.println("\n\nExecution time in milliseconds : " + 
+						timeElapsed / 1000000);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
