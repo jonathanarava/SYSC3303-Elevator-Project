@@ -210,7 +210,7 @@ public class Scheduler extends Thread {
 
 	/* Splitting the packet to determine if its for a floor or elevator request */
 
-	public void packetDealer() {
+	public synchronized static void packetDealer() {
 		if (elevatorOrFloor == 21) {
 			if (elevatorOrFloorID == 0) {
 				if (requestOrUpdate == 1) {
@@ -234,38 +234,42 @@ public class Scheduler extends Thread {
 					}
 				}
 			}
-		} else if (elevatorOrFloor == 69) {
-			floorPacketHandler();
 		}
 	}
 
-	private synchronized void floorPacketHandler() {
-		if (requestOrUpdate1 == 1) {
-			if(upOrDown1 == UP) {
-				if(upQueue1.contains(elevatorOrFloorID1) || upQueue2.contains(elevatorOrFloorID1)) {
-					return;
-				} else if (ele0 < elevatorOrFloorID1) {
-					addToUpQueue(upQueue1, 0);
-				} else if (ele1 < elevatorOrFloorID1) {
-					addToUpQueue(upQueue2, 1);
-				} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !upWaitQueue.contains(elevatorOrFloorID1)) {
-					upWaitQueue.add(elevatorOrFloorID1);
-				}
-			} else if (upOrDown == DOWN) {
-				if(downQueue1.contains(elevatorOrFloorID1) || downQueue2.contains(elevatorOrFloorID1)) {
-					return;
-				} else if (ele0 > elevatorOrFloorID1) {
-					addToDownQueue(downQueue1, 0);
-				} else if (ele1 < elevatorOrFloorID1) {
-					addToDownQueue(downQueue2, 1);
-				} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !downWaitQueue.contains(elevatorOrFloorID1)) {
-					downWaitQueue.add(elevatorOrFloorID1);
+	private synchronized static void floorPacketHandler() {
+		if (elevatorOrFloor == 69) {
+			
+			if (requestOrUpdate1 == 1) {
+				if(upOrDown1 == UP) {
+					if(upQueue1.contains(elevatorOrFloorID1) || upQueue2.contains(elevatorOrFloorID1)) {
+						return;
+					} else if (ele0 < elevatorOrFloorID1) {
+						addToUpQueue(upQueue1, 0);
+						System.out.println("here");
+					} else if (ele1 < elevatorOrFloorID1) {
+						addToUpQueue(upQueue2, 1);
+						System.out.println("here1");
+					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !upWaitQueue.contains(elevatorOrFloorID1)) {
+						upWaitQueue.add(elevatorOrFloorID1);
+						System.out.println("here2");
+					}
+				} else if (upOrDown == DOWN) {
+					if(downQueue1.contains(elevatorOrFloorID1) || downQueue2.contains(elevatorOrFloorID1)) {
+						return;
+					} else if (ele0 > elevatorOrFloorID1) {
+						addToDownQueue(downQueue1, 0);
+					} else if (ele1 < elevatorOrFloorID1) {
+						addToDownQueue(downQueue2, 1);
+					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !downWaitQueue.contains(elevatorOrFloorID1)) {
+						downWaitQueue.add(elevatorOrFloorID1);
+					}
 				}
 			}
 		}
 	}
 
-	public synchronized void addToUpQueue(LinkedList<Integer> upQueue, int ID) {
+	public synchronized static void addToUpQueue(LinkedList<Integer> upQueue, int ID) {
 		for (int i = 0; i <= upQueue.size(); i++) {
 			if (ID == 0) {
 				if (upQueue1.isEmpty()) {
@@ -299,7 +303,7 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	public synchronized void addToDownQueue(LinkedList<Integer> downQueue, int ID) {
+	public synchronized static void addToDownQueue(LinkedList<Integer> downQueue, int ID) {
 		for (int i = 0; i <= downQueue.size(); i++) {
 			if (ID == 0) {
 				if (downQueue1.isEmpty()) {
@@ -442,7 +446,7 @@ public class Scheduler extends Thread {
 				while (true) {
 					packet.floorReceivePacket();
 					if (requestOrUpdate1 == 1) {
-						packet.packetDealer();
+						floorPacketHandler();
 					}
 					while(true) {
 						if (packet.getSemaphore0()) {
