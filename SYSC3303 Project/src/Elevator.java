@@ -63,7 +63,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(4000);
+				Thread.sleep(2000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -172,7 +172,7 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		ElevatorTable.add(data);
+		//ElevatorTable.add(data);
 		return data;
 /*		System.out.print("///////////////////Received from scheduler: ");
 		System.out.println(Arrays.toString(ElevatorTable.get(0)));*/
@@ -248,20 +248,23 @@ public class Elevator extends Thread {
 		try {
 			while(true) {
 				byte[] x = new byte[7];
+				byte[] data = new byte[7];
+				byte[] data1 = new byte[7];
 				x = Elevator0.receivePacket();
 				ElevatorTable1.add(x);
 				if (x[1] == 0 && Elevator0.runningStatus == false) {
-					Elevator0.ElevatorTable.remove(0);
-					Elevator0.toDoID = x[1];
-					Elevator0.instruction = x[6];
+					data = Elevator0.ElevatorTable.remove(0);
+					Elevator0.toDoID = data[1];
+					Elevator0.instruction = data[6];
 					Elevator0.runningStatus = true;
 				}
 				if(x[1] == 1 && Elevator1.runningStatus == false) {
-					Elevator1.ElevatorTable.remove(0);
+					System.out.print("Running ELEVATOR 1 here: ");
+					System.out.println(Arrays.toString(Elevator1.ElevatorTable.get(0)));
+					data1 = Elevator1.ElevatorTable.remove(0);
+					Elevator1.toDoID = data1[1];
+					Elevator1.instruction = data1[6];
 					Elevator1.runningStatus = true;
-					Elevator1.toDoID = x[1];
-					Elevator1.instruction = x[6];
-
 				} 
 			}
 		} catch (InterruptedException e) {

@@ -6,7 +6,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
-public class FloorIntermediate {
+public class FloorIntermediate extends Thread {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	private static final byte HOLD = 0x00;// elevator is in hold state
@@ -34,19 +34,17 @@ public class FloorIntermediate {
 	 * variable to the elevator or floor we have chosen
 	 */
 	public static final int SENDPORTNUM = 488;
-	private Object nameOfElevator;
-	private byte ID;
+	private static int nameOfElevator;
+	public byte ID;
+	private byte instruction;
+	private boolean semaphoreOpen = false;
+	private int elevatorID;
 
-	public FloorIntermediate() {
-		try {
-			floorSendReceiveSocket = new DatagramSocket();
-		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
-			se.printStackTrace();
-			System.exit(1);
-		}
+	public FloorIntermediate(int ID) {
+		elevatorID = ID;
 	}
 
-	public void sendPacket(byte[] requestPacket) {
+	public synchronized static void sendPacket(byte[] requestPacket) {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
@@ -66,7 +64,7 @@ public class FloorIntermediate {
 		}
 	}
 	
-	public void receivePacket() {
+	public synchronized static byte[] receivePacket() {
 		byte data[] = new byte[7];
 		floorReceivePacket = new DatagramPacket(data, data.length);
 		try {
@@ -81,23 +79,22 @@ public class FloorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		ID = data[1];
-		nameOfElevator = data[2];
-		openCloseDoor(data[6]);
+		return data;
 	}
-
-	public String openCloseDoor(byte door) {
+	
+	public void openDoor(int ID, int i) {
 		String msg;
-		if (door == DOOR_OPEN) {
+		if (instruction == DOOR_OPEN) {
 			msg = "Doors are open.";
-			System.out.println(msg);
+			System.out.println(currentThread() + msg + " for Elevator " + nameOfElevator);
 			try {
-				int i = 4;
-				while (i != 0) {
+				int j = 4;
+				while (j != 0) {
 					System.out.format("Seconds until Floor %d door closes: %d second \n", ID,i);
-					i--;
+					j--;
 					Thread.sleep(1000);
 				}
+			sendPacket(Floor.responsePacket(ID, HOLD));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -105,19 +102,71 @@ public class FloorIntermediate {
 			msg = "Doors are closed.";
 			System.out.println(msg);
 		}
-		return msg;
 	}
+	
+	public void run() {
+
+		System.out.println("waiting");
+		while (true) {
+			if(semaphoreOpen) {
+				if(elevatorID == 1) {
+					for(int i = 0; i < Floor.floorsMade.length; i++) {
+						if(ID == Floor.floorsMade[i]) {
+							System.out.println("here1");
+							this.openDoor(ID, i);
+							sendPacket(Floor.responsePacket(ID, 0));
+							this.semaphoreOpen = false;
+							break;
+						}
+					}
+				} else if (elevatorID == 0) {
+					for(int i = 0; i < Floor.floorsMade.length; i++) {
+						if(ID == Floor.floorsMade[i]) {
+							System.out.println("here0");
+							this.openDoor(ID, i);
+							sendPacket(Floor.responsePacket(ID, 0));
+							this.semaphoreOpen = false;
+							break;
+						}
+					}
+				}
+			}
+/*			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+		}
+	}
+
 	public static void main(String args[]) throws IOException {
-		
+		try {
+			floorSendReceiveSocket = new DatagramSocket();
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
 		int createNumFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
-		FloorIntermediate floorHandler = new FloorIntermediate();
+
 		Floor floor = new Floor(createNumFloors);
 		
 		//floor.fileReader("M://hello.txt");
-		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0};
-		floorHandler.sendPacket(responseByteArray);
+		byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
+		sendPacket(responseByteArray);
+		Thread floors[] = new Thread[2];
+		for (int i = 0; i < 2; i++) {
+
+		}
+		FloorIntermediate F1 = new FloorIntermediate(0);
+		FloorIntermediate F2 = new FloorIntermediate(1);
+		
+		F1.start();
+		F2.start();
+		
+		byte [] received = new byte[7];
 		while (true) {
 			if(floor.fileRequests.isEmpty()) {
 				hasRequest = false;
@@ -134,9 +183,22 @@ public class FloorIntermediate {
 			}
 			
 			if(hasRequest == true) {
-				floorHandler.sendPacket(floor.responsePacket(name, up_or_down));
+				sendPacket(Floor.responsePacket(name, up_or_down));
 			} 
-			floorHandler.receivePacket();
+			received = receivePacket();
+			int eleID = received[2];
+			if(eleID == 0) {
+				F1.ID = received[1];
+				F1.elevatorID = received[2];
+				F1.instruction = received[6];
+				F1.semaphoreOpen  = true;
+			} else if (eleID == 1) {
+				F2.ID = received[1];
+				F2.elevatorID = received[2];
+				F2.instruction = received[6];
+				F2.semaphoreOpen  = true;
+			}
+			
 		}
 	}
 }

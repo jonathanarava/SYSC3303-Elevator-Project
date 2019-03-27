@@ -149,11 +149,9 @@ public class Scheduler extends Thread {
 		System.out.println("Response to Floor " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		schedulerFloorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 				schedulerFloorReceivePacket.getAddress(), schedulerFloorReceivePacket.getPort());
-		System.out.println("STOPPED HERE");
 		try {
 	
 			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
-			System.out.println("floor send here");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -380,7 +378,7 @@ public class Scheduler extends Thread {
 			return;
 		}
 
-		if(upQueue1.isEmpty() && downQueue1.isEmpty()) {
+		if(upQueue1.isEmpty() && downQueue1.isEmpty() && elevatorOrFloorID == 0) {
 			byte[] responseByteArray = responsePacket(0, currentFloor, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
@@ -411,7 +409,7 @@ public class Scheduler extends Thread {
 			return;
 		}
 
-		if(upQueue2.isEmpty() && downQueue2.isEmpty()) {
+		if(upQueue2.isEmpty() && downQueue2.isEmpty() && elevatorOrFloorID == 1) {
 			byte[] responseByteArray = responsePacket(1, currentFloor, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
@@ -465,12 +463,14 @@ public class Scheduler extends Thread {
 						byte[] floorResponseByteArray = floorResponsePacket(ele0, 0);
 						packet.floorSendPacket(floorResponseByteArray);
 						packet.semaphoreRemove0 = false;
+						break;
 					}
 					if (packet.getSemaphore1()) {
 						System.out.println("here");
 						byte[] floorResponseByteArray = floorResponsePacket(ele1, 1);
 						packet.floorSendPacket(floorResponseByteArray);
 						packet.semaphoreRemove1 = false;
+						break;
 					}
 					try {
 						Thread.sleep(1);
@@ -492,6 +492,7 @@ public class Scheduler extends Thread {
 				Direction(elevatorOrFloorID, destFloor, currentFloor);
 			} else if(requestOrUpdate == 2) {
 				currentFloorTracker();
+				System.out.println("ELEVATOR 1 ---->  " + ele1);
 			}
 
 			packet.schedulingAlgo();

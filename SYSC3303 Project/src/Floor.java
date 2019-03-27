@@ -46,8 +46,8 @@ public class Floor extends Thread {
 	DatagramSocket floorSendReceiveSocket;
 
 	String elevatorRequest = "";
-	int numOfFloors;
-	int[] floorsMade;
+	public int numOfFloors;
+	public static int[] floorsMade;
 	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
 	 * scheduler
@@ -58,7 +58,7 @@ public class Floor extends Thread {
 		floorsMade = new int[numOfFloors];
 	}
 
-	public byte[] responsePacket(int NAMING, int up_or_down){
+	public static byte[] responsePacket(int NAMING, int up_or_down){
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
@@ -110,5 +110,7 @@ public class Floor extends Thread {
 			}
 		}catch(Exception e) { e.printStackTrace(); }
 	}
+	
+
 }
 
