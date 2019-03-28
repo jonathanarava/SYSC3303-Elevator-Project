@@ -250,6 +250,16 @@ public class Floor extends Thread {
 		}
 	}
 
+	public synchronized void waitForRequest() {
+		while (!hasRequest) {
+			try {
+				System.out.println("waiting indefinitely");
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	/*public void LEDOnOrOff(byte up_or_down, ) {
 		while (schedulerInstruction != true) {
@@ -295,41 +305,7 @@ public class Floor extends Thread {
 				// hasRequest = !hasRequest;
 				hasRequest = false;
 			}
-
-			while (!hasRequest) {// send updates
-				try {
-					Thread.sleep(1);// delay for 1 second
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-				/*while (dealWith) {
-					if (motorDirection == UP || motorDirection == DOWN) {
-						movingDirection = motorDirection;
-						runElevator();
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
-					} else if (motorDirection == UPDATE_DISPLAY) {
-						if (movingDirection == UP || movingDirection == DOWN) {
-							runElevator();
-						}
-						updateDisplay();
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
-						// set the lights sensors and stuff to proper value
-						isUpdate = false;
-					} else if (motorDirection == STOP) {
-						movingDirection = STOP;
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
-					} else if (motorDirection == HOLD) {
-						// Figure out why the Elevator is not reaching the hold state.
-						movingDirection = HOLD;
-						System.out.println("Reached Hold state in elevator");
-						dealWith = !dealWith;
-						waitForRequest();
-					}
-				}*/
-			}
+			waitForRequest();
 		}
 	}
 }
