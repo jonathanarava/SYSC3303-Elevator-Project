@@ -146,10 +146,11 @@ public class Elevator extends Thread {
 			requestElevator.write(OTHER_ERROR); // something's gone wrong
 			return requestElevator.toByteArray();
 		}
+		requestElevator.write(requestUpdateError);
 		requestElevator.write((byte) setSensor(sensor)); // current floor
 		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
 		requestElevator.write(RealTimefloorRequest); // dest floor
-		requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
+		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
 	}
