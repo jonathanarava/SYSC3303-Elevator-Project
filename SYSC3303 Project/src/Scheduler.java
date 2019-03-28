@@ -215,7 +215,7 @@ public class Scheduler extends Thread {
 			if (elevatorOrFloorID == 0) {
 				if (requestOrUpdate == 1) {
 					if (destFloor - currentFloor > 0 && destFloor <= numFloors && destFloor >= 0) {
-						addToUpQueue(upQueue1,0);
+						addToUpQueue(upQueue1,0, destFloor);
 					} else if (destFloor - currentFloor < 0 && destFloor <= numFloors && destFloor >= 0) {
 						addToDownQueue(downQueue1,0);
 					} else if (destFloor < 0){
@@ -225,7 +225,7 @@ public class Scheduler extends Thread {
 			} else if (elevatorOrFloorID == 1) {
 				if (requestOrUpdate == 1) {
 					if (destFloor - currentFloor > 0 && destFloor <= numFloors && destFloor >= 0) {
-						addToUpQueue(upQueue2,1);
+						addToUpQueue(upQueue2,1, destFloor);
 					} else if (destFloor - currentFloor < 0 && destFloor <= numFloors && destFloor >= 0) {
 						addToDownQueue(downQueue2,1);
 					}
@@ -245,14 +245,14 @@ public class Scheduler extends Thread {
 					if(upQueue1.contains(elevatorOrFloorID1) || upQueue2.contains(elevatorOrFloorID1)) {
 						return;
 					} else if (ele0 < elevatorOrFloorID1) {
-						addToUpQueue(upQueue1, 0);
-						System.out.println("here");
+						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
+						//System.out.println("here");
 					} else if (ele1 < elevatorOrFloorID1) {
-						addToUpQueue(upQueue2, 1);
-						System.out.println("here1");
+						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
+						//System.out.println("here1");
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !upWaitQueue.contains(elevatorOrFloorID1)) {
 						upWaitQueue.add(elevatorOrFloorID1);
-						System.out.println("here2");
+						//System.out.println("here2");
 					}
 				} else if (upOrDown == DOWN) {
 					if(downQueue1.contains(elevatorOrFloorID1) || downQueue2.contains(elevatorOrFloorID1)) {
@@ -269,7 +269,7 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	public synchronized static void addToUpQueue(LinkedList<Integer> upQueue, int ID) {
+	public synchronized static void addToUpQueue(LinkedList<Integer> upQueue, int ID, int destFloor) {
 		for (int i = 0; i <= upQueue.size(); i++) {
 			if (ID == 0) {
 				if (upQueue1.isEmpty()) {
@@ -367,10 +367,11 @@ public class Scheduler extends Thread {
 		return direction;
 	}
 
-	public void schedulingAlgo() {
+	public synchronized void schedulingAlgo() {
 		/* ELevator 1 logic */
-		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0 && direction.get(0) == UP) {
+		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
 			int first = upQueue1.getFirst();
+			System.out.println("\nfirst request ---> " + first);
 			byte[] responseByteArray = responsePacket(0, currentFloor, first);
 			if (currentFloor == first) {
 				upQueue1.removeFirst();
@@ -380,7 +381,7 @@ public class Scheduler extends Thread {
 			return;
 		}
 
-		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0 && direction.get(0)  == DOWN) {
+		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == DOWN || direction.get(0) == HOLD)) {
 			int first = downQueue1.getFirst();
 			byte[] responseByteArray = responsePacket(0, currentFloor, first);
 			if (currentFloor == first) {
@@ -400,7 +401,7 @@ public class Scheduler extends Thread {
 
 		/* ELevator 2 logic */
 
-		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && direction.get(1)  == UP) {
+		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
 			int first = upQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -411,7 +412,7 @@ public class Scheduler extends Thread {
 			return;
 		}
 
-		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && direction.get(1) == DOWN) {
+		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(0) == DOWN || direction.get(0) == HOLD)) {
 			int first = downQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -456,7 +457,6 @@ public class Scheduler extends Thread {
 							break;
 						}
 						if (packet.getSemaphore1()) {
-							System.out.println("here");
 							byte[] floorResponseByteArray = floorResponsePacket(ele1, 1);
 							packet.floorSendPacket(floorResponseByteArray);
 							packet.semaphoreRemove1 = false;
