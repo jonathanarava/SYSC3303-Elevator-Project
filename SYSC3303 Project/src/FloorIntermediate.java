@@ -163,11 +163,10 @@ public class FloorIntermediate extends Thread {
 				} else if(segment[2].equals("Down")) {
 					up_or_down = DOWN;
 				}
-				int destination = Integer.parseInt(segment[3]);
 			}
 			
 			if(hasRequest == true) {
-				F1.sendPacket(Floor.responsePacket(name, up_or_down, destination));
+				F1.sendPacket(Floor.responsePacket(name, up_or_down));
 			} 
 			
 			received = receivePacket();
