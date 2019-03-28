@@ -15,7 +15,7 @@ import java.util.List;
 import java.lang.*;
 import java.util.concurrent.TimeUnit;//for measuring time to respond
 
-public class Scheduler {
+public class Scheduler{
 
 	// Packets and sockets required to connect with the Elevator and Floor class
 
@@ -880,8 +880,9 @@ public class Scheduler {
 		 * Scheduler.SchedulingAlgorithm(schedulerElevatorReceivePacket);//call method
 		 * with simulated packet for elevator #2
 		 */
+		/*numElevators = 4;
+		GUI gui = new GUI();*/
 		for (;;) {
-
 			// Receives the Packet
 			//byte[] packetRecieved = //SHOULD BE DATARECEIVED
 			elevatorFloorReceivePacket();

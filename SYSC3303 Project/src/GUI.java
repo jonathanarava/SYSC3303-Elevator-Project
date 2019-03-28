@@ -9,18 +9,18 @@ import javax.swing.JTextArea;
 
 import javafx.scene.text.Font;
 
-public class GUI {
+public class GUI extends Scheduler {
 
 	// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
-	int numOfElevators = 4;
+	//int numElevators = 4;
 		
-	GUI(){
+public GUI(){
 		//	INITIALIZATIONS
 		//Frame initialization
 		JFrame frame = new JFrame("Elevator GUI");
 		//Button(s) & TesxtArea initialization
-		JButton button[] = new JButton[numOfElevators] ;
-		JTextArea textArea[] = new JTextArea[numOfElevators];
+		JButton button[] = new JButton[numElevators] ;
+		JTextArea textArea[] = new JTextArea[numElevators];
 		
 		//Layout Initialization
 		FlowLayout experimentLayout = new FlowLayout();
@@ -28,12 +28,12 @@ public class GUI {
 		
 		// Dynamically creates the number of buttons/ textAreas depending on numOfElevators 
 		// initialized in elevator intermediate class
-		for(int i = 0; i< numOfElevators; i++) {
+		for(int i = 0; i< numElevators; i++) {
 			button[i] = new JButton("Elevator " + i);	
 			frame.add(button[i]);
 		}
-		for(int i = 0; i< numOfElevators; i++) {
-			textArea[i] = new JTextArea("Current FLoor " + i);	
+		for(int i = 0; i< numElevators; i++) {
+			textArea[i] = new JTextArea("Current FLoor " + elevatorCurrentFloor[i]);	
 			frame.add(textArea[i]);
 		}
 		
@@ -65,7 +65,7 @@ public class GUI {
 		frame.setVisible(true);  
 	}
 	
-	public  static void main(String[] args){
+/*	public  static void main(String[] args){
 		new GUI();
-	}
+	}*/
 }
