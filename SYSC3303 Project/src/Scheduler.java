@@ -15,7 +15,7 @@ import java.util.List;
 import java.lang.*;
 import java.util.concurrent.TimeUnit;//for measuring time to respond
 
-public class Scheduler{
+public class Scheduler {
 
 	// Packets and sockets required to connect with the Elevator and Floor class
 
@@ -35,6 +35,7 @@ public class Scheduler{
 	public static int upOrDown;
 	public static int destFloor;
 	public static int instruction;
+	public static byte errorType;
 
 	// SETTING THE NUMBER OF ELEVATORS AND FLOORS PRESENT IN THE SYSTEM
 	public static int numElevators;// = 4;
@@ -94,6 +95,13 @@ public class Scheduler{
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
 	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final byte ERROR=(byte)0xE0;//an error has occured
+	//Errors
+	private static final byte DOOR_ERROR=(byte)0xE1;
+	private static final byte MOTOR_ERROR=(byte)0xE2;
+	//still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR=(byte)0xEF; 
+	private static final byte NO_ERROR=(byte)0x00;
 	// private static final int DOOR_DURATION=4;//duration that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
@@ -167,89 +175,62 @@ public class Scheduler{
 
 		// Separating byte array received 
 		elevatorOrFloor = data[0];
-		if (elevatorOrFloor==ELEVATOR_ID) {
-			System.out.println("Request from elevator: " + Arrays.toString(data));
-			schedulerElevatorReceivePacket=temporaryReceivePacket;
-		}
-		else if(elevatorOrFloor==FLOOR_ID) {
-			System.out.println("Request from floor: " + Arrays.toString(data));
-			schedulerFloorReceivePacket=temporaryReceivePacket;
-		}
-		else {
-			//Error packet?
-			//actual issue otherwise
-		}
-
-		// Converts the received packet from Datagram Packet to Byte[] 
-		//byte[] packetData = temporaryReceivePacket.getData();
 		receiveData = temporaryReceivePacket.getData();
 		elevatorOrFloorID = data[1];
 		requestOrUpdate = data[2];
 		currentFloor = data[3];
 		upOrDown = data[4];
 		destFloor = data[5];
-		//return packetData;
-	}
-	/*public static byte[] elevatorReceivePacket() {
-		// ELEVATOR RECEIVING PACKET HERE 
-		schedulerElevatorReceivePacket = new DatagramPacket(data, data.length);
-		// System.out.println("Server: Waiting for Packet.\n");
-
-		// Block until a datagram packet is received from receiveSocket.
-		try {
-			System.out.println("waiting");
-			schedulerSocketSendReceiveElevator.receive(schedulerElevatorReceivePacket);
-			System.out.println("Request from elevator: " + Arrays.toString(data));
-
-			// schedulerSocketReceiveElevator.close();
-			// schedulerSocketSendReceiveElevator.close()
-
-		} catch (IOException e) {
-			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
-			e.printStackTrace();
-			System.exit(1);
+		errorType=data[7];
+		
+		if (elevatorOrFloor==ELEVATOR_ID) {
+			if (requestOrUpdate==REQUEST) {
+				System.out.print("Request ");
+			}
+			else {
+				System.out.print("Update ");
+			}
+			//System.out.println("from elevator: " + elevatorOrFloorID+ " Direction: "+ upOrDown+ " Current Floor: "+currentFloor+ " Destination: "+ destFloor+"\n");
+			System.out.println("from elevator: " + Arrays.toString(data));
+			schedulerElevatorReceivePacket=temporaryReceivePacket;
 		}
-
-		// Separating byte array received 
-		elevatorOrFloor = data[0];
-		elevatorOrFloorID = data[1];
-		requestOrUpdate = data[2];
-		currentFloor = data[3];
-		upOrDown = data[4];
-		destFloor = data[5];
-
-		// Converts the received packet from Datagram Packet to Byte[] 
-		byte[] packetData = schedulerElevatorReceivePacket.getData();
-
-		return packetData;
+		else if(elevatorOrFloor==FLOOR_ID) {
+			//System.out.print("Request from floor: "+elevatorOrFloorID+ " Direction: "+ upOrDown+ "\n");// Current Floor: "+currentFloor+ " Destination: "+ destFloor+"\n");
+			System.out.println("Request from floor: " + Arrays.toString(data));
+			schedulerFloorReceivePacket=temporaryReceivePacket;
+		}
+		else if (elevatorOrFloor==ERROR) {
+			errorResponse();
+			
+		}
+		else {
+			//Error packet?
+			//actual issue otherwise
+			System.out.print("packet received in Scheduler from neither Elevator nor Floor");
+		}
+		
+		
+	}
+	private static void errorResponse() {
+		if (errorType==DOOR_ERROR) {
+			//stop the elevator
+			//recall the door open-close
+		}
+		else if (errorType==MOTOR_ERROR) {
+			//stop the elevator
+			//call for help?
+		}
+		else if (errorType==OTHER_ERROR) {
+			//stop the elevator
+		}
+		else if (errorType==NO_ERROR) {
+			System.out.println("Scheduler was notified of an error but NO_ERROR was shown");
+		}
+		else{
+			System.out.println("Scheduler received an unknown error");
+		}
 	}
 
-	public static void floorReceivePacket() {
-		// FLOOR RECEIVING PACKET HERE 
-		schedulerFloorReceivePacket = new DatagramPacket(dataFloor, dataFloor.length);
-
-		// Block until a datagram packet is received from receiveSocket.
-		try {
-			System.out.println("waiting");
-			schedulerSocketSendReceiveFloor.receive(schedulerFloorReceivePacket);
-			System.out.println("Request from elevator: " + Arrays.toString(data));
-
-		} catch (IOException e) {
-			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		// Separating byte array received 
-		elevatorOrFloor = data[0];
-		elevatorOrFloorID = data[1];
-		requestOrUpdate = data[2];
-		currentFloor = data[3];
-		upOrDown = data[4];
-		destFloor = data[5];
-	}*/
 	private static void schedulerInitilization() {
 		elevatorCurrentFloor = new int[numElevators];
 		elevatorStatus = new int[numElevators];
@@ -324,6 +305,7 @@ public class Scheduler{
 		floorRequestDirection = packetData[4];// which direction the requesting floor wants to go
 		stopRequest = packetData[5];// a request to stop at a given floor (-1 if no request)
 		if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
+			
 			if (packetIsStatus==INITIALIZE) {
 				elevatorInitialized=true;
 				numElevators=packetElementIndex;
@@ -881,6 +863,7 @@ public class Scheduler{
 		 * with simulated packet for elevator #2
 		 */
 		for (;;) {
+
 			// Receives the Packet
 			//byte[] packetRecieved = //SHOULD BE DATARECEIVED
 			elevatorFloorReceivePacket();
