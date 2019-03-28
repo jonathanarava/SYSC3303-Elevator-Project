@@ -18,31 +18,38 @@ public class GUI {
 		//	INITIALIZATIONS
 		//Frame initialization
 		JFrame frame = new JFrame("Elevator GUI");
-		//Button(s) initialization
-		JButton button;
+		//Button(s) & TesxtArea initialization
+		JButton button[] = new JButton[numOfElevators] ;
+		JTextArea textArea[] = new JTextArea[numOfElevators];
+		
 		//Layout Initialization
 		FlowLayout experimentLayout = new FlowLayout();
 		frame.setLayout(experimentLayout);	// Set frame layout to FlowLayout
 		
-		// Dynamically creates the number of buttons depending on numOfElevators initialized in elevator intermediate class
+		// Dynamically creates the number of buttons/ textAreas depending on numOfElevators 
+		// initialized in elevator intermediate class
 		for(int i = 0; i< numOfElevators; i++) {
-			button = new JButton("Elevator " + i);	
-			frame.add(button);
+			button[i] = new JButton("Elevator " + i);	
+			frame.add(button[i]);
+		}
+		for(int i = 0; i< numOfElevators; i++) {
+			textArea[i] = new JTextArea("Current FLoor " + i);	
+			frame.add(textArea[i]);
 		}
 		
 	
-		JTextArea textArea = new JTextArea(
-			    "This is an editable JTextArea. " +
+		JTextArea TextErrorArea = new JTextArea(
+			    "Elevator Error Message: \n" +
 			    "A text area is a \"plain\" text component, " +
 			    "which means that although it can display text " +
 			    "in any font, all of the text is in the same font."
 			);
 			//textArea.setFont(new Font("Serif", Font.ITALIC, 16));
-			textArea.setLineWrap(true);
-			textArea.setWrapStyleWord(true);
-			textArea.setEditable(false);
+		TextErrorArea.setLineWrap(true);
+		TextErrorArea.setWrapStyleWord(true);
+		TextErrorArea.setEditable(false);
 			
-		JScrollPane areaScrollPane = new JScrollPane(textArea);
+		JScrollPane areaScrollPane = new JScrollPane(TextErrorArea);
 		areaScrollPane.setVerticalScrollBarPolicy(
 		                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		areaScrollPane.setPreferredSize(new Dimension(250, 100));
@@ -53,7 +60,7 @@ public class GUI {
 		frame.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		
 		//Frame dimensions
-		frame.setSize(500,300); 
+		frame.setSize(450,200); 
 		
 		frame.setVisible(true);  
 	}
