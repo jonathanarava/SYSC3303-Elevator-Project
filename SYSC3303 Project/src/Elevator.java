@@ -17,6 +17,7 @@ public class Elevator extends Thread {
 	private static final byte STOP = 0x03;
 	private static final byte HOLD = 0x04;// elevator is in hold state
 	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
 	private static final byte ERROR = (byte) 0xE0;// an error has occured
 	// Errors
 	private static final byte DOOR_ERROR = (byte)0xE1;
@@ -32,8 +33,13 @@ public class Elevator extends Thread {
 	private static final int DOOR_OPEN = 1;// the door is open when == 1
 	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
 	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+	
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+	private static final int MAKE_STOP=3;//
+	private static final int PLACE_ON_HOLD=4;
+	private static final int UPDATE_DISPLAYS=5;
+	//private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int INITIALIZE=8;//for first communication with the scheduler
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
@@ -57,6 +63,7 @@ public class Elevator extends Thread {
 	public boolean isUpdate = false; // This boolean is set to true in the ElevatorIntermediate, if the elevator
 										// intermediate is expecting an update from the elevator
 	public boolean isGoingUp;
+	private boolean elevatorBroken=false; //whether the elevator is broken or not
 
 	private int elevatorNumber;
 	private int RealTimefloorRequest;
@@ -213,6 +220,23 @@ public class Elevator extends Thread {
 		//return msg; 
 	}
 
+	public void shutDown() {
+		movingDirection=STOP;
+		System.out.println("Elevator Out of Order, Maintenance and Emergency Fire Services have been Contacted");
+		if (elevatorBroken==true) {
+			try {// wait for 1000
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	public void fixElevator() {
+		elevatorBroken=false;
+		System.out.println("Elevator has been fixed");
+	}
+	
 	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
 		return sensor;
@@ -293,7 +317,7 @@ public class Elevator extends Thread {
 				}
 				while (dealWith) {
 					if (motorDirection == UP || motorDirection == DOWN) {
-						movingDirection = motorDirection;
+						//movingDirection = motorDirection;//WHAT?
 						runElevator();
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
@@ -316,6 +340,9 @@ public class Elevator extends Thread {
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
 						waitForRequest();
+					}
+					else if(motorDirection==SHUT_DOWN) {
+						shutDown();
 					}
 				}
 			}
