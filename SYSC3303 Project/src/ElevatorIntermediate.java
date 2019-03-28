@@ -14,9 +14,16 @@ import java.lang.Object;
 public class ElevatorIntermediate {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;// elevator is in hold state
-	private static final byte UP = 0x02;// elevator is going up
-	private static final byte DOWN = 0x01;// elevator is going down
+//	private static final byte HOLD = 0x00;// elevator is in hold state
+//	private static final byte UP = 0x02;// elevator is going up
+//	private static final byte DOWN = 0x01;// elevator is going down
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
+	
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
@@ -24,6 +31,10 @@ public class ElevatorIntermediate {
 	private static final int DOOR_DURATION = 4;// duration that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+	private static final int MAKE_STOP=3;//
+	private static final int PLACE_ON_HOLD=4;
+	private static final int UPDATE_DISPLAYS=5;
+	private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
 	private static final int INITIALIZE=8;//for first communication with the scheduler
 	private static final int UNUSED=0;// value for unused parts of data 
 	/*
@@ -184,6 +195,10 @@ public class ElevatorIntermediate {
 				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
 			}*/
 		}
+		else if(schedulerInstruction==SHUT_DOWN) {
+			elevatorArray[elevatorElement].shutDown();
+		}
+		//else if(schedulerInstruction)
 
 		//		System.out.println("elevatorArray.length: "+elevatorArray.length);
 		//		System.out.println("elevatorArray[0]: "+elevatorArray[0]);//elevatorArray.length);
@@ -260,16 +275,12 @@ public class ElevatorIntermediate {
 		// also be difficult, just using the ones which are available
 		int elevatorPortNumbers[] = new int[createNumElevators];
 
-
-
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
 		// allocate receive packet
 		byte data[] = new byte[100];
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
-
-
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
