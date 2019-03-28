@@ -262,7 +262,7 @@ public class Floor extends Thread {
 	 * discarded(due to the formatting given in project requirements) Takes the
 	 * input information and creates a list of Strings that will have the real time
 	 * inputs as a string. For now This section will be commented. Will be
-	 * implemented for other itterations
+	 * implemented for other iterations
 	 */
 	public void fileReader(String fullFile) { 
 		String text = "";
@@ -281,6 +281,7 @@ public class Floor extends Thread {
 					i++;
 				}
 			}
+			reader.close();
 		}catch(Exception e) { e.printStackTrace(); }
 	}
 	
