@@ -48,7 +48,7 @@ public class ElevatorIntermediate {
 	private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
-	private static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
+	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
 	private static Elevator elevatorArray[];
@@ -252,7 +252,11 @@ public class ElevatorIntermediate {
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
 		// argument[0]
-
+		
+		//GUI
+		GUI gui = new GUI();
+		
+		
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
 		// port numbers there

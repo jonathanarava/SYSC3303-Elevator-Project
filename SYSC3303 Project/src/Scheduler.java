@@ -880,8 +880,6 @@ public class Scheduler{
 		 * Scheduler.SchedulingAlgorithm(schedulerElevatorReceivePacket);//call method
 		 * with simulated packet for elevator #2
 		 */
-		/*numElevators = 4;
-		GUI gui = new GUI();*/
 		for (;;) {
 			// Receives the Packet
 			//byte[] packetRecieved = //SHOULD BE DATARECEIVED

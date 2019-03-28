@@ -9,12 +9,12 @@ import javax.swing.JTextArea;
 
 import javafx.scene.text.Font;
 
-public class GUI extends Scheduler {
+public class GUI extends ElevatorIntermediate {
 
 	// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
-	//int numElevators = 4;
-		
-public GUI(){
+	int numElevators = createNumElevators;	
+	
+GUI() {
 		//	INITIALIZATIONS
 		//Frame initialization
 		JFrame frame = new JFrame("Elevator GUI");
@@ -33,10 +33,9 @@ public GUI(){
 			frame.add(button[i]);
 		}
 		for(int i = 0; i< numElevators; i++) {
-			textArea[i] = new JTextArea("Current FLoor " + elevatorCurrentFloor[i]);	
+			textArea[i] = new JTextArea("Current FLoor " /*+ elevatorCurrentFloor[i]*/);	
 			frame.add(textArea[i]);
 		}
-		
 	
 		JTextArea TextErrorArea = new JTextArea(
 			    "Elevator Error Message: \n" +
@@ -64,8 +63,4 @@ public GUI(){
 		
 		frame.setVisible(true);  
 	}
-	
-/*	public  static void main(String[] args){
-		new GUI();
-	}*/
 }
