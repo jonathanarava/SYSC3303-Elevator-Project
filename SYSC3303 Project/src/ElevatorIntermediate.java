@@ -34,7 +34,6 @@ public class ElevatorIntermediate {
 	private static final int MAKE_STOP=3;//
 	private static final int PLACE_ON_HOLD=4;
 	private static final int UPDATE_DISPLAYS=5;
-	private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
 	private static final int INITIALIZE=8;//for first communication with the scheduler
 	private static final int UNUSED=0;// value for unused parts of data 
 	/*
