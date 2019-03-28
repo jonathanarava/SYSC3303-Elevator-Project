@@ -51,8 +51,6 @@ public class FloorIntermediate extends Thread {
 		try {
 			InetAddress address = InetAddress.getByName("134.117.59.128");
 			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, address, SENDPORTNUM);
-			
-			System.out.print("I've sent\n");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -110,7 +108,7 @@ public class FloorIntermediate extends Thread {
 		if(semaphoreOpen) {
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
-					this.openDoor(ID, i);
+					this.openDoor(ID, elevatorID);
 					sendPacket(Floor.responsePacket(ID, 0));
 					this.semaphoreOpen = false;
 					break;
@@ -121,7 +119,7 @@ public class FloorIntermediate extends Thread {
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
 					sendPacket(Floor.responsePacket(ID, 0));
-					this.openDoor(ID, i);
+					this.openDoor(ID, elevatorID);
 					this.semaphoreOpen1 = false;
 					break;
 				}
