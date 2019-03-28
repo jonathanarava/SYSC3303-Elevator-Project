@@ -61,7 +61,7 @@ public class Floor extends Thread {
 		}
 	}
 
-	public static byte[] responsePacket(int NAMING, int up_or_down){
+	public static byte[] responsePacket(int NAMING, int up_or_down, int dest){
 		// creates the byte array according to the required format in this case
 		// 00000000-DATABYTE-00000000
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
@@ -74,7 +74,7 @@ public class Floor extends Thread {
 		}
 		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
 		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
-		requestElevator.write(0); // Destination floor (null)
+		requestElevator.write(dest); // Destination floor (null)
 		requestElevator.write(0); // scheduler instruction
 
 		return requestElevator.toByteArray();
