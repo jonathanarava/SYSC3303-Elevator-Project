@@ -109,6 +109,12 @@ public class Elevator extends Thread {
 			requestElevator.write(0); // up or down
 			requestElevator.write(floorRequest); // dest floor
 			requestElevator.write(0); // instruction
+		} else {
+			requestElevator.write(requestUpdate); // update
+			requestElevator.write((byte) getInitialFloor()); // current floor
+			requestElevator.write(0); // up or down
+			requestElevator.write(floorRequest); // dest floor
+			requestElevator.write(0);
 		}
 		return requestElevator.toByteArray();
 	}
@@ -233,8 +239,13 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
+		
+		
 		sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
+		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
+		
+		sendPacket(Elevator1.responsePacketRequest(3,0));
+		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
 /*		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
 		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
