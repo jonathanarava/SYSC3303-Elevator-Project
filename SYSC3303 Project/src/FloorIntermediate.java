@@ -94,7 +94,7 @@ public class FloorIntermediate extends Thread {
 					j--;
 					Thread.sleep(1000);
 				}
-			sendPacket(Floor.responsePacket(ID, HOLD,0));
+			sendPacket(Floor.responsePacket(ID, HOLD));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -110,7 +110,7 @@ public class FloorIntermediate extends Thread {
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
 					this.openDoor(ID, elevatorID);
-					sendPacket(Floor.responsePacket(ID, 0,0));
+					sendPacket(Floor.responsePacket(ID, 0));
 					this.semaphoreOpen = false;
 					break;
 				}
@@ -119,7 +119,7 @@ public class FloorIntermediate extends Thread {
 			//System.out.println("here");
 			for(int i = 0; i < Floor.floorsMade.length; i++) {
 				if(ID == Floor.floorsMade[i]) {
-					sendPacket(Floor.responsePacket(ID, 0,0));
+					sendPacket(Floor.responsePacket(ID, 0));
 					this.openDoor(ID, elevatorID);
 					this.semaphoreOpen1 = false;
 					break;
@@ -163,7 +163,7 @@ public class FloorIntermediate extends Thread {
 				} else if(segment[2].equals("Down")) {
 					up_or_down = DOWN;
 				}
-				destination = Integer.parseInt(segment[3]);
+				int destination = Integer.parseInt(segment[3]);
 			}
 			
 			if(hasRequest == true) {
