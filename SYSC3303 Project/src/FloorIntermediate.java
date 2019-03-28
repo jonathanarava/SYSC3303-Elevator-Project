@@ -29,6 +29,7 @@ public class FloorIntermediate extends Thread {
 	private static int name;
 	private static boolean hasRequest;
 	private static int up_or_down;
+	private static int destination;
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -162,10 +163,11 @@ public class FloorIntermediate extends Thread {
 				} else if(segment[2].equals("Down")) {
 					up_or_down = DOWN;
 				}
+				int destination = Integer.parseInt(segment[3]);
 			}
 			
 			if(hasRequest == true) {
-				F1.sendPacket(Floor.responsePacket(name, up_or_down));
+				F1.sendPacket(Floor.responsePacket(name, up_or_down, destination));
 			} 
 			
 			received = receivePacket();

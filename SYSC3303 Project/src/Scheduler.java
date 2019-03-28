@@ -65,7 +65,8 @@ public class Scheduler extends Thread {
 	private boolean semaphoreRemove0 = false;
 	private boolean semaphoreRemove1 = false;
 	
-
+	private static boolean semaWAIT = false;
+	
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(369);
@@ -237,27 +238,32 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	private synchronized static void floorPacketHandler() {
+	private synchronized void floorPacketHandler() {
 		if (elevatorOrFloor == 69) {
-			
+			interrupt();
 			if (requestOrUpdate1 == 1) {
 				if(upOrDown1 == UP) {
 					if(upQueue1.contains(elevatorOrFloorID1) || upQueue2.contains(elevatorOrFloorID1)) {
 						return;
+					}else if (ele0 == elevatorOrFloorID1) {
+						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
+					}else if (ele1 == elevatorOrFloorID1) {
+						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
 					} else if (ele0 < elevatorOrFloorID1) {
 						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
-						//System.out.println("here");
 					} else if (ele1 < elevatorOrFloorID1) {
 						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
-						//System.out.println("here1");
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !upWaitQueue.contains(elevatorOrFloorID1)) {
 						upWaitQueue.add(elevatorOrFloorID1);
-						//System.out.println("here2");
 					}
 				} else if (upOrDown == DOWN) {
 					if(downQueue1.contains(elevatorOrFloorID1) || downQueue2.contains(elevatorOrFloorID1)) {
 						return;
-					} else if (ele0 > elevatorOrFloorID1) {
+					}else if (ele0 == elevatorOrFloorID1) {
+						addToDownQueue(upQueue1, 0, elevatorOrFloorID1);
+					}else if (ele1 == elevatorOrFloorID1) {
+						addToDownQueue(upQueue2, 1, elevatorOrFloorID1);
+					}  else if (ele0 > elevatorOrFloorID1) {
 						addToDownQueue(downQueue1, 0, elevatorOrFloorID1);
 					} else if (ele1 < elevatorOrFloorID1) {
 						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
@@ -371,7 +377,6 @@ public class Scheduler extends Thread {
 		/* ELevator 1 logic */
 		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
 			int first = upQueue1.getFirst();
-			System.out.println("\nfirst request ---> " + first);
 			byte[] responseByteArray = responsePacket(0, currentFloor, first);
 			if (currentFloor == first) {
 				upQueue1.removeFirst();
@@ -447,7 +452,10 @@ public class Scheduler extends Thread {
 				while (true) {
 					packet.floorReceivePacket();
 					if (requestOrUpdate1 == 1) {
-						floorPacketHandler();
+						if(semaWAIT == true) {
+							semaWAIT = false;
+						}
+						packet.floorPacketHandler();
 					}
 					while(true) {
 						if (packet.getSemaphore0()) {
@@ -481,7 +489,12 @@ public class Scheduler extends Thread {
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
 
-			if (requestOrUpdate == 1) {
+			if(requestOrUpdate == 3) {
+				semaWAIT = true;
+				while(semaWAIT==true) {
+					Thread.sleep(1);
+				}
+			}else if (requestOrUpdate == 1) {
 				packet.packetDealer();
 				Direction(elevatorOrFloorID, destFloor, currentFloor);
 			} else if(requestOrUpdate == 2) {
