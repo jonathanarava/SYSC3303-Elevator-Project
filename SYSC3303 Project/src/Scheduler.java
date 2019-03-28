@@ -217,7 +217,7 @@ public class Scheduler extends Thread {
 					if (destFloor - currentFloor > 0 && destFloor <= numFloors && destFloor >= 0) {
 						addToUpQueue(upQueue1,0, destFloor);
 					} else if (destFloor - currentFloor < 0 && destFloor <= numFloors && destFloor >= 0) {
-						addToDownQueue(downQueue1,0);
+						addToDownQueue(downQueue1,0, destFloor);
 					} else if (destFloor < 0){
 						elevatorSendPacket(responsePacket(elevatorOrFloorID,currentFloor, -2));
 					}
@@ -227,7 +227,7 @@ public class Scheduler extends Thread {
 					if (destFloor - currentFloor > 0 && destFloor <= numFloors && destFloor >= 0) {
 						addToUpQueue(upQueue2,1, destFloor);
 					} else if (destFloor - currentFloor < 0 && destFloor <= numFloors && destFloor >= 0) {
-						addToDownQueue(downQueue2,1);
+						addToDownQueue(downQueue2,1, destFloor);
 					}
 					else if (destFloor < 0){
 						elevatorSendPacket(responsePacket(elevatorOrFloorID,currentFloor, -2));
@@ -258,9 +258,9 @@ public class Scheduler extends Thread {
 					if(downQueue1.contains(elevatorOrFloorID1) || downQueue2.contains(elevatorOrFloorID1)) {
 						return;
 					} else if (ele0 > elevatorOrFloorID1) {
-						addToDownQueue(downQueue1, 0);
+						addToDownQueue(downQueue1, 0, elevatorOrFloorID1);
 					} else if (ele1 < elevatorOrFloorID1) {
-						addToDownQueue(downQueue2, 1);
+						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !downWaitQueue.contains(elevatorOrFloorID1)) {
 						downWaitQueue.add(elevatorOrFloorID1);
 					}
@@ -303,7 +303,7 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	public synchronized static void addToDownQueue(LinkedList<Integer> downQueue, int ID) {
+	public synchronized static void addToDownQueue(LinkedList<Integer> downQueue, int ID, int destFloor) {
 		for (int i = 0; i <= downQueue.size(); i++) {
 			if (ID == 0) {
 				if (downQueue1.isEmpty()) {
