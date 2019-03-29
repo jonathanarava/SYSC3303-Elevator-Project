@@ -75,7 +75,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(4000);
+				Thread.sleep(3000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -294,7 +294,6 @@ public class Elevator extends Thread {
 			public void run() {
 				while(true) {
 					while(Elevator0.holdReceived || Elevator1.holdReceived) {
-						System.out.println("here");
 						if(fileRequests.isEmpty() && Elevator0.holdReceived) {
 							try {
 								sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
