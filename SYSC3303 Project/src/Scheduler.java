@@ -249,9 +249,9 @@ public class Scheduler extends Thread {
 						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
 					}else if (ele1 == elevatorOrFloorID1) {
 						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
-					} else if (ele0 < elevatorOrFloorID1) {
+					} else if (ele0 < elevatorOrFloorID1 && (elevatorOrFloorID1-ele0 < elevatorOrFloorID1 - ele1) ) {
 						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
-					} else if (ele1 < elevatorOrFloorID1) {
+					} else if (ele1 < elevatorOrFloorID1 && (elevatorOrFloorID1-ele1 < elevatorOrFloorID1 - ele0)) {
 						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && !upWaitQueue.contains(elevatorOrFloorID1)) {
 						upWaitQueue.add(elevatorOrFloorID1);
@@ -499,7 +499,6 @@ public class Scheduler extends Thread {
 				Direction(elevatorOrFloorID, destFloor, currentFloor);
 			} else if(requestOrUpdate == 2) {
 				currentFloorTracker();
-				System.out.println("ELEVATOR 1 ---->  " + ele1);
 			}
 
 			packet.schedulingAlgo();
