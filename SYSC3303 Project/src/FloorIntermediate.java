@@ -148,7 +148,7 @@ public class FloorIntermediate extends Thread {
 
 		Floor floor = new Floor(createNumFloors);
 		
-		floor.fileReader("M://hello.txt");
+		floor.fileReader("C:\\Users\\calvinlam.LABS\\Documents\\GitHub\\SYSC3303-Project-Group5\\SYSC3303 Project\\src\\hello.txt");
 		//byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
 
 		FloorIntermediate F1 = new FloorIntermediate(0);
