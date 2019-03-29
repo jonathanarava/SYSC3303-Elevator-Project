@@ -310,18 +310,15 @@ public class Elevator extends Thread {
 			}
 
 			while (!hasRequest) {// send updates
-				try {
-					Thread.sleep(1);// delay for 1 second
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
 				while (dealWith) {
+					
 					if (motorDirection == UP || motorDirection == DOWN) {
 						motionOfMotor = motorDirection; 
 						runElevator();
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
-					} else if (motorDirection == UPDATE_DISPLAY) {
+					}
+					else if (motorDirection == UPDATE_DISPLAY) {
 						if (motionOfMotor == UP || motionOfMotor == DOWN) {
 							runElevator();
 						}
@@ -330,11 +327,13 @@ public class Elevator extends Thread {
 						sendPacket(2, NO_ERROR);
 						// set the lights sensors and stuff to proper value
 						isUpdate = false;
-					} else if (motorDirection == STOP) {
+					}
+					else if (motorDirection == STOP) {
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
-					} else if (motorDirection == HOLD) {
+					}
+					else if (motorDirection == HOLD) {
 						// Figure out why the Elevator is not reaching the hold state.
 						motionOfMotor = HOLD;
 						System.out.println("Reached Hold state in elevator");
