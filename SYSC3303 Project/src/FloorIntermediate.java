@@ -201,7 +201,7 @@ public class FloorIntermediate {
 		if (schedulerInstruction==INITIALIZE) {
 			intialized=true;
 		}
-		else if(schedulerInstruction==UPDATE) {
+		else if(schedulerInstruction==UPDATE_DISPLAY) {
 			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
 			//send updates to all the floors
 			for (int i = 0; i < numFloors; i++){
@@ -211,7 +211,7 @@ public class FloorIntermediate {
 		
 		else {
 			//something's gone wrong, floors should only ever be receiving updates
-			System.out.println("error in receivePacket(), not an UPDATE for Floor: "+ elevatorLocation);
+			System.out.println("error in receivePacket(), not an UPDATE_DISPLAY for Floor: ."+ elevatorLocation+"Instead "+schedulerInstruction+" is sent.");
 		}
 		
 

@@ -305,7 +305,8 @@ public class Floor extends Thread {
 				// hasRequest = !hasRequest;
 				hasRequest = false;
 			}
-			waitForRequest();
+			while(!hasRequest) {
+			}
 		}
 	}
 }
