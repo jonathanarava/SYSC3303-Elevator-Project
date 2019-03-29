@@ -114,7 +114,7 @@ public class Scheduler extends Thread {
 	public static void elevatorSendPacket(byte[] responseByteArray) {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.127");
+			InetAddress address = InetAddress.getByName("134.117.59.98");
 			schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 					address, schedulerElevatorReceivePacket.getPort());
 		} catch (UnknownHostException e) {
@@ -451,11 +451,12 @@ public class Scheduler extends Thread {
 			public void run() {
 				while (true) {
 					packet.floorReceivePacket();
-					if (requestOrUpdate1 == 1) {
+					while (requestOrUpdate1 == 1) {
 						if(semaWAIT == true) {
 							semaWAIT = false;
 						}
 						packet.floorPacketHandler();
+						break;
 					}
 					while(true) {
 						if (packet.getSemaphore0()) {
@@ -473,7 +474,6 @@ public class Scheduler extends Thread {
 						try {
 							Thread.sleep(1);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
