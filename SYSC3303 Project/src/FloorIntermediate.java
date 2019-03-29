@@ -50,7 +50,7 @@ public class FloorIntermediate extends Thread {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.128");
+			InetAddress address = InetAddress.getByName("134.117.59.99");
 			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, address, SENDPORTNUM);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -155,13 +155,34 @@ public class FloorIntermediate extends Thread {
 		FloorIntermediate F1 = new FloorIntermediate(0);
 		FloorIntermediate F2 = new FloorIntermediate(1);
 		//F1.sendPacket(responseByteArray);
+		while(true) {
+			if(floor.fileRequests.isEmpty()) {
+				hasRequest = false;
+				break;
+			} else {
+				hasRequest = true;
+				String command = floor.fileRequests.remove(0);
+				String segment[] = command.split(" ");
+				name = Integer.parseInt(segment[1]);
+				if(segment[2].equals("Up")) {
+					up_or_down = UP;
+				} else if(segment[2].equals("Down")) {
+					up_or_down = DOWN;
+				}
+			}
+
+			if(hasRequest == true) {
+				F1.sendPacket(Floor.responsePacket(name, up_or_down));
+			}
+		}
+		F1.sendPacket(Floor.responsePacket(0, 0));
 		
 		F1.start();
 		F2.start();
 		
 		byte [] received = new byte[7];
 		while (true) {
-			if(floor.fileRequests.isEmpty()) {
+/*			if(floor.fileRequests.isEmpty()) {
 				hasRequest = false;
 			} else {
 				hasRequest = true;
@@ -177,7 +198,7 @@ public class FloorIntermediate extends Thread {
 			
 			if(hasRequest == true) {
 				F1.sendPacket(Floor.responsePacket(name, up_or_down));
-			} 
+			} */
 			
 			received = receivePacket();
 			int eleID = received[2];
