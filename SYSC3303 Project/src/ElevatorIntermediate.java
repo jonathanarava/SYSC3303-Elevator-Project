@@ -58,7 +58,7 @@ public class ElevatorIntermediate {
 	private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
-	private static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
+	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
 	private static Elevator elevatorArray[];
@@ -277,6 +277,9 @@ public class ElevatorIntermediate {
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
+		
+		GUI gui = new GUI();
+		
 		// allocate receive packet
 		byte data[] = new byte[100];
 		schedulerReceivePacket = new DatagramPacket(data, data.length);
