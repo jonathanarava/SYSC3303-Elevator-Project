@@ -56,9 +56,9 @@ public class Elevator extends Thread {
 	// hasRequest == true means that the elevator should move up or down a floor.
 	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 
-	public boolean dealWith = false;
+	public boolean dealWith = false; // dealWith boolean is set by the Intermediate class for a specific elevator if THAT SPECIFIC elevator has a job set by scheduler it needs to dealWith
 
-	private int movingDirection; // 0x01 is moving up, 0x02 is moving down, 0x03 is stop
+	private int motionOfMotor; // Directory of the motor. This will be set by elevatorDirection, which is the Instruction that is sent by the scheduler
 
 	public boolean isUpdate = false; // This boolean is set to true in the ElevatorIntermediate, if the elevator
 										// intermediate is expecting an update from the elevator
@@ -221,7 +221,7 @@ public class Elevator extends Thread {
 	}
 
 	public void shutDown() {
-		movingDirection=STOP;
+		motionOfMotor=STOP;
 		System.out.println("Elevator Out of Order, Maintenance and Emergency Fire Services have been Contacted");
 		if (elevatorBroken==true) {
 			try {// wait for 1000
@@ -259,12 +259,12 @@ public class Elevator extends Thread {
 			e.printStackTrace();
 		}
 		// for
-		if (movingDirection == UP) {
+		if (motionOfMotor == UP) {
 			System.out.println("Elevator is going up...");
 			isGoingUp = true;
 			sensor++; // increment the floor
 			setSensor(sensor); // updates the current floor
-		} else if (movingDirection == DOWN) {
+		} else if (motionOfMotor == DOWN) {
 			System.out.println("Elevator is going down...");
 			isGoingUp = false;
 			sensor--; // decrements the floor
@@ -317,12 +317,12 @@ public class Elevator extends Thread {
 				}
 				while (dealWith) {
 					if (motorDirection == UP || motorDirection == DOWN) {
-						//movingDirection = motorDirection;//WHAT?
+						motionOfMotor = motorDirection; 
 						runElevator();
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
 					} else if (motorDirection == UPDATE_DISPLAY) {
-						if (movingDirection == UP || movingDirection == DOWN) {
+						if (motionOfMotor == UP || motionOfMotor == DOWN) {
 							runElevator();
 						}
 						updateDisplay();
@@ -331,12 +331,12 @@ public class Elevator extends Thread {
 						// set the lights sensors and stuff to proper value
 						isUpdate = false;
 					} else if (motorDirection == STOP) {
-						movingDirection = STOP;
+						motionOfMotor = STOP;
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
 					} else if (motorDirection == HOLD) {
 						// Figure out why the Elevator is not reaching the hold state.
-						movingDirection = HOLD;
+						motionOfMotor = HOLD;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
 						waitForRequest();

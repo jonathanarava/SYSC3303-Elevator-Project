@@ -36,6 +36,8 @@ public class ElevatorIntermediate {
 	private static final int UPDATE_DISPLAYS=5;
 	private static final int INITIALIZE=8;//for first communication with the scheduler
 	private static final int UNUSED=0;// value for unused parts of data 
+	
+	private static long respondStart, respondEnd;
 	/*
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
@@ -93,6 +95,7 @@ public class ElevatorIntermediate {
 	}
 
 	public synchronized void sendPacket() {
+		respondStart = System.nanoTime();
 		// byte[] requestElevator = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
@@ -167,6 +170,7 @@ public class ElevatorIntermediate {
 			// Block until a datagram packet is received from receiveSocket.
 			System.out.println("waiting to receive");
 			elevatorReceiveSocket.receive(elevatorReceivePacket);
+			respondEnd = System.nanoTime();
 			System.out.print("Received from scheduler: ");
 			System.out.println(Arrays.toString(data));
 		} catch (IOException e) {
@@ -175,6 +179,7 @@ public class ElevatorIntermediate {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		System.out.println("It took "+ (respondEnd-respondStart) +" nanoseconds to get a response from the Scheduler");
 		elevatorReceiveSocket.close();
 
 		/*
@@ -308,13 +313,7 @@ public class ElevatorIntermediate {
 		}
 
 		while (true) {
-			//			if (!elevatorTable.isEmpty()||firstRunTime) {
 			elevatorHandler.sendPacket();
-			//				if (firstRunTime) {
-			//					firstRunTime=false;
-			//				}
-			//			}
-			// receive blocks
 			elevatorHandler.receivePacket();
 
 			// Synchronize Intermediate send and Receive with the Scheduler's send and

@@ -57,7 +57,9 @@ public class Floor extends Thread {
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
-
+	
+	
+	
 	List<String> fileRequests = new ArrayList<String>();
 	/*
 	 * Real-time Input Information: In the next iteration these will be provided
