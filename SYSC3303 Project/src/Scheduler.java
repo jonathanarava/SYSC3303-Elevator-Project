@@ -87,7 +87,7 @@ public class Scheduler extends Thread {
 
 		// Block until a datagram packet is received from receiveSocket.
 		try {
-			System.out.println("waiting");
+			System.out.println("waiting...");
 			schedulerSocketSendReceiveElevator.receive(schedulerElevatorReceivePacket);
 			System.out.println("Request from elevator" + data[1] + ": " + Arrays.toString(data));
 
@@ -136,7 +136,7 @@ public class Scheduler extends Thread {
 
 		// Block until a datagram packet is received from receiveSocket.
 		try {
-			System.out.println("waiting");
+			System.out.println("waiting...");
 			schedulerSocketSendReceiveFloor.receive(schedulerFloorReceivePacket);
 			System.out.println("Request from Floor: " + Arrays.toString(dataFloor));
 		} catch (IOException e) {
@@ -452,11 +452,16 @@ public class Scheduler extends Thread {
 				while (true) {
 					packet.floorReceivePacket();
 					while (requestOrUpdate1 == 1) {
-						if(semaWAIT == true) {
-							semaWAIT = false;
+						switch(requestOrUpdate1) {
+						case 1:
+							if(semaWAIT == true) {
+								semaWAIT = false;
+							}
+							packet.floorPacketHandler();
+							packet.floorReceivePacket();
+						case 2:
+							break;
 						}
-						packet.floorPacketHandler();
-						break;
 					}
 					while(true) {
 						if (packet.getSemaphore0()) {
