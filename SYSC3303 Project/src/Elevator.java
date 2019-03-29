@@ -1,12 +1,16 @@
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Elevator extends Thread {
 	
@@ -32,7 +36,13 @@ public class Elevator extends Thread {
 	private int toDoID;
 	private byte instruction;
 	private int initialFloor;
+	private static List<String> fileRequests = new ArrayList<String>();
+
+	private boolean hasRequest = false;
+	private static int floorRequest;
 	//private byte motorDirection;
+
+	private static int floorButton;
 
 	/* Table to synchronize threads */
 	public LinkedList<byte[]> ElevatorTable =new LinkedList<byte[]>();
@@ -146,6 +156,8 @@ public class Elevator extends Thread {
 		byte[] data = new byte[7];
 		data = toSend;
 		
+		System.out.print("Sendind to scheduler: ");
+		System.out.println(Arrays.toString(data));
 		try {
 			InetAddress address = InetAddress.getByName("134.117.59.128");
 			//System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
@@ -180,12 +192,33 @@ public class Elevator extends Thread {
 		}
 		
 		//ElevatorTable.add(data);
+		System.out.print("Received from scheduler: ");
+		System.out.println(Arrays.toString(data));
 		return data;
-/*		System.out.print("///////////////////Received from scheduler: ");
-		System.out.println(Arrays.toString(ElevatorTable.get(0)));*/
+
 	}
 
 
+	public static void fileReader(String fullFile) { 
+		String text = "";
+		int i=0;
+		try { 
+			FileReader input = new FileReader(fullFile);
+			Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
+
+			while (reader.hasNext()){
+				text = reader.next();
+				if (i<=1) {
+					i++;
+				} else if(i>=2) {
+					fileRequests.add(text);
+					i++;
+				}
+			}
+		}catch(Exception e) { e.printStackTrace(); }
+	}
+	
 	public void run() {
 		while(!isInterrupted()) {
 				if(runningStatus == true) {
@@ -239,13 +272,13 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		
+		fileReader("M://hello.txt");
 		
 		sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
 		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
 		
 		sendPacket(Elevator1.responsePacketRequest(3,0));
-		sendPacket(Elevator0.responsePacketRequest(UPDATE,0));
+		//sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
 /*		Elevator0.ElevatorTable.add(0,Elevator0.responsePacketRequest(1, 6));
 		Elevator1.ElevatorTable.add(1,Elevator1.responsePacketRequest(1, 4));
 		
@@ -253,10 +286,51 @@ public class Elevator extends Thread {
 		sendPacket(ElevatorTable1.get(1));
 		ElevatorTable1.clear();*/
 
+		Thread fileStuff = new Thread() {
+			public void run() {
+				while(true) {
+					if(fileRequests.isEmpty()) {
+						Elevator0.hasRequest = false;
+						Elevator1.hasRequest = false;
+					} else {
+						for(int i = 0; i <fileRequests.size(); i++) {
+							String command = fileRequests.remove(0);
+							String segment[] = command.split(" ");
+							floorButton = Integer.parseInt(segment[1]);
+							floorRequest = Integer.parseInt(segment[3]);
+							if(floorButton == Elevator0.getInitialFloor()) {
+								System.out.println("ELEVATOR 0 HERE");
+								try {
+									//Thread.sleep(4000);
+									sendPacket(Elevator0.responsePacketRequest(REQUEST, floorRequest));
+									break;
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							} else if(floorButton == Elevator1.getInitialFloor()) {
+								try {
+									//Thread.sleep(4000);
+									sendPacket(Elevator1.responsePacketRequest(REQUEST, floorRequest));
+									break;
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
 		Elevator0.start();
 		Elevator1.start();
-		
-		
+		fileStuff.start();
 
 		try {
 			while(true) {

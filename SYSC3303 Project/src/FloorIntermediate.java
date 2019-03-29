@@ -105,25 +105,32 @@ public class FloorIntermediate extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("waiting");
-		if(semaphoreOpen) {
-			for(int i = 0; i < Floor.floorsMade.length; i++) {
-				if(ID == Floor.floorsMade[i]) {
-					this.openDoor(ID, elevatorID);
-					sendPacket(Floor.responsePacket(ID, 0));
-					this.semaphoreOpen = false;
-					break;
+		while(true) {
+			if(semaphoreOpen) {
+				for(int i = 0; i < Floor.floorsMade.length; i++) {
+					if(ID == Floor.floorsMade[i]) {
+						this.openDoor(ID, elevatorID);
+						sendPacket(Floor.responsePacket(ID, 0));
+						this.semaphoreOpen = false;
+						break;
+					}
+				}
+			}else if (semaphoreOpen1) {
+				//System.out.println("here");
+				for(int i = 0; i < Floor.floorsMade.length; i++) {
+					if(ID == Floor.floorsMade[i]) {
+						sendPacket(Floor.responsePacket(ID, 0));
+						this.openDoor(ID, elevatorID);
+						this.semaphoreOpen1 = false;
+						break;
+					}
 				}
 			}
-		}else if (semaphoreOpen1) {
-			//System.out.println("here");
-			for(int i = 0; i < Floor.floorsMade.length; i++) {
-				if(ID == Floor.floorsMade[i]) {
-					sendPacket(Floor.responsePacket(ID, 0));
-					this.openDoor(ID, elevatorID);
-					this.semaphoreOpen1 = false;
-					break;
-				}
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -148,6 +155,9 @@ public class FloorIntermediate extends Thread {
 		FloorIntermediate F1 = new FloorIntermediate(0);
 		FloorIntermediate F2 = new FloorIntermediate(1);
 		//F1.sendPacket(responseByteArray);
+		
+		F1.start();
+		F2.start();
 		
 		byte [] received = new byte[7];
 		while (true) {
@@ -176,13 +186,12 @@ public class FloorIntermediate extends Thread {
 				F1.elevatorID = received[2];
 				F1.instruction = received[6];
 				F1.semaphoreOpen  = true;
-				F1.start();
 			} else if (eleID == 1) {
 				F2.ID = received[1];
 				F2.elevatorID = received[2];
 				F2.instruction = received[6];
 				F2.semaphoreOpen1  = true;
-				F2.start();
+
 			}
 		}
 	}
