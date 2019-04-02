@@ -23,9 +23,7 @@ public class Scheduler {
 	public static DatagramPacket schedulerElevatorSendPacket, schedulerElevatorReceivePacket, schedulerFloorSendPacket,
 	schedulerFloorReceivePacket;
 
-	public static int PORTNUM = 69;
 	// Variables
-
 	public static byte data[] = new byte[8];
 	public static byte dataFloor[] = new byte[8];
 	public static int elevatorOrFloor;
@@ -324,6 +322,7 @@ public class Scheduler {
 					// Elevator
 					// compare floor number with next stop of the elevator (==nextStop variable)
 					// if (floorStatus==nextStop[packetElementIndex])
+					elevatorCurrentFloor[packetElementIndex] = elevatorLocation;
 					if (elevatorStatus[packetElementIndex] == UP) {// direction that the elevator is going is up
 						if (elevatorStopsUp[packetElementIndex].contains(elevatorLocation)) {// we have reached a
 							// destination stop and
@@ -464,6 +463,7 @@ public class Scheduler {
 					// wrong direction)
 
 					// CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
+					elevatorCurrentFloor[packetElementIndex] = elevatorLocation;
 					if (elevatorStatus[packetElementIndex] != HOLD) {// elevator is not in hold mode, currently moving
 						// check direction
 						if (elevatorStatus[packetElementIndex] == UP) {// elevator is going up
@@ -627,12 +627,12 @@ public class Scheduler {
 						// location
 						elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Down direction
-						createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+						createSendingData(packetElementIndex, 0, 1, 5);// 2: down
 					} else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
 						// elevator's current location
 						elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Up direction
-						createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+						createSendingData(packetElementIndex, 0, 2, 5);// 1: up
 					}
 					elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
 				}
@@ -789,7 +789,8 @@ public class Scheduler {
 			schedulerFloorSendPacket = new DatagramPacket(sendData, sendData.length,
 					schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
 			try {
-				schedulerSocketSendReceiveElevator.send(schedulerFloorSendPacket);
+				schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
+				System.out.println("reached here");
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

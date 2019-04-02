@@ -177,11 +177,11 @@ public class Floor extends Thread {
 	}*/
 
 	public void updateDisplay(int onFloor, int goingDirection) {
-		System.out.println("On Floor: " + onFloor);
+		System.out.println("Elevator is Currently on Floor: " + onFloor);
 		if (goingDirection==UP) {
-			System.out.println("Going Up");
+			System.out.println("Coming Up");
 		} else if (goingDirection==DOWN) {
-			System.out.println("Going Down");
+			System.out.println("Coming Down");
 		}
 		else if(goingDirection==HOLD) {
 			System.out.println("Holding");

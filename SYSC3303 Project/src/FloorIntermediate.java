@@ -135,7 +135,7 @@ public class FloorIntermediate {
 
 			if (floorTable.size() != 0) {
 				try {
-					System.out.println("\nSending to scheduler: " + Arrays.toString(floorTable.get(0)));
+					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
 					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
 				} catch (UnknownHostException e) {
@@ -157,6 +157,7 @@ public class FloorIntermediate {
 
 	public synchronized void receivePacket() {
 		byte data[] = new byte[8];
+		int directedFloor; // which floor the packet is directed to
 		int elevatorDirection;//which direction the elevator is going or holding (data[__])
 		int elevatorLocation;//where the floor is (data[__])
 		int schedulerInstruction;//the instruction sent from the scheduler (data[6]
@@ -183,7 +184,7 @@ public class FloorIntermediate {
 			System.out.println("waiting to receive");
 			floorReceiveSocket.receive(floorReceivePacket);
 			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
+			System.out.println(Arrays.toString(data)+"\n");
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
@@ -192,21 +193,18 @@ public class FloorIntermediate {
 		}
 		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
 		
+		directedFloor = data[1];
 		elevatorLocation=data[3];
-		System.out.println("Elevator's Location: "+elevatorLocation);
-		
 		elevatorDirection=data[4];
-		System.out.println("Floor "+data[1]+"'s elevatorDirection: "+elevatorDirection);
 		schedulerInstruction=data[6];
+		
 		if (schedulerInstruction==INITIALIZE) {
 			intialized=true;
 		}
 		else if(schedulerInstruction==UPDATE_DISPLAY) {
 			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
 			//send updates to all the floors
-			for (int i = 0; i < numFloors; i++){
-				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
-			}
+			floorArray[directedFloor].updateDisplay(elevatorLocation, elevatorDirection);
 		}
 		
 		else {
@@ -271,7 +269,9 @@ public class FloorIntermediate {
 		}
 
 		while(true) {
-			floorHandler.sendPacket();
+			if(!floorTable.isEmpty()) {
+				floorHandler.sendPacket();
+			}
 			floorHandler.receivePacket();
 		}
 
