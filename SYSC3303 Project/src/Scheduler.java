@@ -251,7 +251,7 @@ public class Scheduler {
 		elevatorFloorSendPacket(ELEVATOR_ID);
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(FLOOR_ID);
-		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n");
+		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n\n\n\n");
 	}
 	//public byte[] SchedulingAlgorithm(byte[] packetData) {
 	private static void SchedulingAlgorithm(byte[] packetData) {//should be private and shouldn't needa return a global variable
@@ -554,7 +554,7 @@ public class Scheduler {
 					schedulerInitilization();
 				}
 			}
-			else {
+			else {// Its an up or down request coming from one of the floors
 				responseTime = calculateResponseTimes(packetElementIndex, floorRequestDirection);//response times of the elevators to reach the floor in the requested direction
 				temp = responseTime[0];//set to the first elevator at first
 				for (int i = 1; i < responseTime.length; i++) {//find the quickest (smallest) response time
