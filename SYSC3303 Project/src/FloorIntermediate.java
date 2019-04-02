@@ -193,7 +193,7 @@ public class FloorIntermediate {
 		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
 		
 		elevatorLocation=data[3];
-		System.out.println("Floor "+data[1]+"'s elevatorLocation: "+elevatorLocation);
+		System.out.println("Elevator's Location: "+elevatorLocation);
 		
 		elevatorDirection=data[4];
 		System.out.println("Floor "+data[1]+"'s elevatorDirection: "+elevatorDirection);
