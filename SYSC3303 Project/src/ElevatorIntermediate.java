@@ -14,9 +14,6 @@ import java.lang.Object;
 public class ElevatorIntermediate {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-//	private static final byte HOLD = 0x00;// elevator is in hold state
-//	private static final byte UP = 0x02;// elevator is going up
-//	private static final byte DOWN = 0x01;// elevator is going down
 	private static final byte UP = 0x01;// elevator is going up
 	private static final byte DOWN = 0x02;// elevator is going down
 	private static final byte STOP = 0x03;
@@ -284,10 +281,6 @@ public class ElevatorIntermediate {
 
 		
 		GUI gui = new GUI();
-		
-		// allocate receive packet
-		byte data[] = new byte[100];
-		schedulerReceivePacket = new DatagramPacket(data, data.length);
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,

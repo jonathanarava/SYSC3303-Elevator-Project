@@ -252,6 +252,7 @@ public class FloorIntermediate {
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
 		
+		
 		//FOR INITIATION
 		floorInitialization();
 		floorHandler.sendPacket();
@@ -263,6 +264,9 @@ public class FloorIntermediate {
 			// floor it
 			// starts on
 			floorThreadArray[i] = new Thread(floorArray[i]);
+			if(i == Integer.parseInt(args[1])) {
+				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
+			}
 			floorThreadArray[i].start();
 		}
 

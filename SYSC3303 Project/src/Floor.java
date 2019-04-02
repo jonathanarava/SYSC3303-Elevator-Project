@@ -57,6 +57,7 @@ public class Floor extends Thread {
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
+	private int realTimeDirectionRequest;
 	// Variables for displaying what is happening with the elevators
 	
 	List<String> fileRequests = new ArrayList<String>();
@@ -86,7 +87,7 @@ public class Floor extends Thread {
 	private int[] floorsMade;
 	private List<byte[]> floorTable;
 
-	private boolean hasRequest = true;
+	private boolean hasRequest = false;
 	private static byte error=NO_ERROR;//current Error, will be sent on the next send
 	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
@@ -137,7 +138,7 @@ public class Floor extends Thread {
 		} else if (requestUpdateError == ERROR) {
 			requestElevator.write(ERROR); // update
 			requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
-			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+			requestElevator.write(realTimeDirectionRequest); // up or down (not used, only for Floors)
 			requestElevator.write(UNUSED); // dest floor
 			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 			requestElevator.write(errorType); // error ID
@@ -159,69 +160,10 @@ public class Floor extends Thread {
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
 	}
-//	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
-//		// the response packet to be
-//		// sent to the scheduler
-//
-//		/*
-//		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
-//		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
-//		 * instruction) (
-//		 */
-//		// creates the byte array according to the required format
-//
-//		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-//		requestElevator.write(ELEVATOR_ID); // identification as a floor
-//		requestElevator.write(name); // identity of this particular elevator object
-//
-//		// request or update data
-//		if (requestUpdateError == REQUEST) {
-//			requestElevator.write(REQUEST); // request
-//		} else if (requestUpdateError == UPDATE) {
-//			requestElevator.write(UPDATE); // update
-//		} else if (requestUpdateError == ERROR) {
-//			requestElevator.write(ERROR); // update
-//			requestElevator.write(UNUSED);//(byte) setSensor(sensor)); // current floor
-//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-//			requestElevator.write(UNUSED); // dest floor
-//			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-//			requestElevator.write(errorType); // error ID
-//			return requestElevator.toByteArray();
-//		} else {// something's gone wrong with the call to this method
-//			requestElevator.write(ERROR);
-//			System.out.println(name
-//					+ " Floor ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
-//			requestElevator.write(UNUSED);//(byte) setSensor(sensor)); // current floor
-//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-//			requestElevator.write(UNUSED); // dest floor
-//			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-//			requestElevator.write(OTHER_ERROR); // something's gone wrong
-//			return requestElevator.toByteArray();
-//		}
-//		requestElevator.write(UNUSED);//(byte) setSensor(sensor)); // current floor
-//		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-//		requestElevator.write(UNUSED); // dest floor
-//		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-//		requestElevator.write(UNUSED); // no errors
-//		return requestElevator.toByteArray();
-//	}
-	public byte[] responsePacket(int NAMING, int up_or_down){
-		// creates the byte array according to the required format in this case
-		// 00000000-DATABYTE-00000000
-		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(FLOOR_ID);  // To Say That I am a floor(69) elevator has ID(21)
-		requestElevator.write(NAMING); // floor ID
-		if(up_or_down != 0) {
-			requestElevator.write(REQUEST); // request/update. floor only makes requests
-		} else {
-			requestElevator.write(2);
-		}
-		requestElevator.write(0); // Current Floor: Which Floor is sending this packet
-		requestElevator.write(up_or_down); // Up or Down is being pressed at the floor
-		requestElevator.write(0); // Destination floor (null)
-		requestElevator.write(0); // scheduler instruction
 
-		return requestElevator.toByteArray();
+	public void setRealTimeRequest(int upOrDown) {
+		hasRequest = true;
+		realTimeDirectionRequest = upOrDown;
 	}
 	
 	//SAME AS ELEVATOR'S METHOD
