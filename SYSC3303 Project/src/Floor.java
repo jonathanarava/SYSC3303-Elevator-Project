@@ -154,7 +154,7 @@ public class Floor extends Thread {
 			return requestElevator.toByteArray();
 		}
 		requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
-		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+		requestElevator.write(realTimeDirectionRequest); // up or down (not used, only for Floors)
 		requestElevator.write(UNUSED); // dest floor
 		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
