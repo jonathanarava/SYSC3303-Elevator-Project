@@ -1,4 +1,5 @@
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class FloorIntermediate {
 
@@ -28,34 +30,34 @@ public class FloorIntermediate {
 	
 	
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-		// States
-		private static final byte UP = 0x01;// elevator is going up
-		private static final byte DOWN = 0x02;// elevator is going down
-		private static final byte STOP = 0x03;
-		private static final byte HOLD = 0x04;// elevator is in hold state
-		private static final byte UPDATE_DISPLAY = 0x05;
-		private static final byte ERROR = (byte) 0xE0;// an error has occured
-		// Errors
-		private static final byte DOOR_ERROR = (byte)0xE1;
-		private static final byte MOTOR_ERROR = (byte)0xE2;
-		// still error states between 0xE3 to 0xEE for use
-		private static final byte OTHER_ERROR = (byte)0xEF;
-		private static final byte NO_ERROR = 0x00;
-		// Object ID
-		private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
-		private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
-		private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-		// Values for Running
-		private static final int DOOR_OPEN = 1;// the door is open when == 1
-		private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
-		private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
-		private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
-		private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
-		private static final int INITIALIZE=8;//for first communication with the scheduler
-		//private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-		//private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
-		private static final int UNUSED = 0;// value for unused parts of data
-		private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
+	// States
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte ERROR = (byte) 0xE0;// an error has occured
+	// Errors
+	private static final byte DOOR_ERROR = (byte)0xE1;
+	private static final byte MOTOR_ERROR = (byte)0xE2;
+	// still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR = (byte)0xEF;
+	private static final byte NO_ERROR = 0x00;
+	// Object ID
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	// Values for Running
+	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
+	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+	private static final int INITIALIZE=8;//for first communication with the scheduler
+	//private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	//private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final int UNUSED = 0;// value for unused parts of data
+	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
 	public static final int EL_RECEIVEPORTNUM = 369;
 	public static final int EL_SENDPORTNUM = 159;
@@ -85,6 +87,8 @@ public class FloorIntermediate {
 	private boolean intialized=false;
 	private static int numFloors;
 	private static byte initializationData[];
+	
+	static List<String> fileRequests = new ArrayList<String>();
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -229,6 +233,33 @@ public class FloorIntermediate {
 		floorTable.add(initializationData);
 
 	}
+	
+	/*
+	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are
+	 * discarded(due to the formatting given in project requirements) Takes the
+	 * input information and creates a list of Strings that will have the real time
+	 * inputs as a string. For now This section will be commented. Will be
+	 * implemented for other itterations
+	 */
+	public static void fileReader(String fullFile) { 
+		String text = "";
+		int i=0;
+		try { 
+			FileReader input = new FileReader(fullFile);
+			Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
+
+			while (reader.hasNext()){
+				text = reader.next();
+				if (i<=1) {
+					i++;
+				} else if(i>=2) {
+					fileRequests.add(text);
+					i++;
+				}
+			}
+		}catch(Exception e) { e.printStackTrace(); }
+	}
 
 	public static void main(String args[]) {// throws IOException {
 
@@ -239,8 +270,8 @@ public class FloorIntermediate {
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		//Floor floor = new Floor(createNumFloors);
 
-		//floor.fileReader("M://hello.txt");
-		//createNumFloors = Integer.parseInt(args[0]);
+		fileReader("M://hello.txt");
+		//read the input file and get requests for each of the floors. We will then feed these real time info to the floors before we run out program. 
 		numFloors = Integer.parseInt(args[0]);
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
