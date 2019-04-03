@@ -283,6 +283,7 @@ public class FloorIntermediate {
 		floorHandler.receivePacket();
 		for (int i = 0; i < numFloors; i++) {
 			floorArray[i] = new Floor(i, floorTable);//0, floorTable, Integer.parseInt(args[i + 1])); // i names the
+			
 			// elevator, 0
 			// initializes the
 			// floor it
