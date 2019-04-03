@@ -451,7 +451,7 @@ public class Scheduler {
 					// update floor number and direction displays for elevator and all floors
 					//createSendingData(0, 0, elevatorDirection, 5);// 5: status update
 					createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);
-					elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
+					elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS 
 					elevatorFloorSendPacket(ELEVATOR_ID);
 				} else {// elevator sent a request
 
@@ -542,6 +542,7 @@ public class Scheduler {
 							// is sent
 						}
 						elevatorFloorSendPacket(ELEVATOR_ID);// originally the only send in the method
+						elevatorFloorSendPacket(FLOOR_ID);
 					}
 				}
 			}
@@ -790,7 +791,6 @@ public class Scheduler {
 					schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
 			try {
 				schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
-				System.out.println("reached here");
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

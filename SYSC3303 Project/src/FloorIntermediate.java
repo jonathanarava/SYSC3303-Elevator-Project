@@ -157,7 +157,7 @@ public class FloorIntermediate {
 
 	public synchronized void receivePacket() {
 		byte data[] = new byte[8];
-		int directedFloor; // which floor the packet is directed to
+		int elevatorOnTheMove; // which elevator the update packet regarding
 		int elevatorDirection;//which direction the elevator is going or holding (data[__])
 		int elevatorLocation;//where the floor is (data[__])
 		int schedulerInstruction;//the instruction sent from the scheduler (data[6]
@@ -193,7 +193,7 @@ public class FloorIntermediate {
 		}
 		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
 		
-		directedFloor = data[1];
+		elevatorOnTheMove = data[1];
 		elevatorLocation=data[3];
 		elevatorDirection=data[4];
 		schedulerInstruction=data[6];
@@ -201,18 +201,13 @@ public class FloorIntermediate {
 		if (schedulerInstruction==INITIALIZE) {
 			intialized=true;
 		}
-		else if(schedulerInstruction==UPDATE_DISPLAY) {
+		else{
 			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
 			//send updates to all the floors
-			floorArray[directedFloor].updateDisplay(elevatorLocation, elevatorDirection);
+			for(int i=0; i<numFloors; i++) {
+				floorArray[i].updateDisplay(elevatorOnTheMove, elevatorLocation, schedulerInstruction);
+			}
 		}
-		
-		else {
-			//something's gone wrong, floors should only ever be receiving updates
-			System.out.println("error in receivePacket(), not an UPDATE_DISPLAY for Floor: ."+ elevatorLocation+"Instead "+schedulerInstruction+" is sent.");
-		}
-		
-
 	}
 
 	private static void floorInitialization() {
@@ -262,9 +257,9 @@ public class FloorIntermediate {
 			// floor it
 			// starts on
 			floorThreadArray[i] = new Thread(floorArray[i]);
-			if(i == Integer.parseInt(args[1])) {
-				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
-			}
+//			if(i == Integer.parseInt(args[1])) {
+//				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
+//			}
 			floorThreadArray[i].start();
 		}
 

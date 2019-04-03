@@ -58,6 +58,7 @@ public class Floor extends Thread {
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
 	private int realTimeDirectionRequest;
+	private int goingDirection;
 	// Variables for displaying what is happening with the elevators
 	
 	List<String> fileRequests = new ArrayList<String>();
@@ -176,8 +177,11 @@ public class Floor extends Thread {
 		}
 	}*/
 
-	public void updateDisplay(int onFloor, int goingDirection) {
-		System.out.println("Elevator is Currently on Floor: " + onFloor);
+	public void updateDisplay(int whichElevator, int onFloor, int schedularInstruction) {
+		if(schedularInstruction == UP || schedularInstruction == DOWN) {
+			goingDirection = schedularInstruction;
+		}
+		System.out.println("Floor "+ name +": Elevator "+ whichElevator +" is Currently on Floor  " + onFloor);
 		if (goingDirection==UP) {
 			System.out.println("Coming Up");
 		} else if (goingDirection==DOWN) {
