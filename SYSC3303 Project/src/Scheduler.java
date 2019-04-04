@@ -350,19 +350,6 @@ public class Scheduler {
 								}
 								// check if there are more stops down
 								if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
-									// create and send sendPacket to hold the motor
-
-//									try {
-//										Thread.currentThread().sleep(2);
-//									} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
-//										// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
-//										// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
-//										e.printStackTrace();
-//									}
-
-									//createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
-									//elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-									// overwritten before being sent at the very end
 									elevatorStopsUp[packetElementIndex].clear();
 									// Sleep method
 
@@ -383,9 +370,9 @@ public class Scheduler {
 								// overwritten before being sent at the very end
 							}
 
-						} else if(elevatorStopsUp[packetElementIndex].isEmpty()){
-							if(elevatorStopsDown[packetElementIndex].isEmpty()) {
-								createSendingData(packetElementIndex, 0, 0, 4);
+						} else if(elevatorStopsUp[packetElementIndex].isEmpty()){ 
+							if(elevatorStopsDown[packetElementIndex].isEmpty()) { // No stop requests for this elevator so make it go to hold state
+								createSendingData(packetElementIndex, 0, 0, 4); //Put into hold state and send a packet for holding
 								elevatorFloorSendPacket(ELEVATOR_ID);
 							}
 						}
