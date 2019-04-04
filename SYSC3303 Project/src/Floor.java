@@ -178,17 +178,28 @@ public class Floor extends Thread {
 	}*/
 
 	public void updateDisplay(int whichElevator, int onFloor, int schedularInstruction) {
+		System.out.println("Floor "+ name +": Elevator "+ whichElevator +" is Currently on Floor  " + onFloor);
 		if(schedularInstruction == UP || schedularInstruction == DOWN) {
 			goingDirection = schedularInstruction;
 		}
-		System.out.println("Floor "+ name +": Elevator "+ whichElevator +" is Currently on Floor  " + onFloor);
+		else if(schedularInstruction == STOP) {
+			if(onFloor == name) {
+				System.out.println("Opening Doors");
+			}
+			return;
+		}
+		else if(schedularInstruction == HOLD) {
+			if(onFloor == name) {
+				System.out.println("Closing Doors, Elevator Holding on this floor");
+			}
+			return;
+		}
+		
+		
 		if (goingDirection==UP) {
 			System.out.println("Coming Up");
 		} else if (goingDirection==DOWN) {
 			System.out.println("Coming Down");
-		}
-		else if(goingDirection==HOLD) {
-			System.out.println("Holding");
 		}
 		else {
 			System.out.println("Something's gone wrong in updateDisplay() direction argument for Floor: "+name);

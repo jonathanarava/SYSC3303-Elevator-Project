@@ -65,7 +65,7 @@ public class ElevatorIntermediate {
 
 	private byte[] requestElevator = new byte[3];
 	private boolean intialized=false;
-
+	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
 	/*
@@ -80,7 +80,8 @@ public class ElevatorIntermediate {
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
-			elevatorSendSocket.setSoTimeout(250);// sets the maximum time for the receive function to self block
+			//elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
+			//elevatorReceiveSocket.setSoTimeout(8000);// sets the maximum time for the receive function to self block
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -129,6 +130,7 @@ public class ElevatorIntermediate {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
 					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
+					recentlySent = elevatorTable.get(0);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -154,7 +156,7 @@ public class ElevatorIntermediate {
 		byte elevatorElement;
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
-			// elevatorReceiveSocket.setSoTimeout(10); Eventually we will need this to sync
+			elevatorReceiveSocket.setSoTimeout(2500);
 			// send and receive with Scheduler.
 		} catch (SocketException e1) {
 			e1.printStackTrace();
@@ -168,13 +170,14 @@ public class ElevatorIntermediate {
 			System.out.println("waiting to receive");
 			elevatorReceiveSocket.receive(elevatorReceivePacket);
 			respondEnd = System.nanoTime();
+			recentlySent = null;
 			System.out.print("Received from scheduler: ");
 			System.out.println(Arrays.toString(data));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
 			e.printStackTrace();
-			System.exit(1);
+			//System.exit(1);
 		}
 		System.out.println("It took "+ (respondEnd-respondStart) +" nanoseconds to get a response from the Scheduler");
 		elevatorReceiveSocket.close();
@@ -280,7 +283,7 @@ public class ElevatorIntermediate {
 		// with the scheduler. All the elevator threads will use this.
 
 		
-		GUI gui = new GUI();
+		//GUI gui = new GUI();
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,

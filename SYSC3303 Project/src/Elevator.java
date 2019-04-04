@@ -289,17 +289,6 @@ public class Elevator extends Thread {
 		}
 	}
 
-	public synchronized void waitForRequest() {
-		while (!hasRequest) {
-			try {
-				System.out.println("waiting indefinitely");
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	public void run() {
 		while (true) {
 			// while(true) to activate all elevator threads in this system
@@ -338,7 +327,6 @@ public class Elevator extends Thread {
 						motionOfMotor = HOLD;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
-						waitForRequest();
 					}
 					else if(motorDirection==SHUT_DOWN) {
 						shutDown();
