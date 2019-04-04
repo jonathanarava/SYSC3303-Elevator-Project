@@ -278,7 +278,6 @@ public class Elevator extends Thread {
 		synchronized (elevatorTable) {
 			while (elevatorTable.size() != 0) {// wait for an opening to send the packet
 				try {
-					System.out.println("Stuck");
 					elevatorTable.wait(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -314,7 +313,9 @@ public class Elevator extends Thread {
 						}
 						updateDisplay();
 						dealWith = !dealWith;
+						
 						sendPacket(2, NO_ERROR);
+						
 						// set the lights sensors and stuff to proper value
 						isUpdate = false;
 					}
@@ -328,11 +329,14 @@ public class Elevator extends Thread {
 						motionOfMotor = HOLD;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
+						break;
 					}
 					else if(motorDirection==SHUT_DOWN) {
 						shutDown();
 					}
 				}
+				break;
+				
 			}
 		}
 	}

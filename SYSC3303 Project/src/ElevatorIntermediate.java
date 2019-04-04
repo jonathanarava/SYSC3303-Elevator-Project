@@ -219,6 +219,7 @@ public class ElevatorIntermediate {
 			case 1:
 				elevatorArray[1].motorDirection = data[6];
 				elevatorArray[1].dealWith = true;
+
 				break;
 			case 2:
 				elevatorArray[2].motorDirection = data[6];
