@@ -9,60 +9,55 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Elevator extends Thread {
-
-	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	// States
-	private static final byte UP = 0x01;// elevator is going up
-	private static final byte DOWN = 0x02;// elevator is going down
-	private static final byte STOP = 0x03;
-	private static final byte HOLD = 0x04;// elevator is in hold state
-	private static final byte UPDATE_DISPLAY = 0x05;
-	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
-	private static final byte ERROR = (byte) 0xE0;// an error has occured
-	// Errors
-	private static final byte DOOR_ERROR = (byte)0xE1;
-	private static final byte MOTOR_ERROR = (byte)0xE2;
-	// still error states between 0xE3 to 0xEE for use
-	private static final byte OTHER_ERROR = (byte)0xEF;
-	private static final byte NO_ERROR = 0x00;
-	// Object ID
-	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
-	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
-	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-	// Values for Running
-	private static final int DOOR_OPEN = 1;// the door is open when == 1
-	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
-	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
-	
-	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
-	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
-	private static final int MAKE_STOP=3;//
-	private static final int PLACE_ON_HOLD=4;
-	private static final int UPDATE_DISPLAYS=5;
-	//private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
-	private static final int UNUSED = 0;// value for unused parts of data
-	private static final int INITIALIZE=8;//for first communication with the scheduler
-	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
+	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+		//States
+		private static final byte UP = 0x01;// elevator is going up
+		private static final byte DOWN = 0x02;// elevator is going down
+		private static final byte STOP = 0x03;
+		private static final byte HOLD = 0x04;// elevator is in hold state
+		private static final byte UPDATE_DISPLAY = 0x05;
+		private static final byte ERROR=(byte)0xE0;//an error has occured
+		//Errors
+		private static final byte DOOR_ERROR=(byte)0xE1;
+		private static final byte MOTOR_ERROR=(byte)0xE2;
+		//still error states between 0xE3 to 0xEE for use
+		private static final byte OTHER_ERROR=(byte)0xEF; 
+		private static final byte NO_ERROR=(byte)0x00;
+		//Object ID
+		private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+		private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+		private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+		//Values for Running
+		private static final int DOOR_OPEN = 1;// the door is open when == 1
+		private static final int DOOR_CLOSE = 3; // the door is closed when == 3 
+		private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+		private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+		private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+		private static final int MAKE_STOP=3;//
+		private static final int PLACE_ON_HOLD=4;
+		private static final int UPDATE_DISPLAYS=5;
+		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int INITIALIZE=8;//for first communication with the scheduler
+		private static final int UNUSED=0;// value for unused parts of data 
+		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
 
 	public byte motorDirection; // make getters and setters:
-	public boolean hasRequest = true; // make getters and setters: This Boolean will be set to true when the Elevator
+	public boolean hasRequest = false; // make getters and setters: This Boolean will be set to true when the Elevator
 	// Intermediate wants a specific elevator thread to do something.
 	// if hasRequest is true, then the Elevator thread will not send another
 	// request. Ie, he needs to take care of the job he is told to do by the
 	// intermediate
 	// before he takes more real time requests by the people. Incidentally,
 	// hasRequest == true means that the elevator should move up or down a floor.
-	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
+	//public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 
-	public boolean dealWith = false; // dealWith boolean is set by the Intermediate class for a specific elevator if THAT SPECIFIC elevator has a job set by scheduler it needs to dealWith
+	public boolean dealWith = false;
 
-	private int motionOfMotor; // Directory of the motor. This will be set by elevatorDirection, which is the Instruction that is sent by the scheduler
+	public int elevatorState; // 0x01 is moving up, 0x02 is moving down, 0x03 is stop
 
 	public boolean isUpdate = false; // This boolean is set to true in the ElevatorIntermediate, if the elevator
 										// intermediate is expecting an update from the elevator
-	public boolean isGoingUp;
+	//public boolean isGoingUp;
 	private boolean elevatorBroken=false; //whether the elevator is broken or not
 
 	private int elevatorNumber;
@@ -77,11 +72,11 @@ public class Elevator extends Thread {
 	private boolean doorStatusOpen = false; // whether the doors are open(true) or closed (false)
 	private long doorOpenTime, doorCloseTime;// for error checking that doors are closed within time
 
-	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
+	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimeFloorRequest) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
-		this.RealTimefloorRequest = RealTimefloorRequest;
+		setRealTimeFloorRequest(RealTimeFloorRequest);//this.RealTimefloorRequest = RealTimefloorRequest;
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -97,13 +92,18 @@ public class Elevator extends Thread {
 		 * accordingly
 		 */
 	}
+	
+	public void setRealTimeFloorRequest (int setRequest) {
+		RealTimefloorRequest=setRequest;
+		hasRequest=true;
+		}
 
 	/**
 	 * 
 	 * @param requestUpdateError
 	 * @return byte[] to be put on the synchronized table
 	 */
-	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
+	public byte[] createResponsePacketData(int requestUpdateError, int destinationFloor, byte errorType) {// create the Data byte[] for
 																							// the response packet to be
 																							// sent to the scheduler
 
@@ -117,9 +117,15 @@ public class Elevator extends Thread {
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(ELEVATOR_ID); // identification as an elevator, instead of floor, or scheduler
 		requestElevator.write(elevatorNumber); // identity of this particular elevator object
-
+		
 		// request or update data
 		if (requestUpdateError == REQUEST) {
+			requestElevator.write(REQUEST);
+			requestElevator.write((byte) setSensor(sensor)); // current floor
+			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+			requestElevator.write(destinationFloor); // dest floor
+			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+			requestElevator.write(UNUSED); // no errors
 			//requestElevator.write(REQUEST); // request
 			// requestElevator.write((byte) setSensor(sensor)); // current floor
 			// requestElevator.write(0); // up or down (not used, only for Floors)
@@ -128,6 +134,12 @@ public class Elevator extends Thread {
 			// (not used, only from the scheduler)
 			// added error to data structure, not included here
 		} else if (requestUpdateError == UPDATE) {
+			requestElevator.write(UPDATE);
+			requestElevator.write((byte) setSensor(sensor)); // current floor
+			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+			requestElevator.write(UNUSED); // dest floor
+			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+			requestElevator.write(UNUSED); // no errors
 			//requestElevator.write(UPDATE); // update
 			// requestElevator.write((byte) setSensor(sensor)); // current floor
 			// requestElevator.write(0); // up or down (not used, only for Floors)
@@ -135,30 +147,26 @@ public class Elevator extends Thread {
 			// requestElevator.write(0); // instruction
 			// added error to data structure, not included here
 		} else if (requestUpdateError == ERROR) {
-			//requestElevator.write(ERROR); // update
+			requestElevator.write(ERROR); // ERROR
 			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-			requestElevator.write(RealTimefloorRequest); // dest floor
-			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
+			requestElevator.write(UNUSED); // dest floor
+			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 			requestElevator.write(errorType); // error ID
-			return requestElevator.toByteArray();
+			//return requestElevator.toByteArray();
 		} else {// something's gone wrong with the call to this method
 			//requestElevator.write(ERROR);
+			requestElevator.write(ERROR); // ERROR
 			System.out.println(elevatorNumber
 					+ " Elevator ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
 			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-			requestElevator.write(RealTimefloorRequest); // dest floor
+			requestElevator.write(UNUSED); // dest floor
 			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 			requestElevator.write(OTHER_ERROR); // something's gone wrong
-			return requestElevator.toByteArray();
+			//return requestElevator.toByteArray();
 		}
-		requestElevator.write(requestUpdateError);
-		requestElevator.write((byte) setSensor(sensor)); // current floor
-		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-		requestElevator.write(RealTimefloorRequest); // dest floor
-		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-		requestElevator.write(UNUSED); // no errors
+		
 		return requestElevator.toByteArray();
 	}
 
@@ -211,17 +219,17 @@ public class Elevator extends Thread {
 			System.out.println("Doors Closed");
 		}
 		else {//error 
-			sendPacket(ERROR, DOOR_ERROR);
+			sendPacket(ERROR, UNUSED, DOOR_ERROR);
 		}
 		//check that the doors were closed and done so on time
 		if ((doorCloseTime-doorOpenTime)>DOOR_CLOSE_BY*1000000000) {
-			sendPacket(ERROR, DOOR_ERROR);
+			sendPacket(ERROR, UNUSED, DOOR_ERROR);
 		}
 		//return msg; 
 	}
 
 	public void shutDown() {
-		motionOfMotor=STOP;
+		elevatorState=STOP;
 		System.out.println("Elevator Out of Order, Maintenance and Emergency Fire Services have been Contacted");
 		if (elevatorBroken==true) {
 			try {// wait for 1000
@@ -243,11 +251,24 @@ public class Elevator extends Thread {
 	}
 
 	public void updateDisplay() {
-		System.out.println("On Floor: " + sensor);
-		if (isGoingUp) {
-			System.out.println("Going Up");
-		} else if (!isGoingUp) {
-			System.out.println("Going Down");
+		System.out.print("Elevator: "+elevatorNumber+" On Floor: " + sensor);
+		//System.out.print();
+		//if (isGoingUp) {
+		if(elevatorState==UP) {//if (motorDirection==UP) {
+			System.out.println(" Going Up");
+		} 
+		//else if (!isGoingUp) {
+		else if(elevatorState==DOWN) {//else if (motorDirection==DOWN) {
+			System.out.println(" Going Down");
+		}
+		else if(elevatorState==STOP) {//else if (motorDirection==STOP){
+			System.out.println(" at a Stop");
+		}
+		else if(elevatorState==HOLD) {//else if(motorDirection==HOLD) {
+			System.out.println(" on Hold");
+		}
+		else {
+			System.out.println("motorDirection neither UP, DOWN, STOP, nor HOLD... is: "+motorDirection);
 		}
 	}
 
@@ -259,14 +280,16 @@ public class Elevator extends Thread {
 			e.printStackTrace();
 		}
 		// for
-		if (motionOfMotor == UP) {
-			System.out.println("Elevator is going up...");
-			isGoingUp = true;
+		if (elevatorState == UP) {
+			System.out.println("Elevator: "+ elevatorNumber+" is going up...");
+			//isGoingUp = true;
+			motorDirection=DOWN;
 			sensor++; // increment the floor
 			setSensor(sensor); // updates the current floor
-		} else if (motionOfMotor == DOWN) {
-			System.out.println("Elevator is going down...");
-			isGoingUp = false;
+		} else if (elevatorState == DOWN) {
+			System.out.println("Elevator: "+elevatorNumber+" is going down...");
+			//isGoingUp = false;
+			motorDirection=UP;
 			sensor--; // decrements the floor
 			setSensor(sensor); // updates the current floor
 		}
@@ -274,7 +297,7 @@ public class Elevator extends Thread {
 
 	// sets Current location of elevator through this setter
 
-	public synchronized void sendPacket(int requestUpdateError, byte sendErrorType) {
+	public synchronized void sendPacket(int requestUpdateError, int destinationFloor, byte sendErrorType) {
 		synchronized (elevatorTable) {
 			while (elevatorTable.size() != 0) {// wait for an opening to send the packet
 				try {
@@ -283,7 +306,7 @@ public class Elevator extends Thread {
 					e.printStackTrace();
 				}
 			}
-			elevatorTable.add(createResponsePacketData(requestUpdateError, sendErrorType));
+			elevatorTable.add(createResponsePacketData(requestUpdateError, destinationFloor, sendErrorType));
 			// isUpdate = false;
 			elevatorTable.notifyAll();
 		}
@@ -302,46 +325,52 @@ public class Elevator extends Thread {
 
 	public void run() {
 		while (true) {
-			// while(true) to activate all elevator threads in this system
-			while (hasRequest) {// send request
-				sendPacket(1, NO_ERROR);
-				// hasRequest = !hasRequest;
+			if (hasRequest){//while (hasRequest) {// send request
+				sendPacket(REQUEST,RealTimefloorRequest, NO_ERROR);
 				hasRequest = false;
 			}
 
 			while (!hasRequest) {// send updates
+				try {
+					Thread.sleep(1);// delay for 1 second
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				while (dealWith) {
-					
-					if (motorDirection == UP || motorDirection == DOWN) {
-						motionOfMotor = motorDirection; 
+					//if (motorDirection == UP || motorDirection == DOWN) {
+					if (elevatorState == UP || elevatorState == DOWN) {
+						//elevatorState = motorDirection;//WHAT?
 						runElevator();
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
-					}
-					else if (motorDirection == UPDATE_DISPLAY) {
-						if (motionOfMotor == UP || motionOfMotor == DOWN) {
+						dealWith =false;// !dealWith;
+						sendPacket(UPDATE,UNUSED, NO_ERROR);
+					} 
+					else if (elevatorState == UPDATE_DISPLAY) {//else if (motorDirection == UPDATE_DISPLAY) {
+						/*if (elevatorState == UP || elevatorState == DOWN) {
 							runElevator();
-						}
+						}*/
 						updateDisplay();
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
+						dealWith = false;//!dealWith;
+						sendPacket(UPDATE,UNUSED, NO_ERROR);
 						// set the lights sensors and stuff to proper value
-						isUpdate = false;
-					}
-					else if (motorDirection == STOP) {
-						motionOfMotor = STOP;
-						dealWith = !dealWith;
-						sendPacket(2, NO_ERROR);
-					}
-					else if (motorDirection == HOLD) {
+						//isUpdate = false;
+					} 
+					else if (elevatorState == STOP) {//else if (motorDirection == STOP) {
+						//elevatorState = STOP;
+						//motorDirection=STOP;
+						dealWith = false;//!dealWith;
+						sendPacket(UPDATE,UNUSED, NO_ERROR);
+					} 
+					else if (elevatorState == HOLD) {//else if (motorDirection == HOLD) {
 						// Figure out why the Elevator is not reaching the hold state.
-						motionOfMotor = HOLD;
+						//elevatorState = HOLD;
+						//motorDirection=STOP;
 						System.out.println("Reached Hold state in elevator");
-						dealWith = !dealWith;
+						dealWith =false;// !dealWith;
 						waitForRequest();
 					}
-					else if(motorDirection==SHUT_DOWN) {
+					else if(elevatorState==SHUT_DOWN) {//else if(motorDirection==SHUT_DOWN) {
 						shutDown();
+						dealWith=false;//
 					}
 				}
 			}
