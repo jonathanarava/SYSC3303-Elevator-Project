@@ -43,6 +43,8 @@ public class ElevatorIntermediate {
 	private static final int UNUSED=0;// value for unused parts of data 
 	
 	private static long respondStart, respondEnd;
+	
+	private int numFloors;
 	/*
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
@@ -200,6 +202,7 @@ public class ElevatorIntermediate {
 		schedulerInstruction=data[6];
 		elevatorElement=data[1];
 		if (schedulerInstruction==INITIALIZE) {
+			numFloors = data[4];
 			intialized=true;
 		}
 		else if(schedulerInstruction==UPDATE) {
@@ -292,8 +295,13 @@ public class ElevatorIntermediate {
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
+<<<<<<< HEAD
 
 		//GUI gui = new GUI();
+=======
+		
+		GUI gui = new GUI();
+>>>>>>> 1b6f171979d64f55ed91c35328f00895acb3a0ca
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
