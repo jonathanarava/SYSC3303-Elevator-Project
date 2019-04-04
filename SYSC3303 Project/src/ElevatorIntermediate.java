@@ -21,6 +21,14 @@ public class ElevatorIntermediate {
 	private static final byte UPDATE_DISPLAY = 0x05;
 	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
 	
+	private static final byte ERROR = (byte) 0xE0;// an error has occured
+	// Errors
+	private static final byte DOOR_ERROR = (byte)0xE1;
+	private static final byte MOTOR_ERROR = (byte)0xE2;
+	// still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR = (byte)0xEF;
+	private static final byte NO_ERROR = 0x00;
+	
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
@@ -35,6 +43,8 @@ public class ElevatorIntermediate {
 	private static final int UNUSED=0;// value for unused parts of data 
 	
 	private static long respondStart, respondEnd;
+	
+	private int numFloors;
 	/*
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
@@ -192,6 +202,7 @@ public class ElevatorIntermediate {
 		schedulerInstruction=data[6];
 		elevatorElement=data[1];
 		if (schedulerInstruction==INITIALIZE) {
+			numFloors = data[4];
 			intialized=true;
 		}
 		else if(schedulerInstruction==UPDATE) {
@@ -284,8 +295,8 @@ public class ElevatorIntermediate {
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
-		
 		//GUI gui = new GUI();
+
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
@@ -310,6 +321,71 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i].start();
 		}
 
+		
+		Thread fileStuff = new Thread() {
+			public void run() {
+				while(true) {
+					for(int i=0; i< createNumElevators; i++) {
+						while(elevatorArray[i].holdReceived) {
+							if(fileRequests.isEmpty() && elevatorArray[i].holdReceived) {
+								try {
+									elevatorArray[i].sendPacket(2,NO_ERROR);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								Elevator0.holdReceived = false;
+								break;
+							} else if(fileRequests.isEmpty() && Elevator1.holdReceived) {
+								try {
+									sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								Elevator1.holdReceived = false;
+								break;
+							} else {
+								for(int i = 0; i <fileRequests.size(); i++) {
+									String command = fileRequests.get(i);
+									String segment[] = command.split(" ");
+									floorButton = Integer.parseInt(segment[1]);
+									System.out.println("HERE" + segment[3] +".....");
+									floorRequest = Integer.parseInt(segment[3]);
+									if(floorButton == Elevator0.getInitialFloor()) {								
+										try {
+											sendPacket(Elevator0.responsePacketRequest(REQUEST, floorRequest));
+											fileRequests.remove(i);
+											break;
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									} else if(floorButton == Elevator1.getInitialFloor()) {
+										try {
+											sendPacket(Elevator1.responsePacketRequest(REQUEST, floorRequest));
+											fileRequests.remove(i);
+											break;
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
+								}
+								Elevator1.holdReceived = false;
+								Elevator0.holdReceived = false;
+								break;
+							}
+						}
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		};
+		
+		fileStuff.start();;
+		
+		
 		while (true) {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
