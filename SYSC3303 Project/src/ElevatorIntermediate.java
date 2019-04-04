@@ -1,4 +1,5 @@
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.lang.Object;
 
 public class ElevatorIntermediate {
@@ -76,6 +78,7 @@ public class ElevatorIntermediate {
 	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
+	private static List<String> fileRequests = new ArrayList<String>();
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -273,6 +276,26 @@ public class ElevatorIntermediate {
 		elevatorTable.add(initializationData);
 
 	}
+	
+	public static void fileReader(String fullFile) { 
+		String text = "";
+		int i=0;
+		try { 
+			FileReader input = new FileReader(fullFile);
+			Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
+
+			while (reader.hasNext()){
+				text = reader.next();
+				if (i<=1) {
+					i++;
+				} else if(i>=2) {
+					fileRequests.add(text);
+					i++;
+				}
+			}
+		}catch(Exception e) { e.printStackTrace(); }
+	}
 
 	public static void main(String args[]) throws IOException {
 		// 2 arguments: args[0] is the number of Elevators in the system
@@ -308,7 +331,7 @@ public class ElevatorIntermediate {
 		elevatorThreadArray = new Thread[createNumElevators];
 
 		for (int i = 0; i < createNumElevators; i++) {
-			elevatorArray[i] = new Elevator(i, 0, elevatorTable, Integer.parseInt(args[i + 1])); // i names the
+			elevatorArray[i] = new Elevator(i, 0, elevatorTable); // i names the
 			// elevator, 0
 			// initializes the
 			// floor it
@@ -317,55 +340,35 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i].start();
 		}
 
+		fileReader("M://hello.txt");
 		
 		Thread fileStuff = new Thread() {
+			private int floorButton;
+			private int floorRequest;
+
 			public void run() {
 				while(true) {
 					for(int i=0; i< createNumElevators; i++) {
 						while(elevatorArray[i].holdReceived) {
 							if(fileRequests.isEmpty() && elevatorArray[i].holdReceived) {
-								try {
-									elevatorArray[i].sendPacket(2,NO_ERROR);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								Elevator0.holdReceived = false;
-								break;
-							} else if(fileRequests.isEmpty() && Elevator1.holdReceived) {
-								try {
-									sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								Elevator1.holdReceived = false;
+								elevatorArray[i].sendPacket(2,NO_ERROR);
+								elevatorArray[i].holdReceived = false;
 								break;
 							} else {
-								for(int i = 0; i <fileRequests.size(); i++) {
-									String command = fileRequests.get(i);
+								for(int j = 0; j <fileRequests.size(); j++) {
+									String command = fileRequests.get(j);
 									String segment[] = command.split(" ");
 									floorButton = Integer.parseInt(segment[1]);
 									System.out.println("HERE" + segment[3] +".....");
 									floorRequest = Integer.parseInt(segment[3]);
-									if(floorButton == Elevator0.getInitialFloor()) {								
-										try {
-											sendPacket(Elevator0.responsePacketRequest(REQUEST, floorRequest));
-											fileRequests.remove(i);
-											break;
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-										}
-									} else if(floorButton == Elevator1.getInitialFloor()) {
-										try {
-											sendPacket(Elevator1.responsePacketRequest(REQUEST, floorRequest));
-											fileRequests.remove(i);
-											break;
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-										}
+									if(floorButton == elevatorArray[i].getSensor()) {								
+										elevatorArray[i].setRealTimeRequest(floorRequest);
+										elevatorArray[i].hasRequest = true;
+										fileRequests.remove(j);
+										break;
 									}
 								}
-								Elevator1.holdReceived = false;
-								Elevator0.holdReceived = false;
+								elevatorArray[i].holdReceived = false;
 								break;
 							}
 						}
