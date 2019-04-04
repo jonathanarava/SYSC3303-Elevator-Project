@@ -119,7 +119,8 @@ public class ElevatorIntermediate {
 		synchronized (elevatorTable) {
 			while (elevatorTable.isEmpty()) {
 				try {
-					elevatorTable.wait();
+					elevatorTable.wait(1);
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

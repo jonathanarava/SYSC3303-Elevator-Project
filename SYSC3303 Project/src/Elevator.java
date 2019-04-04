@@ -278,7 +278,8 @@ public class Elevator extends Thread {
 		synchronized (elevatorTable) {
 			while (elevatorTable.size() != 0) {// wait for an opening to send the packet
 				try {
-					elevatorTable.wait();
+					System.out.println("Stuck");
+					elevatorTable.wait(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
