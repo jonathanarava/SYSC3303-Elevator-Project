@@ -165,8 +165,8 @@ public class Floor extends Thread {
 	}
 
 
-	public void updateDisplay(int onFloor, int goingDirection) {
-		System.out.println("On Floor: " + onFloor);
+	public void updateDisplay(int elevatorElement, int onFloor, int goingDirection) {
+		System.out.println(name+" Floor's Display for Elevator: "+elevatorElement+" On Floor: " + onFloor);
 		if (goingDirection==UP) {
 			System.out.println("Going Up");
 		} else if (goingDirection==DOWN) {
