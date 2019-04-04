@@ -50,7 +50,7 @@ public class FloorIntermediate extends Thread {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.99");
+			InetAddress address = InetAddress.getByName("134.117.59.127");
 			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, address, SENDPORTNUM);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -148,7 +148,7 @@ public class FloorIntermediate extends Thread {
 
 		Floor floor = new Floor(createNumFloors);
 		
-		floor.fileReader("C:\\Users\\calvinlam.LABS\\Documents\\GitHub\\SYSC3303-Project-Group5\\SYSC3303 Project\\src\\hello.txt");
+		floor.fileReader("M://hello.txt");
 		//byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
 
 		FloorIntermediate F1 = new FloorIntermediate(0);

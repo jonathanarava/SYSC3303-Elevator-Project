@@ -114,7 +114,7 @@ public class Scheduler extends Thread {
 	public static void elevatorSendPacket(byte[] responseByteArray) {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.98");
+			InetAddress address = InetAddress.getByName("134.117.59.127");
 			schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
 					address, schedulerElevatorReceivePacket.getPort());
 		} catch (UnknownHostException e) {

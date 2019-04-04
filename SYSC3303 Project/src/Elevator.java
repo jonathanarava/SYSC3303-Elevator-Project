@@ -161,7 +161,7 @@ public class Elevator extends Thread {
 		System.out.print("Sendind to scheduler: ");
 		System.out.println(Arrays.toString(data));
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.99");
+			InetAddress address = InetAddress.getByName("134.117.59.127");
 			//System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
 			ElevatorSendPacket = new DatagramPacket(data, 7, address, 369);
 		} catch (UnknownHostException e) {
@@ -275,7 +275,7 @@ public class Elevator extends Thread {
 			System.exit(1);
 		}
 		
-		Elevator0.fileReader("C:\\Users\\brianranjanphilip.LABS\\Documents\\GitHub\\SYSC3303-Project-Group5\\SYSC3303 Project\\src\\hello.txt");
+		Elevator0.fileReader("M://hello.txt");
 		//System.out.println(fileRequests.get(0));
 		
 		sendPacket(Elevator1.responsePacketRequest(UPDATE,0));
@@ -312,13 +312,15 @@ public class Elevator extends Thread {
 							break;
 						} else {
 							for(int i = 0; i <fileRequests.size(); i++) {
-								String command = fileRequests.remove(0);
+								String command = fileRequests.get(i);
 								String segment[] = command.split(" ");
 								floorButton = Integer.parseInt(segment[1]);
+								System.out.println("HERE" + segment[3] +".....");
 								floorRequest = Integer.parseInt(segment[3]);
 								if(floorButton == Elevator0.getInitialFloor()) {								
 									try {
 										sendPacket(Elevator0.responsePacketRequest(REQUEST, floorRequest));
+										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
 										e.printStackTrace();
@@ -326,6 +328,7 @@ public class Elevator extends Thread {
 								} else if(floorButton == Elevator1.getInitialFloor()) {
 									try {
 										sendPacket(Elevator1.responsePacketRequest(REQUEST, floorRequest));
+										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
 										e.printStackTrace();
