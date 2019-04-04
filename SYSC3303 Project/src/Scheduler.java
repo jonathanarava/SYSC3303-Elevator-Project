@@ -15,7 +15,7 @@ import java.util.List;
 import java.lang.*;
 import java.util.concurrent.TimeUnit;//for measuring time to respond
 
-public class SchedulerSeperateAlgorithm {
+public class Scheduler {
 //elevator
 	public static final int EL_RECEIVEPORTNUM = 369;
 	public static final int EL_SENDPORTNUM = 159;
@@ -113,21 +113,6 @@ public class SchedulerSeperateAlgorithm {
 	//-otherwise the update packets sent will not have a valid socket address to do so with
 	//-when both have been received, both of the below variables will be TRUE, thus then the scheduler will send a response packet
 	//		notifying each that they may continue
-//CONSTRUCTORS
-	public SchedulerSeperateAlgorithm(boolean a) {
-		// Constructor for Junit Testing
-	}
-	public SchedulerSeperateAlgorithm() {
-		try {
-			schedulerReceiveSocket=new DatagramSocket(RECEIVEPORTNUM);
-			schedulerElevatorSendSocket=new DatagramSocket();
-			schedulerFloorSendSocket=new DatagramSocket();
-		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
-			se.printStackTrace();
-			System.exit(1);
-		}
-	}
-	//INITIALIZATION METHODS
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
 		elevatorStopsUp= new LinkedList[numElevators];
@@ -140,6 +125,120 @@ public class SchedulerSeperateAlgorithm {
 			elevatorRequestsDown[i] = new LinkedList<Integer>();
 			elevatorStopsDown[i] = new LinkedList<Integer>();
 			elevatorStatus[i]=HOLD;
+		}
+	}
+	public Scheduler(boolean a) {
+		// Constructor for Junit Testing
+	}
+	public Scheduler() {
+		try {
+			schedulerReceiveSocket=new DatagramSocket(RECEIVEPORTNUM);
+			schedulerElevatorSendSocket=new DatagramSocket();
+			schedulerFloorSendSocket=new DatagramSocket();
+//			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
+//			schedulerSocketSendReceiveFloor = new DatagramSocket(FL_RECEIVEPORTNUM);
+		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
+			se.printStackTrace();
+			System.exit(1);
+		}
+	}
+	public static void elevatorFloorReceivePacket() {
+		//public static byte[] elevatorFloorReceivePacket() {
+	
+		// ELEVATOR AND FLOOR RECEIVING PACKET HERE 
+		//DatagramPacket temporaryReceivePacket=new DatagramPacket(receiveData, receiveData.length);
+		// System.out.println("Server: Waiting for Packet.\n");
+
+		// Block until a datagram packet is received from receiveSocket.tm
+		schedulerReceivePacket=new DatagramPacket(receiveData,receiveData.length);
+		try {
+			System.out.println("waiting");
+			schedulerReceiveSocket.receive(schedulerReceivePacket);//shedulerSocketSendReceiveElevator.receive(temporaryReceivePacket);
+			//System.out.println("Request from Elevator: " + Arrays.toString(data));
+			
+			// schedulerSocketReceiveElevator.close();
+			// schedulerSocketSendReceiveElevator.close()
+		} catch (IOException e) {
+			System.out.print("IO Exception: likely:");
+			System.out.println("Receive Socket Timed Out.\n" + e);
+			e.printStackTrace();
+			System.exit(1);
+		}
+		// Separating byte array received 
+		//receiveData = temporaryReceivePacket.getData();
+		packetOrigin = receiveData[0];
+		packetElement = receiveData[1];
+		packetType = receiveData[2];
+		packetCurrentFloor = receiveData[3];
+		packetDirection = receiveData[4];
+		packetRequestFloor = receiveData[5];
+		//data[6] is Scheduler's Instruction and should be left empty/ not received
+		packetError=receiveData[7];
+				
+		if (packetOrigin==ELEVATOR_ID) {
+			if (packetType==REQUEST) {
+				System.out.print("Request ");
+			}
+			else if (packetType==UPDATE){
+				System.out.print("Update ");
+			}
+			else if (packetType==ERROR){
+				System.out.print("Error ");
+			}
+			else {
+				//error
+			}
+			//System.out.println("from elevator: " + packetElement+ " Direction: "+ upOrDown+ " Current Floor: "+currentFloor+ " Destination: "+ destFloor+"\n");
+			System.out.println("from Elevator: " + Arrays.toString(receiveData));
+			//schedulerElevatorReceivePacket=temporaryReceivePacket;
+		}
+		else if(packetOrigin==FLOOR_ID) {
+			if (packetType==REQUEST) {
+			//System.out.print("Request from floor: "+packetElement+ " Direction: "+ upOrDown+ "\n");// Current Floor: "+currentFloor+ " Destination: "+ destFloor+"\n");
+			
+			//schedulerFloorReceivePacket=temporaryReceivePacket;
+			}
+			else if (packetType==ERROR){
+				
+			}
+			else {
+				//error
+			}
+			System.out.println("from Floor: " + Arrays.toString(receiveData));
+		}
+		else {
+			//Error packet?
+			//actual issue otherwise
+			System.out.print("packet received in Scheduler from neither Elevator nor Floor");
+		}
+	}
+	private static void errorResponse(){
+		if (packetError==DOOR_ERROR) {
+			//Transient Fault: handle gracefully
+			//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
+			createSendingData(packetElement, 0, 0, 3);//resending the stop signal to the elevator should RE- open and close the door causing the issue-> "Fixing" it
+			elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
+			//after the stop, the elevator should then RE- start and continue with it's previous operation automatically
+		}
+		else if (packetError==MOTOR_ERROR) {
+			//Hard Fault
+			//"shut down the corresponding elevator": stop the elevator (instruction 3), then place it on hold (instruction 4)
+			//call for help?
+			//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
+			createSendingData(packetElement, 0, 0, 6);// shuts down the problem elevator and notifies maintenance and emergency fire services for help
+			elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
+		}
+		else if (packetError==OTHER_ERROR) {
+			//tell the problem elevator to make a stop, possibly "fixing" anythiing that's wrong
+			createSendingData(packetElement, 0, 0, 3);
+			elevatorFloorSendPacket(ELEVATOR_ID);
+		}
+		else if (packetError==NO_ERROR) {
+			System.out.println("Scheduler was notified of an error but NO_ERROR was shown for elevator: "+ packetType);
+			//continue as normal
+		}
+		else{
+			System.out.println("Scheduler received an unknown error");
 		}
 	}
 	private static void schedulerInitilization() {
@@ -156,283 +255,374 @@ public class SchedulerSeperateAlgorithm {
 		elevatorFloorSendPacket(FLOOR_ID);
 		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n");
 	}
-	private static void scheduleElevatorInitialize() {
-		if (packetType==INITIALIZE) {
-			elevatorInitialized=true;
-			numElevators=packetElement;
-			elevatorAddress=schedulerReceivePacket.getAddress();
-			System.out.println("Received Elevator Initialization \n");
-			if (floorInitialized==true) {
-				schedulerInitilization();
-			}
-		}
-	}
-	private static void scheduleFloorInitialize() {
-		floorInitialized=true;
-		System.out.println("Received Floor Initialization\n");
-		numFloors=packetElement;
-		floorAddress=schedulerReceivePacket.getAddress();
-		
-		if (elevatorInitialized==true) {
-			schedulerInitilization();
-		}
-	}
-	//SCHEDULING ALGORITHMS FOR ELEVATOR
-	private static void scheduleElevatorRequest() {
-		// CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
-		if (elevatorStatus[packetElement] != HOLD) {// elevator is not in hold mode, currently moving
-			// check direction
-			if (elevatorStatus[packetElement] == UP) {// elevator is going up
-				if (packetCurrentFloor < packetRequestFloor) {// we haven't reached that floor yet and can still stop
-					// in time
-					if (elevatorStopsUp[packetElement].contains(packetRequestFloor)) {// check if the request
-						// is already in the linked list (duplicate) if so then do nothing, else add it
-						// do nothing, don't want duplicates
-					} else {
-						elevatorStopsUp[packetElement].add(packetRequestFloor);// add to the stopsUp
-						// linkedlist for the current elevator
-					}
-				} else {// the stop has already been missed
-					elevatorStopsDown[packetElement].add(packetRequestFloor);
-					// add it to the stopDown linked list
-				}
-			} else {// elevator is going down
-				if (packetCurrentFloor > packetRequestFloor) {// we haven't reached that floor yet and can still stop
-					// in time
-					if (elevatorStopsDown[packetElement].contains(packetRequestFloor)) {// check if the
-						// request is already in the linked list (duplicate) if so then do nothing,
-						// else add it do nothing, don't want duplicates
-					} else {
-						// add to the stopsDown linkedlist for the current elevator
-						elevatorStopsDown[packetElement].add(packetRequestFloor);
-					}
-				} else {// the stop has already been missed
-					elevatorStopsUp[packetElement].add(packetRequestFloor);
-					// add it to the stopDown linked list
-				}
-			}
-		} else {// currently in hold mode, we can fulfill that request immediately
-			if (packetCurrentFloor < packetRequestFloor) {// we are below the destination floor, we need to go up
-				elevatorStopsUp[packetElement].add(packetRequestFloor);
-				elevatorStatus[packetElement] = UP;
-				createSendingData(packetElement, UNUSED, UNUSED, UP);// 
-			} else if (packetCurrentFloor > packetRequestFloor) {// we are above the destination floor, we need to go
-				// down
-				elevatorStopsDown[packetElement].add(packetRequestFloor);
-				elevatorStatus[packetElement] = DOWN;
-				createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 
-			}
-			// currently in hold mode and remain in hold mode
-			else if (packetCurrentFloor ==packetRequestFloor) {
-				elevatorStatus[packetElement] = HOLD;// place back into hold state
-				createSendingData(packetElement, UNUSED, UNUSED, HOLD);
-			}
-			elevatorFloorSendPacket(ELEVATOR_ID);// originally the only send in the method
-		}
-	}
-	private static void scheduleElevatorUpdate() {
-		if (elevatorStatus[packetElement] == UP) {// direction that the elevator is going is up
-			if (elevatorStopsUp[packetElement].contains(packetCurrentFloor)) {// we have reached a
-				// destination stop and
-				// need to stop the
-				// elevator
-				// open the doors (closes automatically after preallocated duration)
-				// create sendpacket to stop the elevator (and open, close the door)
-				// send the sendPacket
-				// remove the stop from goingup linked list
-				// check if there are more stops
-				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);//
-				elevatorFloorSendPacket(ELEVATOR_ID);
+	//public byte[] SchedulingAlgorithm(byte[] packetData) {
+	private static void SchedulingAlgorithm(byte[] packetData) {//should be private and shouldn't needa return a global variable
 
-				if (elevatorStopsUp[packetElement].size() == 1) {// no more stops Up
-					// check if there are more requests
-					if (elevatorRequestsUp[packetElement].isEmpty()) {// no missed floors for going Up
-						// do nothing
-					} else {// there are outstanding requests to go Up
-						elevatorStopsUp[packetElement] = elevatorRequestsUp[packetElement];
-						// the requests to go Up can now be met once we've finished going down first
-						elevatorRequestsUp[packetElement].clear();
-					}
-					// check if there are more stops down
-					if (elevatorStopsDown[packetElement].isEmpty()) {// no more stops
-						try {
-							Thread.currentThread().sleep(2);
-						} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
-							// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
-							// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
-							e.printStackTrace();
+
+		if (packetOrigin == ELEVATOR_ID) {// if it is an elevator
+			if (packetType==INITIALIZE) {
+				elevatorInitialized=true;
+				numElevators=packetElement;
+				elevatorAddress=schedulerReceivePacket.getAddress();
+				System.out.println("Received Elevator Initialization \n");
+				if (floorInitialized==true) {
+					schedulerInitilization();
+				}
+			}
+			else {
+				if (packetType == UPDATE) {// status update from Elevator
+					// elevatorLocation=packetData[___];//status/ floor number from sensor in
+					// Elevator
+					// compare floor number with next stop of the elevator (==nextStop variable)
+					// if (floorStatus==nextStop[packetElementIndex])
+					if (elevatorStatus[packetElement] == UP) {// direction that the elevator is going is up
+						if (elevatorStopsUp[packetElement].contains(packetCurrentFloor)) {// we have reached a
+							// destination stop and
+							// need to stop the
+							// elevator
+							// open the doors (closes automatically after preallocated duration)
+							// create sendpacket to stop the elevator (and open, close the door)
+							// send the sendPacket
+							// remove the stop from goingup linked list
+							// check if there are more stops
+							createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);// 3: make a stop
+							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+							// overwritten before being sent at the very end
+							// elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
+							// elevatorStopsUp[packetElementIndex].remove(elevatorLocation);
+
+							if (elevatorStopsUp[packetElement].size() == 1) {// no more stops Up
+								// if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops Up
+								// check if there are more requests
+								if (elevatorRequestsUp[packetElement].isEmpty()) {// no missed floors for going Up
+									// do nothing
+								} else {// there are outstanding requests to go Up
+									elevatorStopsUp[packetElement] = elevatorRequestsUp[packetElement];
+									// the requests to go Up can now be met once we've finished going down first
+									elevatorRequestsUp[packetElement].clear();
+								}
+								// check if there are more stops down
+								if (elevatorStopsDown[packetElement].isEmpty()) {// no more stops
+									// create and send sendPacket to hold the motor
+									try {
+										Thread.currentThread().sleep(2);
+									} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
+										// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
+										// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
+										e.printStackTrace();
+									}
+									createSendingData(packetElement, UNUSED, UNUSED, HOLD);// 4: place on hold state
+									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+									// overwritten before being sent at the very end
+									elevatorStopsUp[packetElement].clear();
+									// Sleep method
+
+								} else {// we have stops to go up, start fulfilling those
+									// create and send SendPacket for the motor to go Up
+									createSendingData(packetElement, UNUSED, UNUSED, UP);// 1: up
+									elevatorFloorSendPacket(ELEVATOR_ID);
+								}
+							} else {// finished stopping for destination floor, continue going Up to fulfill other
+								// stops
+								// create and send SendPacket to restart the motor/ have the motor in the up
+								// direction
+								createSendingData(packetElement, UNUSED, UNUSED, UP);// 1: up
+								// IMPORTANT:
+								// this packet sending may not be necessary and could be what's causing the
+								// double sending at the very beginning
+								elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+								// overwritten before being sent at the very end
+							}
+
+						} else {// not a floor that we need to stop at
+							// Look at this.
+							System.out.println(
+									"reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
+							createSendingData(packetElement, packetCurrentFloor,packetDirection, UPDATE_DISPLAYS);
+							elevatorFloorSendPacket(ELEVATOR_ID);
+							elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
 						}
-						createSendingData(packetElement, UNUSED, UNUSED, HOLD);// 4: place on hold state
-						elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-						// overwritten before being sent at the very end
-						elevatorStopsUp[packetElement].clear();
 
-					} else {// we have stops to go up, start fulfilling those
-						createSendingData(packetElement, UNUSED, UNUSED, UP);//
-						elevatorFloorSendPacket(ELEVATOR_ID);
+					} else {// elevator is going down
+						if (elevatorStopsDown[packetElement].contains(packetCurrentFloor)) {// we have reached a
+							// destination stop and
+							// need to stop the
+							// elevator
+							// open the doors (closes automatically after preallocated duration)
+							// create sendpacket to stop the elevator (and open, close the door)
+							// send the sendPacket
+							// remove the stop from goingup linked list
+							// check if there are more stops
+							createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);// 3: make a stop
+							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+							// overwritten before being sent at the very end
+							if (elevatorStopsDown[packetElement].isEmpty()) {
+								// check if there are more requests
+								if (elevatorRequestsDown[packetElement].isEmpty()) {// no missed floors for going
+									// down
+									// do nothing
+								} else {// there are outstanding requests to go down
+									elevatorStopsDown[packetElement] = elevatorRequestsDown[packetElement];
+									// the requests to go down can be met once we have finished going up first
+									elevatorRequestsDown[packetElement].clear();
+								}
+								// check if there are more stops up
+								if (elevatorStopsUp[packetElement].isEmpty()) {// no more stops
+									// create and send sendPacket to hold the motor
+									createSendingData(packetElement, UNUSED, UNUSED, HOLD);// 4: hold
+									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+									// overwritten before being sent at the very end
+									elevatorStopsDown[packetElement].clear();
+								} else {// we have stops to go up, start fulfilling those
+									// create and send SendPacket for the motor to go Down
+									createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
+									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+									// overwritten before being sent at the very end
+								}
+							} else {// finished stopping for a destination floor, continue fulfilling other stops
+								// create and send SendPacket to restart the motor/ have the motor in the down
+								// direction
+								createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
+								// IMPORTANT:
+								// this packet sending may not be necessary and could be what's causing the
+								// double sending at the very beginning
+								elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+								// overwritten before being sent at the very end
+							}
+						} else {// not a floor that we need to stop at
+							// do nothing
+							System.out.println(
+									"reached else of Eleavtor Update while going Down; not a floor that is contained in the stop list");
+						}
+
 					}
-				} else {// finished stopping for destination floor, continue going Up to fulfill other
-					// stops create and send SendPacket to restart the motor/ have the motor in the up
-					// direction
-					createSendingData(packetElement, UNUSED, UNUSED, UP);
+
+					// }
+					// update floor number and direction displays for elevator and all floors
+					//createSendingData(0, 0, elevatorDirection, 5);// 5: status update
+					createSendingData(packetElement, packetCurrentFloor, packetDirection, UPDATE_DISPLAYS);
+					elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
 					elevatorFloorSendPacket(ELEVATOR_ID);
-				}
+				} else {// elevator sent a request
 
-			} else {// not a floor that we need to stop at
-				// Look at this.
-				System.out.println(
-						"reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
-				createSendingData(packetElement, packetCurrentFloor,packetDirection, UPDATE_DISPLAYS);
-				elevatorFloorSendPacket(ELEVATOR_ID);
-				elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
-			}
+					// floorRequesting=packetElementIndex;//the floor# of the requesting floor
+					// proximity
 
-		} else {// elevator is going down
-			if (elevatorStopsDown[packetElement].contains(packetCurrentFloor)) {// we have reached a
-				// destination stop and
-				// need to stop the
-				// elevator
-				// open the doors (closes automatically after preallocated duration)
-				// create sendpacket to stop the elevator (and open, close the door)
-				// send the sendPacket
-				// remove the stop from goingup linked list
-				// check if there are more stops
-				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);// 3: make a stop
-				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-				// overwritten before being sent at the very end
-				if (elevatorStopsDown[packetElement].isEmpty()) {
-					// check if there are more requests
-					if (elevatorRequestsDown[packetElement].isEmpty()) {// no missed floors for going
-						// down
-						// do nothing
-					} else {// there are outstanding requests to go down
-						elevatorStopsDown[packetElement] = elevatorRequestsDown[packetElement];
-						// the requests to go down can be met once we have finished going up first
-						elevatorRequestsDown[packetElement].clear();
+					// check availability and either allocate to a moving elevator, initiate the
+					// movement of another, or add to request linked list if none available (or
+					// wrong direction)
+
+					// CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
+					if (elevatorStatus[packetElement] != HOLD) {// elevator is not in hold mode, currently moving
+						// check direction
+						if (elevatorStatus[packetElement] == UP) {// elevator is going up
+							if (packetCurrentFloor < packetRequestFloor) {// we haven't reached that floor yet and can still stop
+								// in time
+								if (elevatorStopsUp[packetElement].contains(packetRequestFloor)) {// check if the request
+									// is already in the
+									// linked list
+									// (duplicate) if so
+									// then do nothing, else
+									// add it
+									// do nothing, don't want duplicates
+								} else {
+									elevatorStopsUp[packetElement].add(packetRequestFloor);// add to the stopsUp
+									// linkedlist for the
+									// current elevator
+								}
+							} else {// the stop has already been missed
+								elevatorStopsDown[packetElement].add(packetRequestFloor);
+								// add it to the stopDown linked list
+							}
+						} else {// elevator is going down
+							if (packetCurrentFloor > packetRequestFloor) {// we haven't reached that floor yet and can still stop
+								// in time
+								if (elevatorStopsDown[packetElement].contains(packetRequestFloor)) {// check if the
+									// request is
+									// already in the
+									// linked list
+									// (duplicate) if so
+									// then do nothing,
+									// else add it
+									// do nothing, don't want duplicates
+								} else {
+									// add to the stopsDown linkedlist for the current elevator
+									elevatorStopsDown[packetElement].add(packetRequestFloor);
+								}
+
+							} else {// the stop has already been missed
+								elevatorStopsUp[packetElement].add(packetRequestFloor);
+								// add it to the stopDown linked list
+							}
+						}
+					} else {// currently in hold mode, we can fulfill that request immediately
+						// can assume no stops or requests exist, don't need to check for duplicates
+						if (packetCurrentFloor < packetRequestFloor) {// we are below the destination floor, we need to go up
+							elevatorStopsUp[packetElement].add(packetRequestFloor);
+							elevatorStatus[packetElement] = UP;
+							// create and send sendPacket to start the motor
+							createSendingData(packetElement, UNUSED, UNUSED, UP);// 1: up
+						} else if (packetCurrentFloor > packetRequestFloor) {// we are above the destination floor, we need to go
+							// down
+							elevatorStopsDown[packetElement].add(packetRequestFloor);
+							elevatorStatus[packetElement] = DOWN;
+							// create and send sendPacket to start the motor
+							createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
+						}
+						// currently in hold mode and remain in hold mode
+						else if (packetCurrentFloor ==packetRequestFloor) {
+							// Since the elevator is in hold mode and a request for the current floor (where
+							// it already is) the elevator just needs to let the person out
+							// and then resume the hold state since there aren't any other requests made
+
+							// ___________________ if in Hold mode, the elevator should not be moving
+							// anywhere cause that means the elevator
+
+							// elevatorStatus[packetElementIndex] = STOP;//stop the elevator (temporary)
+							// sendData = createSendingData(packetElementIndex, 0, 0, 3);// 3: stop the
+							// elevator turns off the motor but also utilizes the door open/ close letting
+							// the person out
+							// elevatorSendPacket(sendData);//send the created packet immediately, otherwise
+							// will be overwritten before being sent at the very end
+							elevatorStatus[packetElement] = HOLD;// place back into hold state
+							createSendingData(packetElement, UNUSED, UNUSED, HOLD);// doesn't need an immediate send
+							// since there is nothing below to
+							// overwrite the sendData before it
+							// is sent
+						}
+						elevatorFloorSendPacket(ELEVATOR_ID);// originally the only send in the method
 					}
-					// check if there are more stops up
-					if (elevatorStopsUp[packetElement].isEmpty()) {// no more stops
-						// create and send sendPacket to hold the motor
-						createSendingData(packetElement, UNUSED, UNUSED, HOLD);// 4: hold
-						elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-						// overwritten before being sent at the very end
-						elevatorStopsDown[packetElement].clear();
-					} else {// we have stops to go up, start fulfilling those
-						// create and send SendPacket for the motor to go Down
+				}
+			}
+		} else {// FROM FLOOR
+			if (packetType==INITIALIZE) {//for initializing contact with elevatorIntermediate or floorIntermediate
+				floorInitialized=true;
+				System.out.println("Received Floor Initialization\n");
+				numFloors=packetElement;
+				floorAddress=schedulerReceivePacket.getAddress();
+				
+				if (elevatorInitialized==true) {
+					schedulerInitilization();
+				}
+			}
+			else {
+				//responseTime = calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
+				calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
+				// RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN
+				// DIRECTION (UP/DOWN)
+				if (elevatorStatus[indexOfFastestElevator] != HOLD) {// not in hold
+					if (elevatorStatus[indexOfFastestElevator] == UP) {// elevator is going up
+						if (packetDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
+							// go up also
+							if (packetElement > packetCurrentFloor) {// still time
+								if (elevatorStopsUp[indexOfFastestElevator].contains(packetElement)) {
+									// already have that stop requested, don't want to duplicate
+								} else {
+									elevatorStopsUp[indexOfFastestElevator].add(packetElement);// add to stops list
+								}
+							} else {// missed
+								if (elevatorRequestsUp[indexOfFastestElevator].contains(packetElement)) {
+									// already have that stop requested, don't want to duplicate
+								} else {
+									elevatorRequestsUp[indexOfFastestElevator].add(packetElement);// add the floor
+									// to requests
+								}
+							}
+						} else {// elevator is currently fulfilling down stops
+							if (elevatorRequestsUp[indexOfFastestElevator].contains(packetElement)) {
+								// already have that stop requested, don't want to duplicate
+							} else {
+								elevatorRequestsUp[indexOfFastestElevator].add(packetElement);// add the floor to
+								// requests
+							}
+						}
+					} else {// elevator is going down
+						if (packetDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
+							// go Down also
+							if (packetElement < packetCurrentFloor) {// still time
+								if (elevatorStopsDown[indexOfFastestElevator].contains(packetElement)) {
+									// already have that stop requested, don't want to duplicate
+								} else {
+									elevatorStopsDown[indexOfFastestElevator].add(packetElement);// add to stops
+									// list
+								}
+							} else {// missed
+								if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElement)) {
+									// already have that stop requested, don't want to duplicate
+								} else {
+									elevatorRequestsDown[indexOfFastestElevator].add(packetElement);// add the
+									// floor to
+									// requests
+								}
+							}
+						} else {// elevator is currently fulfilling Up stops
+							if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElement)) {
+								// already have that stop requested, don't want to duplicate
+							} else {
+								elevatorRequestsDown[indexOfFastestElevator].add(packetElement);// add the floor to
+								// requests
+							}
+						}
+					}
+				} else {// holding, can fulfill immediately
+					// can assume no stops or requests exist, don't need to check for duplicates if
+					// above
+					if (packetElement > packetCurrentFloor) {// the floor requesting is above the elevator's current
+						// location
+						elevatorRequestsDown[indexOfFastestElevator].add(packetElement);
+						// create and send sendPacket to start motor in Down direction
 						createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
-						elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-						// overwritten before being sent at the very end
+					} else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
+						// elevator's current location
+						elevatorRequestsUp[indexOfFastestElevator].add(packetElement);
+						// create and send sendPacket to start motor in Up direction
+						createSendingData(packetElement, UNUSED, UNUSED, UP);// 1: up
 					}
-				} else {// finished stopping for a destination floor, continue fulfilling other stops
-					// create and send SendPacket to restart the motor/ have the motor in the down
-					// direction
-					createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
-					// IMPORTANT:
-					// this packet sending may not be necessary and could be what's causing the
-					// double sending at the very beginning
-					elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
-					// overwritten before being sent at the very end
+					//elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
+					elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
+					System.out.println("From Floor-Hold, Should have sent to elevator");
 				}
-			} else {// not a floor that we need to stop at
-				// do nothing
-				System.out.println(
-						"reached else of Eleavtor Update while going Down; not a floor that is contained in the stop list");
 			}
-
 		}
+		//return sendData;
+	}
 
-		// }
-		// update floor number and direction displays for elevator and all floors
-		//createSendingData(0, 0, elevatorDirection, 5);// 5: status update
-		createSendingData(packetElement, packetCurrentFloor, packetDirection, UPDATE_DISPLAYS);
-		elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
-		elevatorFloorSendPacket(ELEVATOR_ID);
+	//public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
+	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
+
+		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
+		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
+		sendingOutputStream.write(target); // (exact floor or elevator to receive)
+		sendingOutputStream.write(UNUSED); // not needed (request or status update: for sending from scheduler)
+		
+		if (instruction == UPDATE_DISPLAYS) {// update displays of the floors
+			sendingOutputStream.write(currentFloor); // (current floor of elevator)
+			sendingOutputStream.write(direction); // (direction of elevator)
+		} else {
+			sendingOutputStream.write(UNUSED); // not needed (current floor of elevator)
+			sendingOutputStream.write(UNUSED); // not needed (direction of elevator)
+		}
+		sendingOutputStream.write(UNUSED); // not needed (destination request)
+		sendingOutputStream.write(instruction); // scheduler instruction
+		sendingOutputStream.write(UNUSED); // error's only received by scheduler and not sent
+		sendData = sendingOutputStream.toByteArray();
+		//return sendData;
 	}
 	
-	//SCHEDULING ALGORITHMS FOR FLOOR
-	private static void scheduleFloorRequest() {
-		//responseTime = calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
-		calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
-		fastestElevator();
-		// RECALL THE FLOOR CALLING SHOULD ONLY LET PASSENGERS IN WHEN IN THE CHOSEN
-		// DIRECTION (UP/DOWN)
-		if (elevatorStatus[indexOfFastestElevator] != HOLD) {// not in hold
-			if (elevatorStatus[indexOfFastestElevator] == UP) {// elevator is going up
-				if (packetDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
-					// go up also
-					if (packetElement > packetCurrentFloor) {// still time
-						if (elevatorStopsUp[indexOfFastestElevator].contains(packetElement)) {
-							// already have that stop requested, don't want to duplicate
-						} else {
-							elevatorStopsUp[indexOfFastestElevator].add(packetElement);// add to stops list
-						}
-					} else {// missed
-						if (elevatorRequestsUp[indexOfFastestElevator].contains(packetElement)) {
-							// already have that stop requested, don't want to duplicate
-						} else {
-							elevatorRequestsUp[indexOfFastestElevator].add(packetElement);// add the floor
-							// to requests
-						}
-					}
-				} else {// elevator is currently fulfilling down stops
-					if (elevatorRequestsUp[indexOfFastestElevator].contains(packetElement)) {
-						// already have that stop requested, don't want to duplicate
-					} else {
-						elevatorRequestsUp[indexOfFastestElevator].add(packetElement);// add the floor to
-						// requests
-					}
-				}
-			} else {// elevator is going down
-				if (packetDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
-					// go Down also
-					if (packetElement < packetCurrentFloor) {// still time
-						if (elevatorStopsDown[indexOfFastestElevator].contains(packetElement)) {
-							// already have that stop requested, don't want to duplicate
-						} else {
-							elevatorStopsDown[indexOfFastestElevator].add(packetElement);// add to stops
-							// list
-						}
-					} else {// missed
-						if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElement)) {
-							// already have that stop requested, don't want to duplicate
-						} else {
-							elevatorRequestsDown[indexOfFastestElevator].add(packetElement);// add the
-							// floor to
-							// requests
-						}
-					}
-				} else {// elevator is currently fulfilling Up stops
-					if (elevatorRequestsDown[indexOfFastestElevator].contains(packetElement)) {
-						// already have that stop requested, don't want to duplicate
-					} else {
-						elevatorRequestsDown[indexOfFastestElevator].add(packetElement);// add the floor to
-						// requests
-					}
-				}
+	public static void fastestElevator() {
+		int temp;
+		temp = responseTime[0];//set to the first elevator at first
+		for (int i = 1; i < responseTime.length; i++) {//find the quickest (smallest) response time
+			if (responseTime[i] < temp) {
+				temp = responseTime[i];
+				indexOfFastestElevator = i;
 			}
-		} else {// holding, can fulfill immediately
-			// can assume no stops or requests exist, don't need to check for duplicates if
-			// above
-			if (packetElement > packetCurrentFloor) {// the floor requesting is above the elevator's current
-				// location
-				elevatorRequestsDown[indexOfFastestElevator].add(packetElement);
-				// create and send sendPacket to start motor in Down direction
-				createSendingData(packetElement, UNUSED, UNUSED, DOWN);// 2: down
-			} else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
-				// elevator's current location
-				elevatorRequestsUp[indexOfFastestElevator].add(packetElement);
-				// create and send sendPacket to start motor in Up direction
-				createSendingData(packetElement, UNUSED, UNUSED, UP);// 1: up
-			}
-			//elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
-			elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-			//System.out.println("From Floor-Hold, Should have sent to elevator");
 		}
+		System.out.println("The Fastest Elevator to respond is: "+indexOfFastestElevator);
 	}
-	
-	//RESPONSE TIME METHODS (FOR SERVING FLOOR REQUESTS)
+
 	public static void calculateResponseTimes(int destination, int requestDirection) {
-		System.out.println("calculateResponseTimes() method called");
+
 		//int[] responseTime = new int[numElevators];
 		responseTime = new int[numElevators];
 		int distance = 0;// number of floors traveled before arriving at the destination
@@ -453,7 +643,6 @@ public class SchedulerSeperateAlgorithm {
 			next = elevatorNextStop[i];
 			if (status == HOLD) {// elevator in hold
 				// distance=|destination-current|
-				System.out.println("calculateResponseTimes() Elevator: "+i+" in HOLD");
 				distance = destination - elevatorCurrentFloor[i];
 				stops = 0;// stops=0 since by definition hold means there were no prior requests or stops
 
@@ -508,12 +697,12 @@ public class SchedulerSeperateAlgorithm {
 			}
 			responseTime[i] = distance * TRAVEL_TIME_PER_FLOOR + stops * DOOR_DURATION;
 		}
+		//return responseTime;
 	}
 
 	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {
 		// calculates how many stops are between the destination and current floor for
 		// use in responseTime calculation
-		System.out.println("stopsBetween() method called");
 		int stops = 0;
 		if (direction == UP) {
 			for (int i = current; i < destination; i++) {
@@ -530,24 +719,18 @@ public class SchedulerSeperateAlgorithm {
 		}
 		return stops;
 	}
-	public static void fastestElevator() {
-		System.out.println("fastestElevator() method called");
-		int temp;
-		temp = responseTime[0];//set to the first elevator at first
-		for (int i = 1; i < responseTime.length; i++) {//find the quickest (smallest) response time
-			if (responseTime[i] < temp) {
-				temp = responseTime[i];
-				indexOfFastestElevator = i;
-			}
-		}
-		System.out.println("The Fastest Elevator to respond is: "+indexOfFastestElevator);
-	}
-//SEND & RECEIVE METHODS
+
 	public static void elevatorFloorSendPacket(int sendTo) {//SENDING ELEVATOR PACKET HERE
-		System.out.println("elevatorFloorSendPacket() called, sending to: "+sendTo);
+		
 		if (sendTo==ELEVATOR_ID) {
 			System.out.println("Response to Elevator " + packetElement + ": " + Arrays.toString(sendData) + "\n");
-
+			//sendingPortNum=elevatorPortNum;
+			/*schedulerElevatorSendPacket = new DatagramPacket(sendData, sendData.length,schedulerElevatorReceivePacket.getAddress(), EL_SENDPORTNUM);
+			try {
+				schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}*/
 			DatagramPacket sendingPacket=new DatagramPacket(sendData, sendData.length,elevatorAddress, EL_SENDPORTNUM);
 			try {
 				schedulerElevatorSendSocket.send(sendingPacket);
@@ -557,7 +740,14 @@ public class SchedulerSeperateAlgorithm {
 		}
 		else if(sendTo==FLOOR_ID) {
 			System.out.println("Response to Floor " + packetElement + ": " + Arrays.toString(sendData) + "\n");
-
+			//sendingPortNum=floorPortNum;
+			/*schedulerFloorSendPacket = new DatagramPacket(sendData, sendData.length,
+					schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
+			try {
+				schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}*/
 			DatagramPacket sendingPacket=new DatagramPacket(sendData, sendData.length,floorAddress, FL_SENDPORTNUM);
 			try {
 				schedulerFloorSendSocket.send(sendingPacket);
@@ -570,152 +760,20 @@ public class SchedulerSeperateAlgorithm {
 			//sendingPortNum=elevatorPortNum;//SHOULDN'T BE HERE, but otherwise throws warning if variable not set
 			System.out.println("elevatorFloorSendPacket() Error; given argument is neither ELEVATOR_ID nor FLOOR_ID but: "+sendTo);
 		}
-	}
-	//public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
-	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 
-		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
-		sendingOutputStream.write(SCHEDULER_ID); // Identifying as the scheduler
-		sendingOutputStream.write(target); // (exact floor or elevator to receive)
-		sendingOutputStream.write(UNUSED); // not needed (request or status update: for sending from scheduler)
-		
-		if (instruction == UPDATE_DISPLAYS) {// update displays of the floors
-			sendingOutputStream.write(currentFloor); // (current floor of elevator)
-			sendingOutputStream.write(direction); // (direction of elevator)
-		} else {
-			sendingOutputStream.write(UNUSED); // not needed (current floor of elevator)
-			sendingOutputStream.write(UNUSED); // not needed (direction of elevator)
-		}
-		sendingOutputStream.write(UNUSED); // not needed (destination request)
-		sendingOutputStream.write(instruction); // scheduler instruction
-		sendingOutputStream.write(UNUSED); // error's only received by scheduler and not sent
-		sendData = sendingOutputStream.toByteArray();
-	}
-	public static void elevatorFloorReceivePacket() {
-		//public static byte[] elevatorFloorReceivePacket() {
-	
-		// ELEVATOR AND FLOOR RECEIVING PACKET HERE 
-		//DatagramPacket temporaryReceivePacket=new DatagramPacket(receiveData, receiveData.length);
-		// System.out.println("Server: Waiting for Packet.\n");
 
-		// Block until a datagram packet is received from receiveSocket.tm
-		schedulerReceivePacket=new DatagramPacket(receiveData,receiveData.length);
-		try {
-			System.out.println("waiting");
-			schedulerReceiveSocket.receive(schedulerReceivePacket);//shedulerSocketSendReceiveElevator.receive(temporaryReceivePacket);
-			//System.out.println("Request from Elevator: " + Arrays.toString(data));
-			
-			// schedulerSocketReceiveElevator.close();
-			// schedulerSocketSendReceiveElevator.close()
-		} catch (IOException e) {
-			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
-			e.printStackTrace();
-			System.exit(1);
-		}
-		// Separating byte array received 
-		//receiveData = temporaryReceivePacket.getData();
-		packetOrigin = receiveData[0];
-		packetElement = receiveData[1];
-		packetType = receiveData[2];
-		packetCurrentFloor = receiveData[3];
-		packetDirection = receiveData[4];
-		packetRequestFloor = receiveData[5];
-		//data[6] is Scheduler's Instruction and should be left empty/ not received
-		packetError=receiveData[7];
-				
-		if (packetOrigin==ELEVATOR_ID) {
-			if (packetType==INITIALIZE) {
-				System.out.println("INITIALIZE from Elevator: " + Arrays.toString(receiveData));
-				scheduleElevatorInitialize();
-			}
-			else if (packetType==REQUEST) {
-				System.out.println("REQUEST from Elevator: " + Arrays.toString(receiveData));
-				scheduleElevatorRequest();
-			}
-			else if (packetType==UPDATE){
-				System.out.println("UPDATE from Elevator: " + Arrays.toString(receiveData));
-				scheduleElevatorUpdate();
-			}
-			else if (packetType==ERROR){
-				System.out.println("ERROR from Elevator: " + Arrays.toString(receiveData));
-				errorResponse();
-			}
-			else {
-				//error
-				System.out.println("Elevator sent packet that isn't INITIALIZE, REQUEST, UPDATE, or ERROR: "+Arrays.toString(receiveData));
-			}
-			//System.out.println("from elevator: " + packetElement+ " Direction: "+ upOrDown+ " Current Floor: "+currentFloor+ " Destination: "+ destFloor+"\n");
-			
-			//schedulerElevatorReceivePacket=temporaryReceivePacket;
-		}
-		else if(packetOrigin==FLOOR_ID) {
-			if (packetType==INITIALIZE) {
-				System.out.println("INITIALIZE from Floor: " + Arrays.toString(receiveData));
-				scheduleFloorInitialize();
-			}
-			else if (packetType==REQUEST) {
-				System.out.println("REQUEST from Floor: " + Arrays.toString(receiveData));
-				scheduleFloorRequest();
-			//schedulerFloorReceivePacket=temporaryReceivePacket;
-			}
-			else if (packetType==ERROR){
-				System.out.println("ERROR from Floor: " + Arrays.toString(receiveData));
-				errorResponse();
-			}
-			else {
-				//error
-				System.out.println("Floor sent packet that isn't INITIALIZE, REQUEST, UPDATE, or ERROR: "+Arrays.toString(receiveData));
-			}
-			//System.out.println("from Floor: " + Arrays.toString(receiveData));
-		}
-		else {
-			//Error packet?
-			//actual issue otherwise
-			System.out.print("packet received in Scheduler from neither Elevator nor Floor"+Arrays.toString(receiveData));
-		}
 	}
-	//DEALING WITH ERRORS
-		private static void errorResponse(){
-			if (packetError==DOOR_ERROR) {
-				//Transient Fault: handle gracefully
-				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, 0, 0, 3);//resending the stop signal to the elevator should RE- open and close the door causing the issue-> "Fixing" it
-				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-				//after the stop, the elevator should then RE- start and continue with it's previous operation automatically
-			}
-			else if (packetError==MOTOR_ERROR) {
-				//Hard Fault
-				//"shut down the corresponding elevator": stop the elevator (instruction 3), then place it on hold (instruction 4)
-				//call for help?
-				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, 0, 0, 6);// shuts down the problem elevator and notifies maintenance and emergency fire services for help
-				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-			}
-			else if (packetError==OTHER_ERROR) {
-				//tell the problem elevator to make a stop, possibly "fixing" anythiing that's wrong
-				createSendingData(packetElement, 0, 0, 3);
-				elevatorFloorSendPacket(ELEVATOR_ID);
-			}
-			else if (packetError==NO_ERROR) {
-				System.out.println("Scheduler was notified of an error but NO_ERROR was shown for elevator: "+ packetType);
-				//continue as normal
-			}
-			else{
-				System.out.println("Scheduler received an unknown error");
-			}
-		}
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		SchedulerSeperateAlgorithm schedulerHandler = new SchedulerSeperateAlgorithm();
+		Scheduler schedulerHandler = new Scheduler();
 		
 		//for (;;) {
 		while (true) {
 			elevatorFloorReceivePacket();
-			//respondStart = System.nanoTime();// start the timer
-			//schedulerHandler.SchedulingAlgorithm();//receiveData);
-			//respondEnd = System.nanoTime();// end for the timer
-			//System.out.println("Scheduler took: " + (respondEnd - respondStart) + " nanoseconds to respond");
+			respondStart = System.nanoTime();// start the timer
+			schedulerHandler.SchedulingAlgorithm(receiveData);
+			respondEnd = System.nanoTime();// end for the timer
+			System.out.println("Scheduler took: " + (respondEnd - respondStart) + " nanoseconds to respond");
 		}
 	}
 }
