@@ -63,7 +63,7 @@ public class ElevatorIntermediate {
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	private static boolean firstRunTime = true;
+	//private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
 	private static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
@@ -72,7 +72,7 @@ public class ElevatorIntermediate {
 	private static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
 
-	private byte[] requestElevator = new byte[3];
+	//private byte[] requestElevator = new byte[3];
 	//private boolean intialized=false;
 
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
@@ -84,7 +84,7 @@ public class ElevatorIntermediate {
 	
 	
 	//VARIABLES
-	private static byte[] sendData = new byte[8];
+//	private static byte[] sendData = new byte[8];//in Elevator Class instead
 	private static byte[] receiveData= new byte[8];	
 	private static int packetOrigin;// data[0]
 	private static int packetElement;// data[1];
@@ -192,7 +192,7 @@ public class ElevatorIntermediate {
 			// Block until a datagram packet is received from receiveSocket.
 			System.out.println("waiting to receive");
 			elevatorReceiveSocket.receive(elevatorReceivePacket);
-			System.out.print("Received from scheduler: ");
+			System.out.print("\nReceived from scheduler: ");
 			System.out.println(Arrays.toString(receiveData));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
@@ -288,14 +288,14 @@ public class ElevatorIntermediate {
 		// port numbers there
 		// allocating port numbers to the variable number of elevators and floors would
 		// also be difficult, just using the ones which are available
-		int elevatorPortNumbers[] = new int[createNumElevators];
+		//int elevatorPortNumbers[] = new int[createNumElevators];
 
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
 		// allocate receive packet
-		byte data[] = new byte[8];
-		schedulerReceivePacket = new DatagramPacket(data, data.length);
+		//byte data[] = new byte[8];
+		schedulerReceivePacket = new DatagramPacket(receiveData, receiveData.length);
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
