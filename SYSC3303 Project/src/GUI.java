@@ -7,13 +7,8 @@ import java.awt.Panel;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 import javafx.scene.text.Font;
 
@@ -29,11 +24,14 @@ GUI() {
 		//Button(s) & TesxtArea initialization
 		JButton button[] = new JButton[numElevators] ;
 		JTextArea textArea[] = new JTextArea[numElevators];
-		Panel pnl1 = new Panel(new GridLayout());
-		Panel pnl2 = new Panel(new FlowLayout());
+		Panel pnl1 = new Panel();
+		Panel pnl2 = new Panel();
 		
 		//Layout Initialization
 		FlowLayout flowLayout = new FlowLayout();
+		GridLayout gridLayout = new GridLayout();
+		pnl1.setLayout(gridLayout);	// Elevator Labels
+		pnl2.setLayout(flowLayout);	// Current floors
 		frame.setLayout(flowLayout);
 		
 		
@@ -52,27 +50,7 @@ GUI() {
 			pnl2.add(textArea[i]);
 		}
 		
-		/*String[] labels = {"Name: ", "Fax: ", "Email: ", "Address: "};
-		int numPairs = labels.length;
-
-		//Create and populate the panel.
-		JPanel p = new JPanel(new SpringLayout());
-		for (int i = 0; i < numPairs; i++) {
-		    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
-		    p.add(l);
-		    JTextField textField = new JTextField(10);
-		    l.setLabelFor(textField);
-		    p.add(textField);
-		}
-
-		//Lay out the panel.
-		SwingUtilities.makeCompactGrid(p,
-		                                numPairs, 2, //rows, cols
-		                                6, 6,        //initX, initY
-		                                6, 6);       //xPad, yPad
-	
-		frame.add(p);
-*/			
+		
 		JTextArea TextErrorArea = new JTextArea(
 			    "Elevator Error Message: \n" +
 			    "A text area is a \"plain\" text component, " +
