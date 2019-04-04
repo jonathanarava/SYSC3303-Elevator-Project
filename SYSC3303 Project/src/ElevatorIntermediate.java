@@ -12,29 +12,38 @@ import java.util.List;
 import java.lang.Object;
 
 public class ElevatorIntermediate {
+	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
+		//States
+		private static final byte UP = 0x01;// elevator is going up
+		private static final byte DOWN = 0x02;// elevator is going down
+		private static final byte STOP = 0x03;
+		private static final byte HOLD = 0x04;// elevator is in hold state
+		private static final byte UPDATE_DISPLAY = 0x05;
+		private static final byte ERROR=(byte)0xE0;//an error has occured
+		//Errors
+		private static final byte DOOR_ERROR=(byte)0xE1;
+		private static final byte MOTOR_ERROR=(byte)0xE2;
+		//still error states between 0xE3 to 0xEE for use
+		private static final byte OTHER_ERROR=(byte)0xEF; 
+		private static final byte NO_ERROR=(byte)0x00;
+		//Object ID
+		private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+		private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+		private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+		//Values for Running
+		private static final int DOOR_OPEN = 1;// the door is open when == 1
+		private static final int DOOR_CLOSE = 3; // the door is closed when == 3 
+		private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+		private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+		private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+		private static final int MAKE_STOP=3;//
+		private static final int PLACE_ON_HOLD=4;
+		private static final int UPDATE_DISPLAYS=5;
+		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int INITIALIZE=8;//for first communication with the scheduler
+		private static final int UNUSED=0;// value for unused parts of data 
+		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
 
-	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte UP = 0x01;// elevator is going up
-	private static final byte DOWN = 0x02;// elevator is going down
-	private static final byte STOP = 0x03;
-	private static final byte HOLD = 0x04;// elevator is in hold state
-	private static final byte UPDATE_DISPLAY = 0x05;
-	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
-	
-	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
-	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
-	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN = 1;// the door is open when ==1
-	private static final int DOOR_DURATION = 4;// duration that doors stay open for
-	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
-	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
-	private static final int MAKE_STOP=3;//
-	private static final int PLACE_ON_HOLD=4;
-	private static final int UPDATE_DISPLAYS=5;
-	private static final int INITIALIZE=8;//for first communication with the scheduler
-	private static final int UNUSED=0;// value for unused parts of data 
-	
-	private static long respondStart, respondEnd;
 	/*
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
@@ -57,14 +66,14 @@ public class ElevatorIntermediate {
 	private static boolean firstRunTime = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
-	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
+	private static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
 	private static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
 
 	private byte[] requestElevator = new byte[3];
-	private boolean intialized=false;
+	//private boolean intialized=false;
 
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
@@ -72,6 +81,19 @@ public class ElevatorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
+	
+	
+	//VARIABLES
+	private static byte[] sendData = new byte[8];
+	private static byte[] receiveData= new byte[8];	
+	private static int packetOrigin;// data[0]
+	private static int packetElement;// data[1];
+	private static int packetType;// data[2];
+	private static int packetCurrentFloor;// data[3];
+	private static int packetDirection;// data[4];
+	private static int packetRequestFloor;// data[5];
+	private static int schedulerInstruction; //data[6] Scheduler's Instruction 
+	private static int packetError;// data[7];
 
 	// synchronized table that all of the elevator threads will put their requests
 	// and updates upon
@@ -80,7 +102,8 @@ public class ElevatorIntermediate {
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
-			elevatorSendSocket.setSoTimeout(250);// sets the maximum time for the receive function to self block
+			//elevatorSendSocket.setSoTimeout(250);// sets the maximum time for the receive function to self block
+			elevatorSendSocket.setSoTimeout(2);
 			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
 			// Scheduler will reply to the port
 			// that's been received
@@ -92,7 +115,6 @@ public class ElevatorIntermediate {
 	}
 
 	public synchronized void sendPacket() {
-		respondStart = System.nanoTime();
 		// byte[] requestElevator = new byte[7];
 
 		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
@@ -149,91 +171,85 @@ public class ElevatorIntermediate {
 	public synchronized void receivePacket() {
 		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
 		// 0)
-		byte data[] = new byte[8];
-		byte schedulerInstruction;
-		byte elevatorElement;
+//		byte data[] = new byte[8];
+//		byte schedulerInstruction;
+//		byte elevatorElement;
+
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
 			// elevatorReceiveSocket.setSoTimeout(10); Eventually we will need this to sync
 			// send and receive with Scheduler.
-		} catch (SocketException e1) {
-			e1.printStackTrace();
+		} catch (SocketException receiveException) {
+			System.out.println("timed out of sotime");
 		}
-		elevatorReceivePacket = new DatagramPacket(data, data.length);
+		elevatorReceivePacket = new DatagramPacket(receiveData, receiveData.length);
 
+
+		
 		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.
 			System.out.println("waiting to receive");
 			elevatorReceiveSocket.receive(elevatorReceivePacket);
-			respondEnd = System.nanoTime();
 			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
+			System.out.println(Arrays.toString(receiveData));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
 			e.printStackTrace();
 			System.exit(1);
 		}
-		System.out.println("It took "+ (respondEnd-respondStart) +" nanoseconds to get a response from the Scheduler");
 		elevatorReceiveSocket.close();
-
-		/*
-		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
-		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
-		 * instruction) (
-		 */
-
-		schedulerInstruction=data[6];
-		elevatorElement=data[1];
-		if (schedulerInstruction==INITIALIZE) {
-			intialized=true;
+		
+		packetOrigin = receiveData[0];
+		packetElement = receiveData[1];
+		packetType = receiveData[2];
+		packetCurrentFloor = receiveData[3];
+		packetDirection = receiveData[4];
+		packetRequestFloor = receiveData[5];
+		schedulerInstruction=receiveData[6];//data[6] is Scheduler's Instruction and should be left empty/ not received
+		packetError=receiveData[7];
+		//schedulerInstruction=data[6];
+		//elevatorElement=data[1];
+		if (schedulerInstruction==UP) {
+			elevatorArray[packetElement].elevatorState = schedulerInstruction;
+			elevatorArray[packetElement].dealWith = true;
 		}
-		else if(schedulerInstruction==UPDATE) {
-			elevatorArray[elevatorElement].updateDisplay();
-			/*for (int i = 0; i < numFloors; i++) {
-				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
+		else if (schedulerInstruction==DOWN) {
+			elevatorArray[packetElement].elevatorState = schedulerInstruction;
+			elevatorArray[packetElement].dealWith = true;
+		}
+		else if (schedulerInstruction==STOP) {
+			elevatorArray[packetElement].elevatorState = schedulerInstruction;
+			elevatorArray[packetElement].dealWith = true;
+		}
+		else if (schedulerInstruction==HOLD) {
+			elevatorArray[packetElement].elevatorState = schedulerInstruction;
+			elevatorArray[packetElement].dealWith = true;
+		}
+		else if (schedulerInstruction==INITIALIZE) {
+			//intialized=true;
+			System.out.println("ElevatorIntermediate INITIALIZED");
+		}
+		else if(schedulerInstruction==UPDATE_DISPLAYS) {
+			updateDisplay();
+			/*for (int i=0;i<createNumElevators;i++) {
+				elevatorArray[i].updateDisplay();
 			}*/
 		}
 		else if(schedulerInstruction==SHUT_DOWN) {
-			elevatorArray[elevatorElement].shutDown();
+			elevatorArray[packetElement].shutDown();
 		}
-		//else if(schedulerInstruction)
-
-		//		System.out.println("elevatorArray.length: "+elevatorArray.length);
-		//		System.out.println("elevatorArray[0]: "+elevatorArray[0]);//elevatorArray.length);
-		//		System.out.println("elevatorArray[1]: "+elevatorArray[1]);//elevatorArray.length);
-
-		//FOR TESTING: ADDS REQUESTS
-		if (elevatorArray!=null) {
-			switch (data[1]) {
-			case 0:
-				elevatorArray[0].motorDirection = data[6];
-				elevatorArray[0].dealWith = true;
-				break;
-			case 1:
-				elevatorArray[1].motorDirection = data[6];
-				elevatorArray[1].dealWith = true;
-				break;
-			case 2:
-				elevatorArray[2].motorDirection = data[6];
-				elevatorArray[2].dealWith = true;
-				break;
-			case 3:
-				elevatorArray[3].motorDirection = data[6];
-				elevatorArray[3].dealWith = true;
-				break;
-			}
+		else {
+			System.out.println("Elevator: "+packetElement +"; Unknown Instruction from Scheduler: "+schedulerInstruction);
 		}
-
-		// elevatorArray[0].openCloseDoor(data[2]);
-
-		// send packet for scheduler to know the port this elevator is allocated
-		// sendPacket = new DatagramPacket(data,
-		// receivePacket.getLength(),receivePacket.getAddress(),
-		// receivePacket.getPort());
-		// }
+		
+	}
+	public static void updateDisplay() {
+		for (int i=0;i<createNumElevators;i++) {
+			elevatorArray[i].updateDisplay();
+		}
 	}
 
 	public static void delay(int delayValue) {
@@ -264,8 +280,6 @@ public class ElevatorIntermediate {
 	public static void main(String args[]) throws IOException {
 		// 2 arguments: args[0] is the number of Elevators in the system
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
-		// for iteration 1 there will only be 1 elevator
-		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
 		// argument[0]
 
@@ -279,8 +293,9 @@ public class ElevatorIntermediate {
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
-		
-		GUI gui = new GUI();
+		// allocate receive packet
+		byte data[] = new byte[8];
+		schedulerReceivePacket = new DatagramPacket(data, data.length);
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
@@ -305,27 +320,13 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i].start();
 		}
 
+		updateDisplay();
 		while (true) {
 			elevatorHandler.sendPacket();
+			//while (elevatorTable.isEmpty()) {
 			elevatorHandler.receivePacket();
-
-			// Synchronize Intermediate send and Receive with the Scheduler's send and
-			// receive.
-
-			// delay(1000);
+			//}
 		}
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
 
 	}
 }
