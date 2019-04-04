@@ -78,10 +78,11 @@ public class Elevator extends Thread {
 	private long doorOpenTime, doorCloseTime;// for error checking that doors are closed within time
 	protected boolean holdReceived;
 
-	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable) {
+	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
+		this.RealTimefloorRequest = RealTimefloorRequest;
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 
@@ -241,10 +242,6 @@ public class Elevator extends Thread {
 		sensor = floorSensor;
 		return sensor;
 	}
-	
-	public int getSensor() {
-		return sensor;
-	}
 
 	public void updateDisplay() {
 		System.out.println("On Floor: " + sensor);
@@ -253,10 +250,6 @@ public class Elevator extends Thread {
 		} else if (!isGoingUp) {
 			System.out.println("Going Down");
 		}
-	}
-	
-	public void setRealTimeRequest(int realTimeRequest) {
-		RealTimefloorRequest = realTimeRequest;
 	}
 
 	public void runElevator() {
