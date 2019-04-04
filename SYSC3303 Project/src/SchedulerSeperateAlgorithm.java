@@ -54,7 +54,7 @@ public class SchedulerSeperateAlgorithm {
 		private static final int MAKE_STOP=3;//
 		private static final int PLACE_ON_HOLD=4;
 		private static final int UPDATE_DISPLAYS=5;
-		//private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
 		private static final int INITIALIZE=8;//for first communication with the scheduler
 		private static final int UNUSED=0;// value for unused parts of data 
 		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
@@ -680,7 +680,7 @@ public class SchedulerSeperateAlgorithm {
 			if (packetError==DOOR_ERROR) {
 				//Transient Fault: handle gracefully
 				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, 0, 0, 3);//resending the stop signal to the elevator should RE- open and close the door causing the issue-> "Fixing" it
+				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);//resending the stop signal to the elevator should RE- open and close the door causing the issue-> "Fixing" it
 				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
 				//after the stop, the elevator should then RE- start and continue with it's previous operation automatically
 			}
@@ -689,12 +689,12 @@ public class SchedulerSeperateAlgorithm {
 				//"shut down the corresponding elevator": stop the elevator (instruction 3), then place it on hold (instruction 4)
 				//call for help?
 				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, 0, 0, 6);// shuts down the problem elevator and notifies maintenance and emergency fire services for help
+				createSendingData(packetElement, UNUSED, UNUSED, SHUT_DOWN);// shuts down the problem elevator and notifies maintenance and emergency fire services for help
 				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
 			}
 			else if (packetError==OTHER_ERROR) {
 				//tell the problem elevator to make a stop, possibly "fixing" anythiing that's wrong
-				createSendingData(packetElement, 0, 0, 3);
+				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);
 				elevatorFloorSendPacket(ELEVATOR_ID);
 			}
 			else if (packetError==NO_ERROR) {
