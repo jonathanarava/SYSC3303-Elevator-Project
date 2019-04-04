@@ -315,7 +315,7 @@ public class ElevatorIntermediate {
 		// Lets create a socket for the elevator Intermediate class to communicate
 		// with the scheduler. All the elevator threads will use this.
 
-		GUI gui = new GUI();
+
 
 		// go for the argument passed into Elevator Intermediate, create an array for
 		// elevators,
