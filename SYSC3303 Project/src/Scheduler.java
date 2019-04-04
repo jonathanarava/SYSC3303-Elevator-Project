@@ -85,7 +85,7 @@ public class Scheduler {
 	public static final int FL_RECEIVEPORTNUM = 488;
 	public static final int FL_SENDPORTNUM = 1199;
 
-	private static final byte HOLD = 0x00;// elevator is in hold state
+	private static final byte HOLD = 0x04;// elevator is in hold state
 	private static final byte STOP = 0x03;// elevator is
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
@@ -198,7 +198,7 @@ public class Scheduler {
 			schedulerFloorReceivePacket=temporaryReceivePacket;
 		}
 		else if (elevatorOrFloor==ERROR) {
-			errorResponse();
+			errorResponse(temporaryReceivePacket);
 			
 		}
 		else {
@@ -209,8 +209,10 @@ public class Scheduler {
 		
 		
 	}
-	private static void errorResponse() {
+	private static void errorResponse(DatagramPacket temporaryReceivePacket) {
 		if (errorType==DOOR_ERROR) {
+			System.out.println("Door Error Update from floor: " + Arrays.toString(data));
+			schedulerFloorReceivePacket=temporaryReceivePacket;
 			//stop the elevator
 			//recall the door open-close
 		}
@@ -238,12 +240,9 @@ public class Scheduler {
 		elevatorHighestRequestFloor = new int[numElevators];
 		elevatorLowestRequestFloor = new int[numElevators];
 		
-		/*for (int i = 0; i < numElevators; i++) {
-			elevatorRequestsUp[i] = new LinkedList<Integer>();
-			elevatorStopsUp[i] = new LinkedList<Integer>();
-			elevatorRequestsDown[i] = new LinkedList<Integer>();
-			elevatorStopsDown[i] = new LinkedList<Integer>();
-		}*/
+		for (int i = 0; i < numElevators; i++) {
+			elevatorStatus[i] = HOLD;
+		}
 
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -353,15 +352,15 @@ public class Scheduler {
 								if (elevatorStopsDown[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
 
-									try {
-										Thread.currentThread().sleep(2);
-									} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
-										// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
-										// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
-										e.printStackTrace();
-									}
+//									try {
+//										Thread.currentThread().sleep(2);
+//									} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
+//										// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
+//										// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
+//										e.printStackTrace();
+//									}
 
-									createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
+									//createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
 									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 									// overwritten before being sent at the very end
 									elevatorStopsUp[packetElementIndex].clear();
@@ -376,7 +375,7 @@ public class Scheduler {
 								// stops
 								// create and send SendPacket to restart the motor/ have the motor in the up
 								// direction
-								createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+								createSendingData(packetElementIndex, 0, 0, 4);// 1: up
 								// IMPORTANT:
 								// this packet sending may not be necessary and could be what's causing the
 								// double sending at the very beginning
