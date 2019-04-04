@@ -76,6 +76,7 @@ public class Elevator extends Thread {
 	private List<byte[]> elevatorTable;
 	private boolean doorStatusOpen = false; // whether the doors are open(true) or closed (false)
 	private long doorOpenTime, doorCloseTime;// for error checking that doors are closed within time
+	protected boolean holdReceived;
 
 	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
@@ -323,6 +324,7 @@ public class Elevator extends Thread {
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
 						openCloseDoor(DOOR_OPEN);
+						holdReceived = true;
 						sendPacket(2, NO_ERROR);
 					}
 					else if (motorDirection == HOLD) {
