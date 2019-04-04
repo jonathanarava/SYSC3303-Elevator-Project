@@ -163,7 +163,7 @@ public class Elevator extends Thread {
 	}
 
 	// COMENTING OUT FOR TESTING REASONS, DO NOT DELETE
-	public void openCloseDoor(byte doorOpenCloseError) { 
+	public void openCloseDoor(int doorOpenCloseError) { 
 		//String msg; 
 		
 		if (doorOpenCloseError == DOOR_OPEN) { //instruction is to open the doors for DOOR_DURATION seconds
@@ -322,6 +322,7 @@ public class Elevator extends Thread {
 					else if (motorDirection == STOP) {
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
+						openCloseDoor(DOOR_OPEN);
 						sendPacket(2, NO_ERROR);
 					}
 					else if (motorDirection == HOLD) {

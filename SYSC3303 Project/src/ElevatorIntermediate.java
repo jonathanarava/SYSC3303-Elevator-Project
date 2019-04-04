@@ -157,7 +157,7 @@ public class ElevatorIntermediate {
 		byte elevatorElement;
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
-			elevatorReceiveSocket.setSoTimeout(2500);
+			//elevatorReceiveSocket.setSoTimeout(2500);
 			// send and receive with Scheduler.
 		} catch (SocketException e1) {
 			e1.printStackTrace();
