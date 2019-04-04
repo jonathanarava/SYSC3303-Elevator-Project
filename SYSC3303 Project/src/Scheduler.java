@@ -361,7 +361,7 @@ public class Scheduler {
 //									}
 
 									//createSendingData(packetElementIndex, 0, 0, 4);// 4: place on hold state
-									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
+									//elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 									// overwritten before being sent at the very end
 									elevatorStopsUp[packetElementIndex].clear();
 									// Sleep method
@@ -383,7 +383,13 @@ public class Scheduler {
 								// overwritten before being sent at the very end
 							}
 
-						} else {// not a floor that we need to stop at
+						} else if(elevatorStopsUp[packetElementIndex].isEmpty()){
+							if(elevatorStopsDown[packetElementIndex].isEmpty()) {
+								createSendingData(packetElementIndex, 0, 0, 4);
+								elevatorFloorSendPacket(ELEVATOR_ID);
+							}
+						}
+						else {// not a floor that we need to stop at
 							// Look at this.
 							System.out.println(
 									"reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
