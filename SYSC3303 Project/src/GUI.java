@@ -33,7 +33,7 @@ GUI() {
 			frame.add(button[i]);
 		}
 		for(int i = 0; i< numElevators; i++) {
-			textArea[i] = new JTextArea("Current FLoor " + elevatorCurrentFloor[i]);	
+			textArea[i] = new JTextArea("Current FLoor " /*+ elevatorCurrentFloor[i]*/);	
 			frame.add(textArea[i]);
 		}
 	
@@ -60,7 +60,7 @@ GUI() {
 		
 		//Frame dimensions
 		frame.setSize(450,200); 
-		 
+		
 		frame.setVisible(true);  
 	}
 }
