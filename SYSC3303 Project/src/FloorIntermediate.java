@@ -86,6 +86,7 @@ public class FloorIntermediate {
 	//private boolean intialized=false;
 	private static int numFloors;
 	private static byte initializationData[];
+	private static byte receiveData[]=new byte[8];
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -157,16 +158,18 @@ public class FloorIntermediate {
 	}
 
 	public synchronized void receivePacket() {
-		byte data[] = new byte[8];
+		//byte data[] = new byte[8];
+		int elevatorElement;
 		int elevatorDirection;//which direction the elevator is going or holding (data[__])
 		int elevatorLocation;//where the floor is (data[__])
 		int schedulerInstruction;//the instruction sent from the scheduler (data[6]
+		
 		try {
 			floorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
-		floorReceivePacket = new DatagramPacket(data, data.length);
+		floorReceivePacket = new DatagramPacket(receiveData, receiveData.length);
 //		try {
 //			System.out.println("Waiting...\n"); // so we know we're waiting
 //			floorReceiveSocket.receive(floorReceivePacket);
@@ -184,7 +187,7 @@ public class FloorIntermediate {
 			System.out.println("waiting to receive");
 			floorReceiveSocket.receive(floorReceivePacket);
 			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data));
+			System.out.println(Arrays.toString(receiveData));
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
@@ -192,20 +195,20 @@ public class FloorIntermediate {
 			System.exit(1);
 		}
 		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
-		
-		elevatorLocation=data[3];
+		elevatorElement=receiveData[1];
+		elevatorLocation=receiveData[3];
 		System.out.println("FloorIntermediate's elevatorLocation: "+elevatorLocation);
 		
-		elevatorDirection=data[4];
+		elevatorDirection=receiveData[4];
 		System.out.println("FloorIntermediate's elevatorDirection: "+elevatorDirection);
-		schedulerInstruction=data[6];
+		schedulerInstruction=receiveData[6];
 		if (schedulerInstruction==INITIALIZE) {
 			//intialized=true;
 			System.out.println("FloorIntermediate INITIALIZED");
 		}
 		else if(schedulerInstruction==UPDATE_DISPLAYS) {
 			for (int i = 0; i < numFloors; i++){
-				floorArray[i].updateDisplay(elevatorLocation, elevatorDirection);
+				floorArray[i].updateDisplay(elevatorElement, elevatorLocation, elevatorDirection);
 			}
 		}
 		else {
