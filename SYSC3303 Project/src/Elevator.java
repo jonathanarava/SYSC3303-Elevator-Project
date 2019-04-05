@@ -45,7 +45,9 @@ public class Elevator extends Thread {
 	private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
-
+	
+	protected boolean GUI_LIGHT;
+	
 	public byte motorDirection; // make getters and setters:
 	public boolean hasRequest = true; // make getters and setters: This Boolean will be set to true when the Elevator
 	// Intermediate wants a specific elevator thread to do something.
@@ -241,6 +243,10 @@ public class Elevator extends Thread {
 		sensor = floorSensor;
 		return sensor;
 	}
+	
+	public int getSensor() {
+		return sensor;
+	}
 
 	public void updateDisplay() {
 		System.out.println("On Floor: " + sensor);
@@ -322,7 +328,10 @@ public class Elevator extends Thread {
 					else if (motorDirection == STOP) {
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
+						GUI_LIGHT = true;
+						System.out.println(GUI_LIGHT + "by elevator " + elevatorNumber);
 						openCloseDoor(DOOR_OPEN);
+						//GUI_LIGHT = false;
 						sendPacket(2, NO_ERROR);
 					}
 					else if (motorDirection == HOLD) {

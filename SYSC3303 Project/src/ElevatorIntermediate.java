@@ -60,7 +60,7 @@ public class ElevatorIntermediate {
 	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
-	private static Elevator elevatorArray[];
+	protected static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
 
 	private byte[] requestElevator = new byte[3];
@@ -282,7 +282,9 @@ public class ElevatorIntermediate {
 		int elevatorPortNumbers[] = new int[createNumElevators];
 
 		elevatorInitialization();
-
+		
+		
+		
 		//INITIALIZE THE SCHEDULER
 		elevatorHandler.sendPacket();
 		//wait for the scheduler to have access to Elevators and Floors
@@ -301,6 +303,10 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
+		
+		GUI gui = new GUI();
+		Thread guiThread = new Thread(gui);
+		guiThread.start();
 
 		while (true) {
 			elevatorHandler.sendPacket();

@@ -256,7 +256,7 @@ public class Floor extends Thread {
 
 	
 	public void run() {
-		while (true) {
+		while (hasRequest) {
 			// while(true) to activate all elevator threads in this system
 			if (hasRequest) {// send request
 				sendPacket(1, error);
