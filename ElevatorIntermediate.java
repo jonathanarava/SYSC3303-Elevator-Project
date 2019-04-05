@@ -40,6 +40,7 @@ public class ElevatorIntermediate {
 		private static final int PLACE_ON_HOLD=4;
 		private static final int UPDATE_DISPLAYS=5;
 		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int FIX_ELEVATOR=7;//
 		private static final int INITIALIZE=8;//for first communication with the scheduler
 		private static final int UNUSED=0;// value for unused parts of data 
 		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
@@ -213,18 +214,22 @@ public class ElevatorIntermediate {
 		//schedulerInstruction=data[6];
 		//elevatorElement=data[1];
 		if (schedulerInstruction==UP) {
+			elevatorArray[packetElement].previousState = elevatorArray[packetElement].elevatorState;
 			elevatorArray[packetElement].elevatorState = schedulerInstruction;
 			elevatorArray[packetElement].dealWith = true;
 		}
 		else if (schedulerInstruction==DOWN) {
+			elevatorArray[packetElement].previousState = elevatorArray[packetElement].elevatorState;
 			elevatorArray[packetElement].elevatorState = schedulerInstruction;
 			elevatorArray[packetElement].dealWith = true;
 		}
 		else if (schedulerInstruction==STOP) {
+			elevatorArray[packetElement].previousState = elevatorArray[packetElement].elevatorState;
 			elevatorArray[packetElement].elevatorState = schedulerInstruction;
 			elevatorArray[packetElement].dealWith = true;
 		}
 		else if (schedulerInstruction==HOLD) {
+			elevatorArray[packetElement].previousState = elevatorArray[packetElement].elevatorState;
 			elevatorArray[packetElement].elevatorState = schedulerInstruction;
 			elevatorArray[packetElement].dealWith = true;
 		}
@@ -240,6 +245,12 @@ public class ElevatorIntermediate {
 		}
 		else if(schedulerInstruction==SHUT_DOWN) {
 			elevatorArray[packetElement].shutDown();
+		}
+		else if (schedulerInstruction==FIX_ELEVATOR) {
+			elevatorArray[packetElement].fixElevator();
+		}
+		else if(schedulerInstruction==UNUSED) {
+			//do nothing
 		}
 		else {
 			System.out.println("Elevator: "+packetElement +"; Unknown Instruction from Scheduler: "+schedulerInstruction);
@@ -321,9 +332,24 @@ public class ElevatorIntermediate {
 		}
 
 		updateDisplay();
+		
+		//add the requesst so that the elevators stop at first and second floor
+		elevatorArray[0].setRealTimeFloorRequest(1);//add request for elevator 0 (first elevator) to go to the first floor
+		elevatorHandler.sendPacket();
+		elevatorHandler.receivePacket();
+		
+		elevatorArray[1].setRealTimeFloorRequest(2);//add request for elevator 1 (second elevator) to go to the second floor
+		elevatorHandler.sendPacket();
+		elevatorHandler.receivePacket();
+		
 		//break third and fourth elevator (shouldn't effect the ones with arrivals
 		elevatorArray[2].breakElevator(DOOR_ERROR);
+		elevatorHandler.sendPacket();
+		elevatorHandler.receivePacket();
+		
 		elevatorArray[3].breakElevator(MOTOR_ERROR);
+		elevatorHandler.sendPacket();
+		elevatorHandler.receivePacket();
 		
 		while (true) {
 			elevatorHandler.sendPacket();
