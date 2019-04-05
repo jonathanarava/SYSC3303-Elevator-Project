@@ -213,7 +213,7 @@ public class FloorIntermediate {
 		}
 		else {
 			//something's gone wrong, floors should only ever be receiving updates
-			System.out.println("error in receivePacket(), not an UPDATE for Floor: "+ elevatorLocation);
+			System.out.println("Floor: "+ elevatorLocation+" error in receivePacket(), not an UPDATE but: "+schedulerInstruction);
 		}
 	}
 
