@@ -55,6 +55,7 @@ public class SchedulerSeperateAlgorithm {
 		private static final int PLACE_ON_HOLD=4;
 		private static final int UPDATE_DISPLAYS=5;
 		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int FIX_ELEVATOR=7;//
 		private static final int INITIALIZE=8;//for first communication with the scheduler
 		private static final int UNUSED=0;// value for unused parts of data 
 		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
@@ -699,6 +700,9 @@ public class SchedulerSeperateAlgorithm {
 			}
 			else if (packetError==NO_ERROR) {
 				System.out.println("Scheduler was notified of an error but NO_ERROR was shown for elevator: "+ packetType);
+				//still need to reply in order for everything to continue on
+				createSendingData(packetElement, UNUSED, UNUSED, UNUSED);
+				elevatorFloorSendPacket(ELEVATOR_ID);
 				//continue as normal
 			}
 			else{
