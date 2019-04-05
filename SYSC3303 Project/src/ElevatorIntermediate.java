@@ -281,25 +281,6 @@ public class ElevatorIntermediate {
 		// also be difficult, just using the ones which are available
 		int elevatorPortNumbers[] = new int[createNumElevators];
 
-		// Lets create a socket for the elevator Intermediate class to communicate
-		// with the scheduler. All the elevator threads will use this.
-
-<<<<<<< HEAD
-		
-		//GUI gui = new GUI();
-
-=======
-<<<<<<< HEAD
-
-		//GUI gui = new GUI();
-=======
-		
-		GUI gui = new GUI();
->>>>>>> 1b6f171979d64f55ed91c35328f00895acb3a0ca
-
->>>>>>> parent of ff1f5b4... Update ElevatorIntermediate.java
-		// go for the argument passed into Elevator Intermediate, create an array for
-		// elevators,
 		elevatorInitialization();
 
 		//INITIALIZE THE SCHEDULER
