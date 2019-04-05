@@ -54,6 +54,7 @@ public class FloorIntermediate {
 		private static final int PLACE_ON_HOLD=4;
 		private static final int UPDATE_DISPLAYS=5;
 		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+		private static final int FIX_ELEVATOR=7;//
 		private static final int INITIALIZE=8;//for first communication with the scheduler
 		private static final int UNUSED=0;// value for unused parts of data 
 		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
@@ -234,16 +235,18 @@ public class FloorIntermediate {
 
 	public static void main(String args[]) {// throws IOException {
 
-		// for iteration 1 there will only be 1 elevator
+		//FOR ITERATION 5, hard coding number of elevators, floors, requests, errors
+		numFloors=22;//as per specificied
+		
 		// getting floor numbers from parameters set
 		//int createNumFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
-		numFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
+		//numFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		//Floor floor = new Floor(createNumFloors);
 
 		//floor.fileReader("M://hello.txt");
 		//createNumFloors = Integer.parseInt(args[0]);
-		numFloors = Integer.parseInt(args[0]);
+		//numFloors = Integer.parseInt(args[0]);
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
 		
@@ -256,12 +259,20 @@ public class FloorIntermediate {
 			// elevator, 0
 			// initializes the
 			// floor it
-			if (i!=numFloors-1) {
+			
+			//FOR TESTING; SETS A REQUEST FOR EACH FLOOR TO SEND
+			/*if (i!=numFloors-1) {
 				floorArray[i].setRequestDirection(UP);
 			}
 			else {
 				floorArray[i].setRequestDirection(DOWN);
+			}*/
+			
+			//FOR ITERATION 5, hard coding number of elevators, floors, requests, errors
+			if (i==1 ||1==2) {//as per specified, arrivals for levels one and two
+				floorArray[i].setRequestDirection(UP);
 			}
+			
 			// starts on
 			floorThreadArray[i] = new Thread(floorArray[i]);
 			floorThreadArray[i].start();
@@ -269,7 +280,6 @@ public class FloorIntermediate {
 
 		while(true) {
 			floorHandler.sendPacket();
-			
 			floorHandler.receivePacket();
 		}
 
