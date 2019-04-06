@@ -22,7 +22,28 @@ import javax.swing.border.TitledBorder;
 
 import javafx.scene.text.Font;
 
+
 public class GUI extends Scheduler implements Runnable {
+	
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte SHUT_DOWN = 0x06;//for shutting down a hard fault problem elevator
+	
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	private static final int DOOR_OPEN = 1;// the door is open when ==1
+	private static final int DOOR_DURATION = 4;// duration that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
+	private static final int MAKE_STOP=3;//
+	private static final int PLACE_ON_HOLD=4;
+	private static final int UPDATE_DISPLAYS=5;
+	private static final int INITIALIZE=8;//for first communication with the scheduler
+	private static final int UNUSED=0;// value for unused parts of data 
 
 	// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
 	int numElevators = 4;	
@@ -148,8 +169,8 @@ public class GUI extends Scheduler implements Runnable {
 		South.add(Elevator3Dialog);
 		South.add(Elevator4Dialog);
 
-		Full.add(North,BorderLayout.NORTH );
-		Full.add(South,BorderLayout.SOUTH );
+		Full.add(North,BorderLayout.NORTH);
+		Full.add(South,BorderLayout.SOUTH);
 
 		//Layout Initialization
 		BorderLayout borderLayout = new BorderLayout();
@@ -165,19 +186,77 @@ public class GUI extends Scheduler implements Runnable {
 	public void run() {
 		while(true) {
 			for(int i = 0; i < numElevators; i++) {
-				if(i==0) {
-					button1[elevatorCurrentFloor[i]].setBackground(Color.green);
-					
-				}
-				if(i==1) {
-					
-					button2[elevatorCurrentFloor[i]].setBackground(Color.green);
-				}
-				if(i==2) {
-					button3[elevatorCurrentFloor[i]].setBackground(Color.green);
-				}
-				if(i==3) {
-					button4[elevatorCurrentFloor[i]].setBackground(Color.green);
+				switch(i) {
+				case 0:
+					for(int j = 0; j < numFloors; j++) {
+						button1[j].setBackground(null);
+					}
+					switch(elevatorStatus[i]) {
+					case STOP:
+						button1[elevatorCurrentFloor[i]].setBackground(Color.yellow);
+						break;
+					case UP:
+						button1[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case DOWN:
+						button1[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case HOLD:
+						button1[elevatorCurrentFloor[i]].setBackground(Color.red);
+					}
+				case 1:
+					for(int j = 0; j < numFloors; j++) {
+						button2[j].setBackground(null);
+					}
+					switch(elevatorStatus[i]) {
+					case STOP:
+						button2[elevatorCurrentFloor[i]].setBackground(Color.yellow);
+						break;
+					case UP:
+						button2[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case DOWN:
+						button2[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case HOLD:
+						button2[elevatorCurrentFloor[i]].setBackground(Color.red);
+					}
+				
+				case 2:
+					for(int j = 0; j < numFloors; j++) {
+						button3[j].setBackground(null);
+					}
+					switch(elevatorStatus[i]) {
+					case STOP:
+						button3[elevatorCurrentFloor[i]].setBackground(Color.yellow);
+						break;
+					case UP:
+						button3[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case DOWN:
+						button3[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case HOLD:
+						button3[elevatorCurrentFloor[i]].setBackground(Color.red);
+					}
+				
+				case 3:
+					for(int j = 0; j < numFloors; j++) {
+						button4[j].setBackground(null);
+					}
+					switch(elevatorStatus[i]) {
+					case STOP:
+						button4[elevatorCurrentFloor[i]].setBackground(Color.yellow);
+						break;
+					case UP:
+						button4[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case DOWN:
+						button4[elevatorCurrentFloor[i]].setBackground(Color.green);
+						break;
+					case HOLD:
+						button4[elevatorCurrentFloor[i]].setBackground(Color.red);
+					}
 				}
 			}
 		}

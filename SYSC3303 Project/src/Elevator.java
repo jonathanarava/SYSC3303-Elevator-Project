@@ -328,10 +328,7 @@ public class Elevator extends Thread {
 					else if (motorDirection == STOP) {
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
-						GUI_LIGHT = true;
-						System.out.println(GUI_LIGHT + "by elevator " + elevatorNumber);
 						openCloseDoor(DOOR_OPEN);
-						//GUI_LIGHT = false;
 						sendPacket(2, NO_ERROR);
 					}
 					else if (motorDirection == HOLD) {

@@ -292,7 +292,7 @@ public class FloorIntermediate {
 //			if(i == Integer.parseInt(args[1])) {
 //				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
 //			}
-			floorThreadArray[i].start();
+			//floorThreadArray[i].start();
 		}
 
 		while(true) {
@@ -301,33 +301,5 @@ public class FloorIntermediate {
 			}
 			floorHandler.receivePacket();
 		}
-
-		/*while (true) {
-			if(floor.fileRequests.isEmpty()) {
-				hasRequest = false;
-			} else {
-				hasRequest = true;
-				String command = floor.fileRequests.remove(0);
-				String segment[] = command.split(" ");
-				name = Integer.parseInt(segment[1]);
-				if(segment[2].equals("Up")) {
-					up_or_down = UP;
-				} else if(segment[2].equals("Down")) {
-					up_or_down = DOWN;
-				}
-			}
-
-			if(hasRequest == true) {
-				floorHandler.sendPacket();//name, up_or_down));
-			} else {
-				floorHandler.sendPacket();//(0, 0));
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			floorHandler.receivePacket();
-		}*/
 	}
 }
