@@ -22,7 +22,7 @@ import javax.swing.border.TitledBorder;
 
 import javafx.scene.text.Font;
 
-public class GUI extends ElevatorIntermediate implements Runnable {
+public class GUI extends Scheduler implements Runnable {
 
 	// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
 	int numElevators = 4;	
@@ -165,29 +165,21 @@ public class GUI extends ElevatorIntermediate implements Runnable {
 	public void run() {
 		while(true) {
 			for(int i = 0; i < numElevators; i++) {
-				if(elevatorArray[i].GUI_LIGHT == true) {
-					if(i==0) {
-						button1[elevatorArray[i].getSensor()].setBackground(Color.green);
-					}
-					if(i==1) {
-						
-						button2[elevatorArray[i].getSensor()].setBackground(Color.green);
-					}
-					if(i==2) {
-						button3[elevatorArray[i].getSensor()].setBackground(Color.green);
-					}
-					if(i==3) {
-						button4[elevatorArray[i].getSensor()].setBackground(Color.green);
-					}
+				if(i==0) {
+					button1[elevatorCurrentFloor[i]].setBackground(Color.green);
+					
+				}
+				if(i==1) {
+					
+					button2[elevatorCurrentFloor[i]].setBackground(Color.green);
+				}
+				if(i==2) {
+					button3[elevatorCurrentFloor[i]].setBackground(Color.green);
+				}
+				if(i==3) {
+					button4[elevatorCurrentFloor[i]].setBackground(Color.green);
 				}
 			}
 		}
-	}
-
-	public static void main(String args[]) throws IOException {
-		GUI gui = new GUI();
-		Thread t = new Thread(gui);
-		t.start();
-
 	}
 }

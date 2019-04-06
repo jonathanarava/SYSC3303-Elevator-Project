@@ -304,9 +304,7 @@ public class ElevatorIntermediate {
 			elevatorThreadArray[i].start();
 		}
 		
-		GUI gui = new GUI();
-		Thread guiThread = new Thread(gui);
-		guiThread.start();
+		
 
 		while (true) {
 			elevatorHandler.sendPacket();

@@ -115,7 +115,12 @@ public class Scheduler {
 	private static boolean elevatorInitialized=false;
 	private static boolean floorInitialized=false;
 
-
+	
+	// variables for GUI
+	public static GUI gui;
+	public static Thread guiThread;
+	
+	
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
 		elevatorStopsUp= new LinkedList[numElevators];
@@ -243,6 +248,8 @@ public class Scheduler {
 		for (int i = 0; i < numElevators; i++) {
 			elevatorStatus[i] = HOLD;
 		}
+		
+		guiThread.start();
 
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -820,7 +827,11 @@ public class Scheduler {
 
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		Scheduler schedulerHandler = new Scheduler();
+		gui = new GUI();
+		guiThread = new Thread(gui);
+		
+		//Scheduler schedulerHandler = new Scheduler();
+		
 		//Scheduler.linkedListInitialization();
 
 		/*
@@ -854,7 +865,7 @@ public class Scheduler {
 			// Sorts the received Packet and returns the byte array to be sent
 			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
 			//schedulerHandler.SchedulingAlgorithm(packetRecieved);
-			schedulerHandler.SchedulingAlgorithm(receiveData);
+			SchedulingAlgorithm(receiveData);
 			// Sends the Packet to Elevator
 			// elevatorSendPacket(sendData);
 			respondEnd = System.nanoTime();// end for the timer
