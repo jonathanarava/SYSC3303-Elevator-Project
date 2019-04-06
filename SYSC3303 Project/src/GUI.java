@@ -167,7 +167,6 @@ public class GUI extends Scheduler implements Runnable {
 			for(int i = 0; i < numElevators; i++) {
 				if(i==0) {
 					button1[elevatorCurrentFloor[i]].setBackground(Color.green);
-					
 				}
 				if(i==1) {
 					
