@@ -267,11 +267,11 @@ public class FloorIntermediate {
 			else {
 				floorArray[i].setRequestDirection(DOWN);
 			}*/
-			
+			//IMPLEMENTED THROUGH ELEVATORINTERMEDIATE FOR SIMPLICITY INSTEAD
 			//FOR ITERATION 5, hard coding number of elevators, floors, requests, errors
-			if (i==1 ||1==2) {//as per specified, arrivals for levels one and two
+			/*if (i==1 ||1==2) {//as per specified, arrivals for levels one and two
 				floorArray[i].setRequestDirection(UP);
-			}
+			}*/
 			
 			// starts on
 			floorThreadArray[i] = new Thread(floorArray[i]);

@@ -105,9 +105,12 @@ public class SchedulerSeperateAlgorithm {
 	private static int[] responseTime;// response time of individual elevators to got to a floor request
 	private static int indexOfFastestElevator = 0;// index of array for which elevator is fastest
 	//private static int temp;// temporary for finding the fastest response time
-	//timing measurement
-	private static long respondStart, respondEnd;// variables for the measurements to respond
-	//initialization
+
+	/*SHOULD BE MIGRATED TO THE ELEVATORS AND FLOORS
+	//timing measurement; 
+	//private static long respondStart, respondEnd;// variables for the measurements to respond
+	*/
+	//initialization; when both the elevator and floor are initialized then so is the scheduler and thus requests and updates can be sent
 	private static boolean elevatorInitialized=false;
 	private static boolean floorInitialized=false;
 	//for use at initialization, both elevatorIntermediate and floorIntermediate need to send their initialization packets
@@ -153,7 +156,7 @@ public class SchedulerSeperateAlgorithm {
 		linkedListInitialization();
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
-		createSendingData(0,0,0, INITIALIZE);
+		createSendingData(0,0,0, INITIALIZE);//probably not necessary to re-create the same sendData but owell... 
 		elevatorFloorSendPacket(FLOOR_ID);
 		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n");
 	}
@@ -173,7 +176,7 @@ public class SchedulerSeperateAlgorithm {
 		System.out.println("Received Floor Initialization\n");
 		numFloors=packetElement;
 		floorAddress=schedulerReceivePacket.getAddress();
-		
+		System.out.println("Received FLoor Initialization \n");
 		if (elevatorInitialized==true) {
 			schedulerInitilization();
 		}
@@ -231,6 +234,7 @@ public class SchedulerSeperateAlgorithm {
 			elevatorFloorSendPacket(ELEVATOR_ID);// originally the only send in the method
 		}
 	}
+	
 	private static void scheduleElevatorUpdate() {
 		if (elevatorStatus[packetElement] == UP) {// direction that the elevator is going is up
 			if (elevatorStopsUp[packetElement].contains(packetCurrentFloor)) {// we have reached a
@@ -260,7 +264,7 @@ public class SchedulerSeperateAlgorithm {
 							Thread.currentThread().sleep(2);
 						} catch (InterruptedException e) { // THIS SLEEP IS HERE TO GIVE THE ELEVATOR ENOUGH
 							// TIME RECEIVE THE PACKET FOR 'HOLD' DO NOT REMOVE
-							// TODO Auto-generated catch block // UNLESS YOU KNOW WHAT YOU'RE DOING
+							// UNLESS YOU KNOW WHAT YOU'RE DOING
 							e.printStackTrace();
 						}
 						createSendingData(packetElement, UNUSED, UNUSED, HOLD);// 4: place on hold state
@@ -459,6 +463,7 @@ public class SchedulerSeperateAlgorithm {
 				stops = 0;// stops=0 since by definition hold means there were no prior requests or stops
 
 			} else if (status == UP) {// elevator going up
+				System.out.println("calculateResponseTimes() Elevator: "+i+" going UP");
 				if (requestDirection == UP) {// if requesting to go up
 					// if along the way
 					if (destination >= next) {
@@ -481,6 +486,7 @@ public class SchedulerSeperateAlgorithm {
 					// stops=upStops+downStops between destination and top
 				}
 			} else if (status == DOWN) {// elevator going down
+				System.out.println("calculateResponseTimes() Elevator: "+i+" going DOWN");
 				if (requestDirection == UP) {// if requesting to go up
 					distance = (current - lowest) + (destination - lowest);
 					stops = elevatorStopsDown[i].size() + stopsBetween(elevatorStopsUp[i], lowest, destination, UP);
@@ -541,7 +547,7 @@ public class SchedulerSeperateAlgorithm {
 				indexOfFastestElevator = i;
 			}
 		}
-		System.out.println("The Fastest Elevator to respond is: "+indexOfFastestElevator);
+		System.out.println("The Fastest Elevator to respond is: "+indexOfFastestElevator+"\n");
 	}
 //SEND & RECEIVE METHODS
 	public static void elevatorFloorSendPacket(int sendTo) {//SENDING ELEVATOR PACKET HERE
@@ -552,7 +558,9 @@ public class SchedulerSeperateAlgorithm {
 			DatagramPacket sendingPacket=new DatagramPacket(sendData, sendData.length,elevatorAddress, EL_SENDPORTNUM);
 			try {
 				schedulerElevatorSendSocket.send(sendingPacket);
+				System.out.println("scheduler- Elevator send SUCCESSFUL\n");
 			} catch (IOException e1) {
+				System.out.println("scheduler- Elevator send FAILED\n");
 				e1.printStackTrace();
 			}
 		}
@@ -562,7 +570,9 @@ public class SchedulerSeperateAlgorithm {
 			DatagramPacket sendingPacket=new DatagramPacket(sendData, sendData.length,floorAddress, FL_SENDPORTNUM);
 			try {
 				schedulerFloorSendSocket.send(sendingPacket);
+				System.out.println("scheduler- Floor send SUCCESSFUL\n");
 			} catch (IOException e1) {
+				System.out.println("scheduler- Floor send FAILED\n");
 				e1.printStackTrace();
 			}
 		}
@@ -680,10 +690,10 @@ public class SchedulerSeperateAlgorithm {
 		private static void errorResponse(){
 			if (packetError==DOOR_ERROR) {
 				//Transient Fault: handle gracefully
-				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);//resending the stop signal to the elevator should RE- open and close the door causing the issue-> "Fixing" it
+				//fix the elevator: how that is done is handled in elevator
+				createSendingData(packetElement, UNUSED, UNUSED, FIX_ELEVATOR);
 				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-				//after the stop, the elevator should then RE- start and continue with it's previous operation automatically
+				
 			}
 			else if (packetError==MOTOR_ERROR) {
 				//Hard Fault
