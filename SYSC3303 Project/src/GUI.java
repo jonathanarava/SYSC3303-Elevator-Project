@@ -186,7 +186,6 @@ public class GUI extends Scheduler implements Runnable {
 	public void run() {
 		while(true) {
 			for(int i = 0; i < numElevators; i++) {
-<<<<<<< HEAD
 				switch(i) {
 				case 0:
 					for(int j = 0; j < numFloors; j++) {
@@ -258,20 +257,6 @@ public class GUI extends Scheduler implements Runnable {
 					case HOLD:
 						button4[elevatorCurrentFloor[i]].setBackground(Color.red);
 					}
-=======
-				if(i==0) {
-					button1[elevatorCurrentFloor[i]].setBackground(Color.green);
-				}
-				if(i==1) {
-					
-					button2[elevatorCurrentFloor[i]].setBackground(Color.green);
-				}
-				if(i==2) {
-					button3[elevatorCurrentFloor[i]].setBackground(Color.green);
-				}
-				if(i==3) {
-					button4[elevatorCurrentFloor[i]].setBackground(Color.green);
->>>>>>> f83942dcdf654ad8c3f0bf3366ec10ec40a0d66e
 				}
 			}
 		}
