@@ -188,74 +188,76 @@ public class GUI extends Scheduler implements Runnable {
 			for(int i = 0; i < numElevators; i++) {
 				switch(i) {
 				case 0:
-					for(int j = 0; j < numFloors; j++) {
+					/*for(int j = 0; j < numFloors; j++) {
 						button1[j].setBackground(null);
-					}
+					}*/
 					switch(elevatorStatus[i]) {
-					case STOP:
-						button1[elevatorCurrentFloor[i]].setBackground(Color.yellow);
-						break;
-					case UP:
-						button1[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case DOWN:
-						button1[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case HOLD:
-						button1[elevatorCurrentFloor[i]].setBackground(Color.red);
+						case STOP:
+							button1[elevatorCurrentFloor[i]].setBackground(Color.red);
+							break;
+						case UP:
+							button1[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case DOWN:
+							button1[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case HOLD:
+							button1[elevatorCurrentFloor[i]].setBackground(Color.yellow);
 					}
 				case 1:
-					for(int j = 0; j < numFloors; j++) {
-						button2[j].setBackground(null);
-					}
+					
+					/*	button2[i+1].setBackground(null);
+						if(i <= 1) {
+							button2[i-1].setBackground(null);
+						}*/
 					switch(elevatorStatus[i]) {
-					case STOP:
-						button2[elevatorCurrentFloor[i]].setBackground(Color.yellow);
-						break;
-					case UP:
-						button2[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case DOWN:
-						button2[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case HOLD:
-						button2[elevatorCurrentFloor[i]].setBackground(Color.red);
+						case STOP:
+							button2[elevatorCurrentFloor[i]].setBackground(Color.red);
+							break;
+						case UP:
+							button2[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case DOWN:
+							button2[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case HOLD:
+							button2[elevatorCurrentFloor[i]].setBackground(Color.yellow);
 					}
 				
 				case 2:
-					for(int j = 0; j < numFloors; j++) {
+					/*for(int j = 0; j < numFloors; j++) {
 						button3[j].setBackground(null);
-					}
+					}*/
 					switch(elevatorStatus[i]) {
-					case STOP:
-						button3[elevatorCurrentFloor[i]].setBackground(Color.yellow);
-						break;
-					case UP:
-						button3[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case DOWN:
-						button3[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case HOLD:
-						button3[elevatorCurrentFloor[i]].setBackground(Color.red);
+						case STOP:
+							button3[elevatorCurrentFloor[i]].setBackground(Color.red);
+							break;
+						case UP:
+							button3[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case DOWN:
+							button3[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case HOLD:
+							button3[elevatorCurrentFloor[i]].setBackground(Color.yellow);
 					}
 				
 				case 3:
-					for(int j = 0; j < numFloors; j++) {
+					/*for(int j = 0; j < numFloors; j++) {
 						button4[j].setBackground(null);
-					}
+					}*/
 					switch(elevatorStatus[i]) {
-					case STOP:
-						button4[elevatorCurrentFloor[i]].setBackground(Color.yellow);
-						break;
-					case UP:
-						button4[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case DOWN:
-						button4[elevatorCurrentFloor[i]].setBackground(Color.green);
-						break;
-					case HOLD:
-						button4[elevatorCurrentFloor[i]].setBackground(Color.red);
+						case STOP:
+							button4[elevatorCurrentFloor[i]].setBackground(Color.red);
+							break;
+						case UP:
+							button4[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case DOWN:
+							button4[elevatorCurrentFloor[i]].setBackground(Color.green);
+							break;
+						case HOLD:
+							button4[elevatorCurrentFloor[i]].setBackground(Color.yellow);
 					}
 				}
 			}
