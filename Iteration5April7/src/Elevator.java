@@ -111,7 +111,7 @@ public class Elevator extends Thread {
 	}
 	public void fixElevator() {
 		elevatorBroken=false;
-		System.out.println("Elevator: "+elevatorNumber+" has been fixed");
+		System.out.println("Elevator: "+elevatorNumber+" has been fixed\n");
 		elevatorState=previousState;
 		dealWith=true;
 	}
@@ -372,7 +372,6 @@ public class Elevator extends Thread {
 						dealWith=false;
 					}
 				}
-
 			}
 		}
 	}

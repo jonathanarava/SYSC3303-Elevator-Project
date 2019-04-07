@@ -118,28 +118,8 @@ public class ElevatorIntermediate {
 
 	}
 
-	public synchronized void sendPacket() {
-		// byte[] requestElevator = new byte[7];
-
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
-		// requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes
-		// into the first index of elevatorArray list, and tells that elevator to return
-		// a byte array that
-		// will be the packet that is being sent to the Scheduler. This needs to be done
-		// in a dynamic manner so all
-		// elevators can acquire a lock to send a packet one at a time.
-
+	//public synchronized void sendPacket() {
+	public void sendPacket() {
 		// allocate sockets, packets
 		synchronized (elevatorTable) {
 			while (elevatorTable.isEmpty()) {
@@ -169,7 +149,6 @@ public class ElevatorIntermediate {
 				elevatorTable.notifyAll();
 			}
 		}
-
 	}
 
 	//public synchronized void receivePacket() {

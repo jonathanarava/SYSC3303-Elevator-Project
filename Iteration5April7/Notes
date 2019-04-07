@@ -1,0 +1,8 @@
+Notes: 
+
+-removed Synchronization in method types of send, receive of elevatorintermediate
+
+	-either no synchronization on the method (since it is only called from within the intermediate; responsible for actual sending and receiving)
+	-OR actually call notifyall, etc
+	
+	-check for floorintermeidate
