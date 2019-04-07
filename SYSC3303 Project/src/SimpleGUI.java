@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -12,12 +13,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
+
+
 public class SimpleGUI implements Runnable{
+	int i;
 	int numElevators = 4;	
 	int numFloors = 22;
 	public JButton DirectionButtons[] = new JButton[8] ;
 	String elevator1msg = "Elevator 1"; 
 	String elevator1 = "Elevator 1"; 
+	
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	
 	
 	SimpleGUI(){
 		JFrame frame = new JFrame("SimpleElevator GUI");
@@ -165,8 +175,18 @@ public class SimpleGUI implements Runnable{
 		textArea = new JTextArea(Integer.toString(currentFloor));
 	}
 	
+	public void UpdateElevatorGUIDirection(int i, JButton DirectionButtons[], int STATUS) {
+		if(STATUS == HOLD) {
+			DirectionButtons[i].setBackground(Color.yellow);
+		}
+		if(STATUS == UP || STATUS == DOWN) {
+			DirectionButtons[i].setBackground(Color.green);
+		}
+		if(STATUS == STOP) {
+			DirectionButtons[i].setBackground(Color.red);
+		}
+	}
 	
-
 	
 	@Override
 	public void run() {
