@@ -121,39 +121,18 @@ public class Elevator extends Thread {
 		requestElevator.write(elevatorNumber); // identity of this particular elevator object
 
 		// request or update data
-		if (requestUpdateError == REQUEST) {
-			//requestElevator.write(REQUEST); // request
-			// requestElevator.write((byte) setSensor(sensor)); // current floor
-			// requestElevator.write(0); // up or down (not used, only for Floors)
-			// requestElevator.write(RealTimefloorRequest); // dest floor
-			// requestElevator.write(0); // instruction (not used, only from the scheduler)
-			// (not used, only from the scheduler)
-			// added error to data structure, not included here
-		} else if (requestUpdateError == UPDATE) {
-			//requestElevator.write(UPDATE); // update
-			// requestElevator.write((byte) setSensor(sensor)); // current floor
-			// requestElevator.write(0); // up or down (not used, only for Floors)
-			// requestElevator.write(RealTimefloorRequest); // dest floor
-			// requestElevator.write(0); // instruction
-			// added error to data structure, not included here
-		} else if (requestUpdateError == ERROR) {
-			//requestElevator.write(ERROR); // update
-			requestElevator.write((byte) setSensor(sensor)); // current floor
-			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-			requestElevator.write(RealTimefloorRequest); // dest floor
-			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
-			requestElevator.write(errorType); // error ID
-			return requestElevator.toByteArray();
-		} else {// something's gone wrong with the call to this method
-			//requestElevator.write(ERROR);
-			System.out.println(elevatorNumber
-					+ " Elevator ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
-			requestElevator.write((byte) setSensor(sensor)); // current floor
-			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-			requestElevator.write(RealTimefloorRequest); // dest floor
-			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-			requestElevator.write(OTHER_ERROR); // something's gone wrong
-			return requestElevator.toByteArray();
+		switch(requestUpdateError) {
+			case REQUEST:
+				break;
+			case UPDATE:
+				break;
+			case ERROR:
+				requestElevator.write((byte) setSensor(sensor)); // current floor
+				requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+				requestElevator.write(RealTimefloorRequest); // dest floor
+				requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
+				requestElevator.write(errorType); // error ID
+				return requestElevator.toByteArray();
 		}
 		requestElevator.write(requestUpdateError);
 		requestElevator.write((byte) setSensor(sensor)); // current floor
@@ -162,6 +141,42 @@ public class Elevator extends Thread {
 		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
+		
+//		if (requestUpdateError == REQUEST) {
+//			//requestElevator.write(REQUEST); // request
+//			// requestElevator.write((byte) setSensor(sensor)); // current floor
+//			// requestElevator.write(0); // up or down (not used, only for Floors)
+//			// requestElevator.write(RealTimefloorRequest); // dest floor
+//			// requestElevator.write(0); // instruction (not used, only from the scheduler)
+//			// (not used, only from the scheduler)
+//			// added error to data structure, not included here
+//		} else if (requestUpdateError == UPDATE) {
+//			//requestElevator.write(UPDATE); // update
+//			// requestElevator.write((byte) setSensor(sensor)); // current floor
+//			// requestElevator.write(0); // up or down (not used, only for Floors)
+//			// requestElevator.write(RealTimefloorRequest); // dest floor
+//			// requestElevator.write(0); // instruction
+//			// added error to data structure, not included here
+//		} else if (requestUpdateError == ERROR) {
+//			//requestElevator.write(ERROR); // update
+//			requestElevator.write((byte) setSensor(sensor)); // current floor
+//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+//			requestElevator.write(RealTimefloorRequest); // dest floor
+//			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
+//			requestElevator.write(errorType); // error ID
+//			return requestElevator.toByteArray();
+//		} else {// something's gone wrong with the call to this method
+//			//requestElevator.write(ERROR);
+//			System.out.println(elevatorNumber
+//					+ " Elevator ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
+//			requestElevator.write((byte) setSensor(sensor)); // current floor
+//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
+//			requestElevator.write(RealTimefloorRequest); // dest floor
+//			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+//			requestElevator.write(OTHER_ERROR); // something's gone wrong
+//			return requestElevator.toByteArray();
+//		}
+		
 	}
 
 	// COMENTING OUT FOR TESTING REASONS, DO NOT DELETE
@@ -265,23 +280,26 @@ public class Elevator extends Thread {
 			e.printStackTrace();
 		}
 		// for
-		if (motionOfMotor == UP) {
-			System.out.println("Elevator is going up...");
-			isGoingUp = true;
-			sensor++; // increment the floor
-			setSensor(sensor); // updates the current floor
-		} else if (motionOfMotor == DOWN) {
-			System.out.println("Elevator is going down...");
-			isGoingUp = false;
-			sensor--; // decrements the floor
-			setSensor(sensor); // updates the current floor
+		switch(motionOfMotor) {
+			case UP:
+				System.out.println("Elevator is going up...");
+				isGoingUp = true;
+				sensor++; // increment the floor
+				setSensor(sensor); // updates the current floor
+				break;
+			case DOWN:
+				System.out.println("Elevator is going down...");
+				isGoingUp = false;
+				sensor--; // decrements the floor
+				setSensor(sensor); // updates the current floor
+				break;
 		}
 	}
 
 	// sets Current location of elevator through this setter
 
 	public synchronized void sendPacket(int requestUpdateError, byte sendErrorType) {
-		synchronized (elevatorTable) {
+		synchronized(elevatorTable) {
 			while (elevatorTable.size() != 0) {// wait for an opening to send the packet
 				try {
 					elevatorTable.wait(1);
@@ -290,7 +308,6 @@ public class Elevator extends Thread {
 				}
 			}
 			elevatorTable.add(createResponsePacketData(requestUpdateError, sendErrorType));
-			// isUpdate = false;
 			elevatorTable.notifyAll();
 		}
 	}
@@ -306,40 +323,50 @@ public class Elevator extends Thread {
 
 			while (!hasRequest) {// send updates
 				while (dealWith) {
-					
-					if (motorDirection == UP || motorDirection == DOWN) {
+					switch(motorDirection) {
+					case UP:
 						motionOfMotor = motorDirection; 
 						runElevator();
 						dealWith = !dealWith;
 						sendPacket(2, NO_ERROR);
-					}
-					else if (motorDirection == UPDATE_DISPLAY) {
-						if (motionOfMotor == UP || motionOfMotor == DOWN) {
+						break;
+						
+					case DOWN:
+						motionOfMotor = motorDirection; 
+						runElevator();
+						dealWith = !dealWith;
+						sendPacket(2, NO_ERROR);
+						break;
+						
+					case UPDATE_DISPLAY:
+						switch(motionOfMotor) {
+						case UP:
 							runElevator();
+							break;
+						
+						case DOWN:
+							runElevator();
+							break;
 						}
 						updateDisplay();
 						dealWith = !dealWith;
-						
 						sendPacket(2, NO_ERROR);
-						
-						// set the lights sensors and stuff to proper value
-						isUpdate = false;
-					}
-					else if (motorDirection == STOP) {
+						break;
+					case STOP:
 						motionOfMotor = STOP;
 						dealWith = !dealWith;
 						openCloseDoor(DOOR_OPEN);
 						sendPacket(2, NO_ERROR);
-					}
-					else if (motorDirection == HOLD) {
-						// Figure out why the Elevator is not reaching the hold state.
+						break;
+					case HOLD:
 						motionOfMotor = HOLD;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
 						break;
-					}
-					else if(motorDirection==SHUT_DOWN) {
+					case SHUT_DOWN:
 						shutDown();
+						break;
+					
 					}
 				}
 				break;

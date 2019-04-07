@@ -117,8 +117,8 @@ public class Scheduler {
 
 	
 	// variables for GUI
-	public static GUI gui;
-	public static Thread guiThread;
+//	public static GUI gui;
+//	public static Thread guiThread;
 	
 	
 	private static void linkedListInitialization() {
@@ -143,6 +143,7 @@ public class Scheduler {
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
+			schedulerSocketSendReceiveElevator.setSoTimeout(2500);
 			schedulerSocketSendReceiveFloor = new DatagramSocket(FL_RECEIVEPORTNUM);// can be any available port,
 			// Scheduler will reply
 			// to the port
@@ -150,6 +151,25 @@ public class Scheduler {
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
+		}
+	}
+	
+	public static void resendPacket() {
+		System.out.println("Response to Elevator " + data[1] + ": " + Arrays.toString(sendData) + "\n");
+		schedulerElevatorSendPacket = new DatagramPacket(sendData, sendData.length,
+				schedulerElevatorReceivePacket.getAddress(), EL_SENDPORTNUM);
+		try {
+			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(sendData) + "\n");
+		schedulerFloorSendPacket = new DatagramPacket(sendData, sendData.length,
+				schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
+		try {
+			schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -169,9 +189,13 @@ public class Scheduler {
 			// schedulerSocketReceiveElevator.close();
 			// schedulerSocketSendReceiveElevator.close()
 
-		} catch (IOException e) {
+		} catch (SocketTimeoutException e) {
+			System.out.println("Receive Socket Timed Out, Resent Packet\n" + e);
+			resendPacket();
+			return;
+		}
+		catch (IOException e) {
 			System.out.print("IO Exception: likely:");
-			System.out.println("Receive Socket Timed Out.\n" + e);
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -249,7 +273,7 @@ public class Scheduler {
 			elevatorStatus[i] = HOLD;
 		}
 		
-		guiThread.start();
+//		guiThread.start();
 
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -444,9 +468,9 @@ public class Scheduler {
 					// }
 					// update floor number and direction displays for elevator and all floors
 					//createSendingData(0, 0, elevatorDirection, 5);// 5: status update
-					createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);
-					elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS 
-					elevatorFloorSendPacket(ELEVATOR_ID);
+					//createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);*********************************************************************************************************
+					//elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS 
+					//elevatorFloorSendPacket(ELEVATOR_ID);
 				} else {// elevator sent a request
 
 					// floorRequesting=packetElementIndex;//the floor# of the requesting floor
@@ -827,10 +851,10 @@ public class Scheduler {
 
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		gui = new GUI();
-		guiThread = new Thread(gui);
+//		gui = new GUI();
+//		guiThread = new Thread(gui);
 		
-		//Scheduler schedulerHandler = new Scheduler();
+		Scheduler schedulerHandler = new Scheduler();
 		
 		//Scheduler.linkedListInitialization();
 
