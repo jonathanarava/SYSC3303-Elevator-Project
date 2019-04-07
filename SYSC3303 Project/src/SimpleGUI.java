@@ -12,11 +12,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-public class SimpleGUI {
+public class SimpleGUI implements Runnable{
 	int numElevators = 4;	
 	int numFloors = 22;
-	public JButton DirectionButtons[];
-	
+	public JButton DirectionButtons[] = new JButton[8] ;
+	String elevator1msg = "Elevator 1"; 
+	String elevator1 = "Elevator 1"; 
 	
 	SimpleGUI(){
 		JFrame frame = new JFrame("SimpleElevator GUI");
@@ -35,11 +36,10 @@ public class SimpleGUI {
 		JPanel ErrorMsg = new JPanel();
 		JTextArea textArea1, textArea2, textArea3, textArea4;
 		
-		// Testing Values
-		String elevator1 = "Elevator 1"; 
+		// Testing Values; 
 		int currentFloor1 = 10, currentFloor2 = 0, currentFloor3 = 4, currentFloor4 = 6;
 		int direction1 = 1;
-		String elevator1msg = "Elevator 1"; 
+		
 		DirectionButtons = new JButton[8] ;
 		
 		//
@@ -159,21 +159,29 @@ public class SimpleGUI {
 		frame.setVisible(true); 
 	}
 	
-	JPanel ElevatorPanelSetup(JPanel panel, String elevator, int currentFloor, int Direction, JTextArea textArea, String errorMsg, JButton button[]) {
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(new TitledBorder(elevator));
-		textArea = new JTextArea( Integer.toString(currentFloor));
-		textArea.setLineWrap(true);
-		textArea.setWrapStyleWord(true);
-		textArea.setEditable(false);
-		
-		return panel;
+	
+	
+	public void UpdateGUICurrentFloor(JTextArea textArea, int currentFloor) {
+		textArea = new JTextArea(Integer.toString(currentFloor));
 	}
+	
+	
 
+	
+	@Override
+	public void run() {
+		while(true) {
+			
+		}
 		
+	}	
 		
 	public static void main(String args[]) throws IOException {
 		SimpleGUI gui = new SimpleGUI();
 	}
+
+
+
+	
 }
 
