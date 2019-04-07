@@ -75,7 +75,7 @@ public class FloorIntermediate {
 
 	private static DatagramPacket floorSendPacket, floorReceivePacket;
 	private static DatagramSocket floorReceiveSocket,floorSendSocket;
-
+	
 	public static List<byte[]> floorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 	private static Floor floorArray[];
 	private static Thread floorThreadArray[];
@@ -142,6 +142,7 @@ public class FloorIntermediate {
 					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
 					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
+					
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 					System.exit(1);
