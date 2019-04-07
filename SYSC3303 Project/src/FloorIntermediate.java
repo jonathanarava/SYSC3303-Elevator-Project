@@ -50,8 +50,8 @@ public class FloorIntermediate extends Thread {
 		int lengthOfByteArray = requestPacket.length;
 		System.out.println("Request from Floor " + requestPacket[1] + ": " + Arrays.toString(requestPacket));
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.127");
-			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, address, SENDPORTNUM);
+			//InetAddress address = InetAddress.getByName("134.117.59.127");
+			floorSendPacket = new DatagramPacket(requestPacket, lengthOfByteArray, InetAddress.getLocalHost(), SENDPORTNUM);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);

@@ -60,8 +60,8 @@ public class Scheduler extends Thread {
 	//private static Thread newRequest;
 
 	public static LinkedList<Integer> direction = new LinkedList<Integer>();
-	private static int ele0;
-	private static int ele1;
+	protected static int ele0;
+	protected static int ele1;
 	private boolean semaphoreRemove0 = false;
 	private boolean semaphoreRemove1 = false;
 	
@@ -111,16 +111,11 @@ public class Scheduler extends Thread {
 		destFloor = data[5];
 	}
 
-	public static void elevatorSendPacket(byte[] responseByteArray) {
+	public static void elevatorSendPacket(byte[] responseByteArray) throws UnknownHostException {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		try {
-			InetAddress address = InetAddress.getByName("134.117.59.127");
-			schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-					address, schedulerElevatorReceivePacket.getPort());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//InetAddress address = InetAddress.getByName("134.117.59.127");
+		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
+				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
 
 		try {
 			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
@@ -211,7 +206,7 @@ public class Scheduler extends Thread {
 
 	/* Splitting the packet to determine if its for a floor or elevator request */
 
-	public synchronized static void packetDealer() {
+	public synchronized static void packetDealer() throws UnknownHostException {
 		if (elevatorOrFloor == 21) {
 			if (elevatorOrFloorID == 0) {
 				if (requestOrUpdate == 1) {
@@ -373,7 +368,7 @@ public class Scheduler extends Thread {
 		return direction;
 	}
 
-	public synchronized void schedulingAlgo() {
+	public synchronized void schedulingAlgo() throws UnknownHostException {
 		/* ELevator 1 logic */
 		if (!(upQueue1.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
 			int first = upQueue1.getFirst();
@@ -406,7 +401,7 @@ public class Scheduler extends Thread {
 
 		/* ELevator 2 logic */
 
-		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
+		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == UP || direction.get(1) == HOLD)) {
 			int first = upQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -417,7 +412,7 @@ public class Scheduler extends Thread {
 			return;
 		}
 
-		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(0) == DOWN || direction.get(0) == HOLD)) {
+		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == DOWN || direction.get(1) == HOLD)) {
 			int first = downQueue2.getFirst();
 			byte[] responseByteArray = responsePacket(1, currentFloor, first);
 			if (currentFloor == first) {
@@ -443,10 +438,11 @@ public class Scheduler extends Thread {
 		return semaphoreRemove1; 
 	}
 
-	public static void main(String args[]) throws InterruptedException {
+	public static void main(String args[]) throws InterruptedException, UnknownHostException {
 
 		Scheduler packet = new Scheduler();
-		//byte[] responseByteArray = new byte[] {69,0,0,0,0,0,1};
+		
+
 		Thread floor = new Thread() {
 			public void run() {
 				while (true) {
@@ -490,7 +486,8 @@ public class Scheduler extends Thread {
 		direction.add(1, (int) HOLD);
 
 		floor.start();
-		//floorSend.start();
+
+
 		for (;;) {
 			Scheduler.elevatorReceivePacket(); // connection to elevator class
 
