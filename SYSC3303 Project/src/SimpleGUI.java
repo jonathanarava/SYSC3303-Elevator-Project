@@ -15,11 +15,11 @@ import javax.swing.border.TitledBorder;
 
 
 
-public class SimpleGUI implements Runnable{
-	int i;
+public class SimpleGUI  extends Scheduler implements Runnable{
 	int numElevators = 4;	
 	int numFloors = 22;
 	public JButton DirectionButtons[] = new JButton[8] ;
+	
 	String elevator1msg = "Elevator 1"; 
 	String elevator1 = "Elevator 1"; 
 	
@@ -27,7 +27,7 @@ public class SimpleGUI implements Runnable{
 	private static final byte DOWN = 0x02;// elevator is going down
 	private static final byte STOP = 0x03;
 	private static final byte HOLD = 0x04;// elevator is in hold state
-	
+	public JTextArea textArea1, textArea2, textArea3, textArea4;
 	
 	SimpleGUI(){
 		JFrame frame = new JFrame("SimpleElevator GUI");
@@ -44,11 +44,11 @@ public class SimpleGUI implements Runnable{
 		JPanel FullPanel = new JPanel();
 		JPanel ElevatorStatus = new JPanel();
 		JPanel ErrorMsg = new JPanel();
-		JTextArea textArea1, textArea2, textArea3, textArea4;
 		
-		// Testing Values; 
+		
+		/*// Testing Values; 
 		int currentFloor1 = 10, currentFloor2 = 0, currentFloor3 = 4, currentFloor4 = 6;
-		int direction1 = 1;
+		int direction1 = 1;*/
 		
 		DirectionButtons = new JButton[8] ;
 		
@@ -64,7 +64,7 @@ public class SimpleGUI implements Runnable{
 		Elevator1.setLayout(new FlowLayout());
 		Elevator1.setBorder(new TitledBorder("Elevator 1"));
 		
-		textArea1 = new JTextArea( Integer.toString(currentFloor1));
+		textArea1 = new JTextArea( Integer.toString(1/*elevatorCurrentFloor[0]*/));
 		textArea1.setLineWrap(true);
 		textArea1.setWrapStyleWord(true);
 		textArea1.setEditable(false);
@@ -84,7 +84,7 @@ public class SimpleGUI implements Runnable{
 		Elevator2.setLayout(new FlowLayout());
 		Elevator2.setBorder(new TitledBorder("Elevator 2"));
 		
-		textArea2 = new JTextArea( Integer.toString(currentFloor2));
+		textArea2 = new JTextArea( Integer.toString(1));
 		textArea2.setLineWrap(true);
 		textArea2.setWrapStyleWord(true);
 		textArea2.setEditable(false);
@@ -104,7 +104,7 @@ public class SimpleGUI implements Runnable{
 		Elevator3.setLayout(new FlowLayout());
 		Elevator3.setBorder(new TitledBorder("Elevator 3"));
 		
-		textArea3 = new JTextArea( Integer.toString(currentFloor3));
+		textArea3 = new JTextArea( Integer.toString(1));
 		textArea3.setLineWrap(true);
 		textArea3.setWrapStyleWord(true);
 		textArea3.setEditable(false);
@@ -124,7 +124,7 @@ public class SimpleGUI implements Runnable{
 		Elevator4.setLayout(new FlowLayout());
 		Elevator4.setBorder(new TitledBorder("Elevator 3"));
 		
-		textArea4 = new JTextArea( Integer.toString(currentFloor4));
+		textArea4 = new JTextArea( Integer.toString(1));
 		textArea4.setLineWrap(true);
 		textArea4.setWrapStyleWord(true);
 		textArea4.setEditable(false);
@@ -172,36 +172,80 @@ public class SimpleGUI implements Runnable{
 	
 	
 	public void UpdateGUICurrentFloor(JTextArea textArea, int currentFloor) {
-		textArea = new JTextArea(Integer.toString(currentFloor));
+		textArea.setText(Integer.toString(currentFloor));
+		//textArea = new JTextArea(Integer.toString(currentFloor));
 	}
 	
-	public void UpdateElevatorGUIDirection(int i, JButton DirectionButtons[], int STATUS) {
-		if(STATUS == HOLD) {
-			DirectionButtons[i].setBackground(Color.yellow);
-		}
-		if(STATUS == UP || STATUS == DOWN) {
-			DirectionButtons[i].setBackground(Color.green);
-		}
-		if(STATUS == STOP) {
-			DirectionButtons[i].setBackground(Color.red);
+	public void UpdateElevatorGUIDirection(int elevator) {
+		switch(elevatorStatus[elevator]) {
+			case STOP:
+				DirectionButtons[elevator].setBackground(Color.red);
+				DirectionButtons[elevator+1].setBackground(Color.red);
+				break;
+			case UP:
+				DirectionButtons[elevator].setBackground(null);
+				DirectionButtons[elevator+1].setBackground(Color.green);
+				break;
+			case DOWN:
+				DirectionButtons[elevator+1].setBackground(null);
+				DirectionButtons[elevator].setBackground(Color.green);
+				break;
+			case HOLD:
+				DirectionButtons[elevator].setBackground(Color.yellow);
+				DirectionButtons[elevator+1].setBackground(Color.yellow);
+				break;
 		}
 	}
 	
 	
-	@Override
 	public void run() {
 		while(true) {
-			
+			for(int i = 0; i < numElevators; i++) {
+				switch(i) {
+				case 0:
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					UpdateElevatorGUIDirection(i);
+					UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
+				case 1:
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					UpdateElevatorGUIDirection(i);	
+					UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
+				case 2:
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					UpdateElevatorGUIDirection(i);
+					UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
+				case 3:
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					UpdateElevatorGUIDirection(i);
+					UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
+					}
+				}
+			}
 		}
+	
 		
-	}	
-		
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) {
 		SimpleGUI gui = new SimpleGUI();
 	}
-
-
-
-	
 }
 

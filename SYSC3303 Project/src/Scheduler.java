@@ -120,6 +120,8 @@ public class Scheduler {
 	public static GUI gui;
 	public static Thread guiThread;
 	
+	public static SimpleGUI simpleGUI;
+	public static Thread SimpleGUIThread;
 	
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
@@ -273,7 +275,8 @@ public class Scheduler {
 			elevatorStatus[i] = HOLD;
 		}
 		
-		guiThread.start();
+		/*guiThread.start();*/
+		SimpleGUIThread.start();
 
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -851,8 +854,11 @@ public class Scheduler {
 
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		gui = new GUI();
-		guiThread = new Thread(gui);
+		/*gui = new GUI();
+		guiThread = new Thread(gui);*/
+		
+		simpleGUI = new SimpleGUI();
+		SimpleGUIThread = new Thread(simpleGUI);
 		
 		//Scheduler schedulerHandler = new Scheduler();
 		
