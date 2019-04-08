@@ -205,46 +205,26 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 			for(int i = 0; i < numElevators; i++) {
 				switch(i) {
 					case 0:
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						System.out.println("			Elevator 1 " + elevatorCurrentFloor[i]);
+						//System.out.println("			Elevator 1 " + elevatorCurrentFloor[i]);
 						UpdateElevatorGUIDirection(i);
 						UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
 						//UpdateGUIErrorMsg("ELevator 1");
 						break;
 					case 1:
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
 						UpdateElevatorGUIDirection(i);	
-						System.out.println("			Elevator 2 " + elevatorCurrentFloor[i]);
+						//System.out.println("			Elevator 2 " + elevatorCurrentFloor[i]);
 						UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
 						//UpdateGUIErrorMsg("ELevator 2");
 						break;
 					case 2:
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
 						UpdateElevatorGUIDirection(i);
-						System.out.println("			Elevator 3 " + elevatorCurrentFloor[i]);
+						//System.out.println("			Elevator 3 " + elevatorCurrentFloor[i]);
 						UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
 						//UpdateGUIErrorMsg("ELevator 3");
 						break;
 					case 3:
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
 						UpdateElevatorGUIDirection(i);
-						System.out.println("			Elevator 4 " + elevatorCurrentFloor[i]);
+						//System.out.println("			Elevator 4 " + elevatorCurrentFloor[i]);
 						UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
 						//UpdateGUIErrorMsg("ELevator 4");
 						break;
@@ -254,9 +234,9 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 	}
 		
 	
-		
+/*		
 	public static void main(String args[]) {
 		SimpleGUI gui = new SimpleGUI();
-	}
+	}*/
 }
 
