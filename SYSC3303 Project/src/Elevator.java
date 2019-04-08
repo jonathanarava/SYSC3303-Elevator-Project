@@ -49,14 +49,14 @@ public class Elevator extends Thread {
 	protected boolean GUI_LIGHT;
 	
 	public byte motorDirection; // make getters and setters:
-	public boolean hasRequest = true; // make getters and setters: This Boolean will be set to true when the Elevator
+	public boolean hasRequest; // make getters and setters: This Boolean will be set to true when the Elevator
 	// Intermediate wants a specific elevator thread to do something.
 	// if hasRequest is true, then the Elevator thread will not send another
 	// request. Ie, he needs to take care of the job he is told to do by the
 	// intermediate
 	// before he takes more real time requests by the people. Incidentally,
 	// hasRequest == true means that the elevator should move up or down a floor.
-	public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
+	//public boolean hasRTRequest = false; // Real time variable for *****TESTING LINE 1.0******
 
 	public boolean dealWith = false; // dealWith boolean is set by the Intermediate class for a specific elevator if THAT SPECIFIC elevator has a job set by scheduler it needs to dealWith
 
@@ -83,7 +83,14 @@ public class Elevator extends Thread {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
-		this.RealTimefloorRequest = RealTimefloorRequest;
+		if(RealTimefloorRequest == 0) {
+			hasRequest = false;
+			return;
+		}
+		else {
+			hasRequest = true;
+			this.RealTimefloorRequest = RealTimefloorRequest;
+		}
 		// arbitrary usage of 23 for port number of Scheduler's receive
 		// use a numbering scheme for the naming
 

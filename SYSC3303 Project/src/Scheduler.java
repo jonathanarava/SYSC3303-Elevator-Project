@@ -115,6 +115,8 @@ public class Scheduler {
 	private static boolean elevatorInitialized=false;
 	private static boolean floorInitialized=false;
 
+	private static boolean receiveTimedOut = false;
+	
 	
 	// variables for GUI
 	public static GUI gui;
@@ -145,7 +147,6 @@ public class Scheduler {
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
-			schedulerSocketSendReceiveElevator.setSoTimeout(2500);
 			schedulerSocketSendReceiveFloor = new DatagramSocket(FL_RECEIVEPORTNUM);// can be any available port,
 			// Scheduler will reply
 			// to the port
@@ -193,6 +194,7 @@ public class Scheduler {
 
 		} catch (SocketTimeoutException e) {
 			System.out.println("Receive Socket Timed Out, Resent Packet\n" + e);
+			receiveTimedOut = true;
 			resendPacket();
 			return;
 		}
@@ -282,6 +284,11 @@ public class Scheduler {
 		elevatorFloorSendPacket(ELEVATOR_ID);
 		createSendingData(0,0,0, INITIALIZE);
 		elevatorFloorSendPacket(FLOOR_ID);
+		try {
+			schedulerSocketSendReceiveElevator.setSoTimeout(4500);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n\n\n\n");
 	}
 	//public byte[] SchedulingAlgorithm(byte[] packetData) {
@@ -335,6 +342,7 @@ public class Scheduler {
 		// elevator as status update)
 		floorRequestDirection = packetData[4];// which direction the requesting floor wants to go
 		stopRequest = packetData[5];// a request to stop at a given floor (-1 if no request)
+		
 		if (packetSentFrom == ELEVATOR_ID) {// if it is an elevator
 			
 			if (packetIsStatus==INITIALIZE) {
@@ -895,6 +903,10 @@ public class Scheduler {
 			// Sorts the received Packet and returns the byte array to be sent
 			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
 			//schedulerHandler.SchedulingAlgorithm(packetRecieved);
+			if(receiveTimedOut) {
+				receiveTimedOut = !receiveTimedOut;
+				elevatorFloorReceivePacket();
+			}
 			SchedulingAlgorithm(receiveData);
 			// Sends the Packet to Elevator
 			// elevatorSendPacket(sendData);

@@ -1,4 +1,5 @@
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.lang.Object;
 
 public class ElevatorIntermediate {
@@ -68,6 +70,7 @@ public class ElevatorIntermediate {
 	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
+	
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -76,6 +79,9 @@ public class ElevatorIntermediate {
 	// synchronized table that all of the elevator threads will put their requests
 	// and updates upon
 	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	
+	// ArrayList for Inputfile
+	public static List<String> fileRequests = new ArrayList<String>();
 
 	public ElevatorIntermediate() {
 		try {
@@ -129,7 +135,7 @@ public class ElevatorIntermediate {
 			if (elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length, InetAddress.getByName("134.117.59.126"),
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
 					recentlySent = elevatorTable.get(0);
 				} catch (UnknownHostException e) {
@@ -242,10 +248,33 @@ public class ElevatorIntermediate {
 	}
 
 	public static void delay(int delayValue) {
+
 		for (int i = 0; i < delayValue;) {
 			i++;
 		}
 	}
+	
+	public static void fileReader(String fullFile) { 
+		String text = "";
+		int i=0;
+		try { 
+			FileReader input = new FileReader(fullFile);
+			Scanner reader = new Scanner(input);
+			reader.useDelimiter("[\n]");
+
+			while (reader.hasNext()){
+				text = reader.next();
+				if (i<=1) {
+					i++;
+				} else if(i>=2) {
+					fileRequests.add(text);
+					i++;
+				}
+			}
+			reader.close();
+		}catch(Exception e) { e.printStackTrace(); }
+	}
+	
 	private static void elevatorInitialization() {
 		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
 		initializationOutputStream.write(ELEVATOR_ID); // Identifying as the scheduler
@@ -265,6 +294,16 @@ public class ElevatorIntermediate {
 		elevatorTable.add(initializationData);
 
 	}
+	static String floorRequesting[] = new String[4];
+	static String floorToGoTo[] = new String[4];
+	public static void createRequests() {
+		for(int i = 0; i <fileRequests.size(); i++) {
+			String command = fileRequests.get(i);
+			String segment[] = command.split(" ");
+			floorRequesting[i] = segment[1];
+			floorToGoTo[i] = segment[3];
+		}
+	}
 
 	public static void main(String args[]) throws IOException {
 		// 2 arguments: args[0] is the number of Elevators in the system
@@ -273,7 +312,13 @@ public class ElevatorIntermediate {
 		// getting floor numbers from parameters set
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
 		// argument[0]
-
+		
+		fileReader("M://hello.txt");
+		System.out.println(fileRequests.size());
+		createRequests();
+		System.out.println(floorRequesting[1]);
+		System.out.println(floorToGoTo[1]);
+		
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
 		// port numbers there

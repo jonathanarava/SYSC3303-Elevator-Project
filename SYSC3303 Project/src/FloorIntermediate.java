@@ -124,7 +124,7 @@ public class FloorIntermediate {
 			if (floorTable.size() != 0) {
 				try {
 					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
-					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getByName("134.117.59.126"),
+					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
 					
 				} catch (UnknownHostException e) {
@@ -226,7 +226,7 @@ public class FloorIntermediate {
 	 * inputs as a string. For now This section will be commented. Will be
 	 * implemented for other itterations
 	 */
-/*	public static void fileReader(String fullFile) { 
+	public static void fileReader(String fullFile) { 
 		String text = "";
 		int i=0;
 		try { 
@@ -243,8 +243,9 @@ public class FloorIntermediate {
 					i++;
 				}
 			}
+			reader.close();
 		}catch(Exception e) { e.printStackTrace(); }
-	}*/
+	}
 
 	public static void main(String args[]) {// throws IOException {
 
