@@ -23,11 +23,11 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 	String elevator1msg = "Elevator 1"; 
 	String elevator1 = "Elevator 1"; 
 	
-	private static final byte UP = 0x01;// elevator is going up
-	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte UP = 0x02;// elevator is going up
+	private static final byte DOWN = 0x01;// elevator is going down
 	private static final byte STOP = 0x03;
 	private static final byte HOLD = 0x04;// elevator is in hold state
-	public JTextArea textArea1, textArea2, textArea3, textArea4;
+	public JTextArea textArea1, textArea2, textArea3, textArea4, ErrorMsgTextArea;
 	
 	SimpleGUI(){
 		JFrame frame = new JFrame("SimpleElevator GUI");
@@ -64,7 +64,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		Elevator1.setLayout(new FlowLayout());
 		Elevator1.setBorder(new TitledBorder("Elevator 1"));
 		
-		textArea1 = new JTextArea( Integer.toString(1/*elevatorCurrentFloor[0]*/));
+		textArea1 = new JTextArea("0"/*Integer.toString(elevatorCurrentFloor[0])*/);
 		textArea1.setLineWrap(true);
 		textArea1.setWrapStyleWord(true);
 		textArea1.setEditable(false);
@@ -84,7 +84,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		Elevator2.setLayout(new FlowLayout());
 		Elevator2.setBorder(new TitledBorder("Elevator 2"));
 		
-		textArea2 = new JTextArea( Integer.toString(1));
+		textArea2 = new JTextArea("0"/*Integer.toString(elevatorCurrentFloor[1])*/);
 		textArea2.setLineWrap(true);
 		textArea2.setWrapStyleWord(true);
 		textArea2.setEditable(false);
@@ -104,7 +104,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		Elevator3.setLayout(new FlowLayout());
 		Elevator3.setBorder(new TitledBorder("Elevator 3"));
 		
-		textArea3 = new JTextArea( Integer.toString(1));
+		textArea3 = new JTextArea("0"/*Integer.toString(elevatorCurrentFloor[2])*/);
 		textArea3.setLineWrap(true);
 		textArea3.setWrapStyleWord(true);
 		textArea3.setEditable(false);
@@ -124,7 +124,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		Elevator4.setLayout(new FlowLayout());
 		Elevator4.setBorder(new TitledBorder("Elevator 3"));
 		
-		textArea4 = new JTextArea( Integer.toString(1));
+		textArea4 = new JTextArea("0"/*Integer.toString(elevatorCurrentFloor[3])*/);
 		textArea4.setLineWrap(true);
 		textArea4.setWrapStyleWord(true);
 		textArea4.setEditable(false);
@@ -169,10 +169,12 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		frame.setVisible(true); 
 	}
 	
-	
-	
 	public void UpdateGUICurrentFloor(JTextArea textArea, int currentFloor) {
 		textArea.setText(Integer.toString(currentFloor));
+	}
+	
+	public void UpdateGUIErrorMsg(String errorMsg) {
+		ErrorMsgTextArea.append(Integer.toString(currentFloor));
 		//textArea = new JTextArea(Integer.toString(currentFloor));
 	}
 	
@@ -202,42 +204,44 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 		while(true) {
 			for(int i = 0; i < numElevators; i++) {
 				switch(i) {
-				case 0:
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					UpdateElevatorGUIDirection(i);
-					UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
-				case 1:
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					UpdateElevatorGUIDirection(i);	
-					UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
-				case 2:
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					UpdateElevatorGUIDirection(i);
-					UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
-				case 3:
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					UpdateElevatorGUIDirection(i);
-					UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
+					case 0:
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						System.out.println("Elevator 1" + elevatorCurrentFloor[i]);
+						UpdateElevatorGUIDirection(i);
+						UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
+						//UpdateGUIErrorMsg("ELevator 1");
+					case 1:
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						UpdateElevatorGUIDirection(i);	
+						System.out.println("Elevator 2" + elevatorCurrentFloor[i]);
+						UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
+						//UpdateGUIErrorMsg("ELevator 2");
+					case 2:
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						UpdateElevatorGUIDirection(i);
+						UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
+						//UpdateGUIErrorMsg("ELevator 3");
+					case 3:
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						UpdateElevatorGUIDirection(i);
+						UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
+						//UpdateGUIErrorMsg("ELevator 4");
 					}
 				}
 			}
