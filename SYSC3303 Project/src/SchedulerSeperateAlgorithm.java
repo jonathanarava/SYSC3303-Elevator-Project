@@ -83,8 +83,8 @@ public class SchedulerSeperateAlgorithm {
 	private static int numFloors;
 
 	// scheduling alogrithm variable declaration
-	private static int elevatorCurrentFloor[];// = new int[numElevators];
-	private static int elevatorStatus[];// = new int[numElevators];
+	protected static int elevatorCurrentFloor[];// = new int[numElevators];		//Changed to protected for SimpleGUI
+	protected static int elevatorStatus[];// = new int[numElevators];			//Changed to protected for SimpleGUI
 	private static int elevatorNextStop[];// = new int[numElevators];
 	private static int elevatorNumStops[];// = new int[numElevators];
 	private static int elevatorHighestRequestFloor[];// = new int[numElevators];
