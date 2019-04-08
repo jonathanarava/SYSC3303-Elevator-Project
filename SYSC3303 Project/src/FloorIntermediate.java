@@ -149,6 +149,8 @@ public class FloorIntermediate extends Thread {
 		Floor floor = new Floor(createNumFloors);
 		
 		floor.fileReader("M://hello.txt");
+		System.out.println("FIRST REQUEST  --> " + floor.fileRequests.get(0));
+		System.out.println("Second REQUEST  --> " + floor.fileRequests.get(1));
 		//byte[] responseByteArray = new byte[] {69,0,0,0,0,0,0}; // test packet
 
 		FloorIntermediate F1 = new FloorIntermediate(0);
@@ -167,6 +169,7 @@ public class FloorIntermediate extends Thread {
 					up_or_down = UP;
 				} else if(segment[2].equals("Down")) {
 					up_or_down = DOWN;
+					System.out.println("here down request");
 				}
 			}
 
