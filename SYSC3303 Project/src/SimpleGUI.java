@@ -201,7 +201,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 	
 	
 	public void run() {
-		
+		while(true) {
 			for(int i = 0; i < numElevators; i++) {
 				switch(i) {
 					case 0:
@@ -251,6 +251,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 					}
 				}
 			}
+	}
 		
 	
 		
