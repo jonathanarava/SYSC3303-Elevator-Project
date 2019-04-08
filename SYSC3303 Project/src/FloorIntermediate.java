@@ -22,10 +22,10 @@ public class FloorIntermediate {
 	private static final byte UPDATE_DISPLAY = 0x05;
 	private static final byte ERROR = (byte) 0xE0;// an error has occured
 	// Errors
-	private static final byte DOOR_ERROR = (byte)0xE1;
-	private static final byte MOTOR_ERROR = (byte)0xE2;
+	private static final byte DOOR_ERROR = (byte) 0xE1;
+	private static final byte MOTOR_ERROR = (byte) 0xE2;
 	// still error states between 0xE3 to 0xEE for use
-	private static final byte OTHER_ERROR = (byte)0xEF;
+	private static final byte OTHER_ERROR = (byte) 0xEF;
 	private static final byte NO_ERROR = 0x00;
 	// Object ID
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
@@ -33,22 +33,24 @@ public class FloorIntermediate {
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
 	// Values for Running
 	private static final int DOOR_OPEN = 1;// the door is open when == 1
-	private static final int DOOR_CLOSE = 3; // the door is closed when == 3  
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3
 	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
-	private static final int INITIALIZE=8;//for first communication with the scheduler
-	//private static final byte[] ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	//private static final byte[] FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	private static final int INITIALIZE = 8;// for first communication with the scheduler
+	// private static final byte[]
+	// ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
+	// private static final byte[]
+	// FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
 	public static final int EL_RECEIVEPORTNUM = 369;
 	public static final int EL_SENDPORTNUM = 159;
 
-	/*//FROM ELEVATORINTERMEDIATE
-	private static final int SENDPORTNUM = 369;
-	private static final int RECEIVEPORTNUM = 159;
+	/*
+	 * //FROM ELEVATORINTERMEDIATE private static final int SENDPORTNUM = 369;
+	 * private static final int RECEIVEPORTNUM = 159;
 	 */
 
 	private static final int SENDPORTNUM = 369;
@@ -58,8 +60,8 @@ public class FloorIntermediate {
 	public static final int FL_SENDPORTNUM = 1199;
 
 	private static DatagramPacket floorSendPacket, floorReceivePacket;
-	private static DatagramSocket floorReceiveSocket,floorSendSocket;
-	
+	private static DatagramSocket floorReceiveSocket, floorSendSocket;
+
 	public static List<byte[]> floorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 	private static Floor floorArray[];
 	private static Thread floorThreadArray[];
@@ -68,26 +70,25 @@ public class FloorIntermediate {
 //	private static int name;
 //	private static boolean hasRequest;
 //	private static int up_or_down;
-	private boolean intialized=false;
+	private boolean intialized = false;
 	private static int numFloors;
 	private static byte initializationData[];
-	
+
 	static List<String> fileRequests = new ArrayList<String>();
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	//public static final int SENDPORTNUM = 488;
+	// public static final int SENDPORTNUM = 488;
 
 	public FloorIntermediate() {
 		try {
-			floorSendSocket = new DatagramSocket();//FL_RECEIVEPORTNUM);
+			floorSendSocket = new DatagramSocket();// FL_RECEIVEPORTNUM);
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
 		}
 	}
-
 
 	public synchronized void sendPacket() {
 		// byte[] requestElevator = new byte[7];
@@ -124,9 +125,9 @@ public class FloorIntermediate {
 			if (floorTable.size() != 0) {
 				try {
 					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
-					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost()/*InetAddress.getByName("134.117.59.126")*/,
-							SENDPORTNUM);
-					
+					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length,
+							InetAddress.getLocalHost()/* InetAddress.getByName("134.117.59.126") */, SENDPORTNUM);
+
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -147,9 +148,9 @@ public class FloorIntermediate {
 	public synchronized void receivePacket() {
 		byte data[] = new byte[8];
 		int elevatorOnTheMove; // which elevator the update packet regarding
-		int elevatorDirection;//which direction the elevator is going or holding (data[__])
-		int elevatorLocation;//where the floor is (data[__])
-		int schedulerInstruction;//the instruction sent from the scheduler (data[6]
+		int elevatorDirection;// which direction the elevator is going or holding (data[__])
+		int elevatorLocation;// where the floor is (data[__])
+		int schedulerInstruction;// the instruction sent from the scheduler (data[6]
 		try {
 			floorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
 		} catch (SocketException e1) {
@@ -173,27 +174,26 @@ public class FloorIntermediate {
 			System.out.println("waiting to receive");
 			floorReceiveSocket.receive(floorReceivePacket);
 			System.out.print("Received from scheduler: ");
-			System.out.println(Arrays.toString(data)+"\n");
+			System.out.println(Arrays.toString(data) + "\n");
 		} catch (IOException e) {
 			System.out.print("IO Exception: likely:");
 			System.out.println("Receive Socket Timed Out.\n" + e);
 			e.printStackTrace();
 			System.exit(1);
 		}
-		floorReceiveSocket.close();//close the socket, will be reallocated at the next method call
-		
+		floorReceiveSocket.close();// close the socket, will be reallocated at the next method call
+
 		elevatorOnTheMove = data[1];
-		elevatorLocation=data[3];
-		elevatorDirection=data[4];
-		schedulerInstruction=data[6];
-		
-		if (schedulerInstruction==INITIALIZE) {
-			intialized=true;
-		}
-		else{
-			//floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
-			//send updates to all the floors
-			for(int i=0; i<numFloors; i++) {
+		elevatorLocation = data[3];
+		elevatorDirection = data[4];
+		schedulerInstruction = data[6];
+
+		if (schedulerInstruction == INITIALIZE) {
+			intialized = true;
+		} else {
+			// floorArray[data[1]].updateDisplay(elevatorLocation, elevatorDirection);
+			// send updates to all the floors
+			for (int i = 0; i < numFloors; i++) {
 				floorArray[i].updateDisplay(elevatorOnTheMove, elevatorLocation, schedulerInstruction);
 			}
 		}
@@ -203,7 +203,8 @@ public class FloorIntermediate {
 		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
 		initializationOutputStream.write(FLOOR_ID); // Identifying as the scheduler
 		initializationOutputStream.write(numFloors); // (exact floor or elevator to receive)
-		initializationOutputStream.write(INITIALIZE); // not needed (request or status update: for sending from scheduler)
+		initializationOutputStream.write(INITIALIZE); // not needed (request or status update: for sending from
+														// scheduler)
 		// somewhat redundant usage since floors would only receive updates and
 		// elevators would only receive requests
 
@@ -214,11 +215,11 @@ public class FloorIntermediate {
 		initializationOutputStream.write(UNUSED); // scheduler instruction
 		initializationOutputStream.write(UNUSED); // error's only received by scheduler and not sent
 
-		initializationData=initializationOutputStream.toByteArray();
+		initializationData = initializationOutputStream.toByteArray();
 		floorTable.add(initializationData);
 
 	}
-	
+
 	/*
 	 * Takes in a .txt file as a string. 1st and 2nd line of of txt file are
 	 * discarded(due to the formatting given in project requirements) Takes the
@@ -226,49 +227,40 @@ public class FloorIntermediate {
 	 * inputs as a string. For now This section will be commented. Will be
 	 * implemented for other itterations
 	 */
-/*	public static void fileReader(String fullFile) { 
-		String text = "";
-		int i=0;
-		try { 
-			FileReader input = new FileReader(fullFile);
-			Scanner reader = new Scanner(input);
-			reader.useDelimiter("[\n]");
-
-			while (reader.hasNext()){
-				text = reader.next();
-				if (i<=1) {
-					i++;
-				} else if(i>=2) {
-					fileRequests.add(text);
-					i++;
-				}
-			}
-		}catch(Exception e) { e.printStackTrace(); }
-	}*/
+	/*
+	 * public static void fileReader(String fullFile) { String text = ""; int i=0;
+	 * try { FileReader input = new FileReader(fullFile); Scanner reader = new
+	 * Scanner(input); reader.useDelimiter("[\n]");
+	 * 
+	 * while (reader.hasNext()){ text = reader.next(); if (i<=1) { i++; } else
+	 * if(i>=2) { fileRequests.add(text); i++; } } }catch(Exception e) {
+	 * e.printStackTrace(); } }
+	 */
 
 	public static void main(String args[]) {// throws IOException {
 
 		// for iteration 1 there will only be 1 elevator
 		// getting floor numbers from parameters set
-		//int createNumFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
+		// int createNumFloors = Integer.parseInt(args[0]);// The number of Elevators in
+		// the system is passed via argument[0]
 		numFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
 		FloorIntermediate floorHandler = new FloorIntermediate();
-		//Floor floor = new Floor(createNumFloors);
+		// Floor floor = new Floor(createNumFloors);
 
-		//fileReader("M://hello.txt");
-		//read the input file and get requests for each of the floors. We will then feed these real time info to the floors before we run out program. 
+		// fileReader("M://hello.txt");
+		// read the input file and get requests for each of the floors. We will then
+		// feed these real time info to the floors before we run out program.
 		numFloors = Integer.parseInt(args[0]);
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
-		
-		
-		//FOR INITIATION
+
+		// FOR INITIATION
 		floorInitialization();
 		floorHandler.sendPacket();
 		floorHandler.receivePacket();
 		for (int i = 0; i < numFloors; i++) {
-			floorArray[i] = new Floor(i, floorTable);//0, floorTable, Integer.parseInt(args[i + 1])); // i names the
-			
+			floorArray[i] = new Floor(i, floorTable);// 0, floorTable, Integer.parseInt(args[i + 1])); // i names the
+
 			// elevator, 0
 			// initializes the
 			// floor it
@@ -277,11 +269,11 @@ public class FloorIntermediate {
 //			if(i == Integer.parseInt(args[1])) {
 //				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
 //			}
-			//floorThreadArray[i].start();
+			// floorThreadArray[i].start();
 		}
 
-		while(true) {
-			if(!floorTable.isEmpty()) {
+		while (true) {
+			if (!floorTable.isEmpty()) {
 				floorHandler.sendPacket();
 			}
 			floorHandler.receivePacket();
