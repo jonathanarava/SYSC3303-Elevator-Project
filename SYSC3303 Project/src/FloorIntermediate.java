@@ -124,7 +124,7 @@ public class FloorIntermediate {
 			if (floorTable.size() != 0) {
 				try {
 					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
-					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getLocalHost(),
+					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length, InetAddress.getByName("134.117.59.128"),
 							SENDPORTNUM);
 					
 				} catch (UnknownHostException e) {
