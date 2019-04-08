@@ -468,6 +468,66 @@ public class Scheduler extends Thread {
 			elevatorSendPacket(responseByteArray);
 			return;
 		}
+		
+		/* ELevator 3 logic */
+		if (!(upQueue3.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == UP || direction.get(0) == HOLD)) {
+			int first = upQueue3.getFirst();
+			byte[] responseByteArray = responsePacket(0, currentFloor, first);
+			if (currentFloor == first) {
+				upQueue3.removeFirst();
+				semaphoreRemove0 = true;
+			}
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
+
+		if (!(downQueue3.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == DOWN || direction.get(0) == HOLD)) {
+			int first = downQueue3.getFirst();
+			byte[] responseByteArray = responsePacket(0, currentFloor, first);
+			if (currentFloor == first) {
+				downQueue3.removeFirst();
+				semaphoreRemove0 = true;
+			}
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
+
+		if(upQueue3.isEmpty() && downQueue3.isEmpty() && elevatorOrFloorID == 0) {
+			byte[] responseByteArray = responsePacket(0, currentFloor, -1);
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
+
+
+		/* ELevator 4 logic */
+
+		if (!(upQueue4.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == UP || direction.get(1) == HOLD)) {
+			int first = upQueue4.getFirst();
+			byte[] responseByteArray = responsePacket(1, currentFloor, first);
+			if (currentFloor == first) {
+				upQueue4.removeFirst();
+				semaphoreRemove1 = true;
+			}
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
+
+		if (!(downQueue4.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == DOWN || direction.get(1) == HOLD)) {
+			int first = downQueue4.getFirst();
+			byte[] responseByteArray = responsePacket(1, currentFloor, first);
+			if (currentFloor == first) {
+				downQueue4.removeFirst();
+				semaphoreRemove1 = true;
+			}
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
+
+		if(upQueue4.isEmpty() && downQueue4.isEmpty() && elevatorOrFloorID == 1) {
+			byte[] responseByteArray = responsePacket(1, currentFloor, -1);
+			elevatorSendPacket(responseByteArray);
+			return;
+		}
 	}
 	
 	public boolean getSemaphore0() {
@@ -555,10 +615,10 @@ public class Scheduler extends Thread {
 			System.out.println("CURRENT FLOOR OF ELEVATOR 1 --->" + ele1);
 		}if(elevatorOrFloorID == 2) {
 			ele2 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 1 --->" + ele2);
+			System.out.println("CURRENT FLOOR OF ELEVATOR 2 --->" + ele2);
 		}if(elevatorOrFloorID == 3) {
 			ele3 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 1 --->" + ele3);
+			System.out.println("CURRENT FLOOR OF ELEVATOR 3 --->" + ele3);
 		}
 	}
 }
