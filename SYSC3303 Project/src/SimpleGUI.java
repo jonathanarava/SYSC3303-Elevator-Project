@@ -185,11 +185,11 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 				DirectionButtons[elevator+1].setBackground(Color.red);
 				break;
 			case UP:
-				DirectionButtons[elevator].setBackground(null);
+				//DirectionButtons[elevator].setBackground(null);		
 				DirectionButtons[elevator+1].setBackground(Color.green);
 				break;
 			case DOWN:
-				DirectionButtons[elevator+1].setBackground(null);
+				//DirectionButtons[elevator+1].setBackground(null);
 				DirectionButtons[elevator].setBackground(Color.green);
 				break;
 			case HOLD:
