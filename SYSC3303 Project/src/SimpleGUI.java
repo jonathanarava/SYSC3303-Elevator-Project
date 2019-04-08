@@ -122,7 +122,7 @@ public class SimpleGUI  extends Scheduler implements Runnable{
 				
 		//Elevator 4
 		Elevator4.setLayout(new FlowLayout());
-		Elevator4.setBorder(new TitledBorder("Elevator 3"));
+		Elevator4.setBorder(new TitledBorder("Elevator 4"));
 		
 		textArea4 = new JTextArea("0"/*Integer.toString(elevatorCurrentFloor[3])*/);
 		textArea4.setLineWrap(true);
