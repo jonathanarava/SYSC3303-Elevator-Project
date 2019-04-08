@@ -344,8 +344,7 @@ public class Scheduler extends Thread {
 		for (int i = 0; i <= upQueue.size(); i++) {
 			if (upQueue.isEmpty()) {
 				upQueue.addLast(destFloor);
-				System.out.println("ELEVATOR 1 UPQUEUE LIST SIZE --> " + upQueue1.size());
-				System.out.println("ELEVATOR 2 UPQUEUE LIST SIZE --> " + upQueue2.size());
+				System.out.println("ELEVATOR 0 UPQUEUE LIST SIZE --> " + upQueue1.size());
 				break;
 			}
 			if (destFloor < upQueue.get(i)) {
@@ -364,6 +363,7 @@ public class Scheduler extends Thread {
 		for (int i = 0; i <= downQueue.size(); i++) {
 			if (downQueue.isEmpty()) {
 				downQueue.addFirst(destFloor);
+				System.out.println("ELEVATOR 1 DOWNQUEUE LIST SIZE --> " + downQueue2.size());
 				break;
 			}
 			if (destFloor > downQueue.get(i)) {

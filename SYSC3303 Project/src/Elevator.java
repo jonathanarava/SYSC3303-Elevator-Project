@@ -230,7 +230,7 @@ public class Elevator extends Thread {
 	
 	public void run() {
 		while(!isInterrupted()) {
-				if(runningStatus == true) {
+				while(runningStatus == true) {
 					if(toDoID == nameOfElevator) {
 						
 						System.out.println("Elevator number" +toDoID + " is on floor " + sensorArray[1]);
