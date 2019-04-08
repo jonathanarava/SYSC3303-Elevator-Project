@@ -115,6 +115,8 @@ public class Scheduler {
 	private static boolean elevatorInitialized=false;
 	private static boolean floorInitialized=false;
 
+	private static boolean receiveTimedOut = false;
+	
 	
 	// variables for GUI
 	public static GUI gui;
@@ -145,7 +147,7 @@ public class Scheduler {
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
-			schedulerSocketSendReceiveElevator.setSoTimeout(2500);
+			schedulerSocketSendReceiveElevator.setSoTimeout(4500);
 			schedulerSocketSendReceiveFloor = new DatagramSocket(FL_RECEIVEPORTNUM);// can be any available port,
 			// Scheduler will reply
 			// to the port
@@ -193,6 +195,7 @@ public class Scheduler {
 
 		} catch (SocketTimeoutException e) {
 			System.out.println("Receive Socket Timed Out, Resent Packet\n" + e);
+			receiveTimedOut = true;
 			resendPacket();
 			return;
 		}
@@ -895,6 +898,10 @@ public class Scheduler {
 			// Sorts the received Packet and returns the byte array to be sent
 			//sendData = Scheduler.SchedulingAlgorithm(packetRecieved);//sendData is a global variable, completely redundant to set itself being passed to itself
 			//schedulerHandler.SchedulingAlgorithm(packetRecieved);
+			if(receiveTimedOut) {
+				receiveTimedOut = !receiveTimedOut;
+				elevatorFloorReceivePacket();
+			}
 			SchedulingAlgorithm(receiveData);
 			// Sends the Packet to Elevator
 			// elevatorSendPacket(sendData);

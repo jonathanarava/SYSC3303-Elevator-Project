@@ -129,7 +129,7 @@ public class ElevatorIntermediate {
 			if (elevatorTable.size() != 0) {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
-					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length, InetAddress.getByName("134.117.59.126"),
+					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length, InetAddress.getLocalHost(),
 							SENDPORTNUM);
 					recentlySent = elevatorTable.get(0);
 				} catch (UnknownHostException e) {
