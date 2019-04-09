@@ -78,6 +78,7 @@ public class Scheduler extends Thread {
 	private boolean semaphoreRemove1 = false;
 	private boolean semaphoreRemove2 = false;
 	private boolean semaphoreRemove3 = false;
+	private static int wakeUpEle;
 	
 	private static boolean semaWAIT = false;
 
@@ -288,8 +289,8 @@ public class Scheduler extends Thread {
 			compEle3 = elevatorOrFloorID1 - competingEle3;
 		}
 
-		if ((elevatorOrFloorID1-elevatorInQuestion < compEle1) && (elevatorOrFloorID1-elevatorInQuestion <compEle2) &&
-				(elevatorOrFloorID1-elevatorInQuestion <compEle3)){
+		if ((elevatorOrFloorID1-elevatorInQuestion < compEle1) && (elevatorOrFloorID1-elevatorInQuestion < compEle2) &&
+				(elevatorOrFloorID1-elevatorInQuestion < compEle3)){
 			return true;
 		} else {
 			return false;
@@ -297,25 +298,7 @@ public class Scheduler extends Thread {
 	}
 	
 	public boolean checkClosestDownEle(int elevatorOrFloorID1, int elevatorInQuestion, int competingEle1, int competingEle2, int competingEle3) {
-		int compEle1, compEle2, compEle3;
-		if(elevatorOrFloorID1 - competingEle1 > 0 ) {
-			compEle1 = 21;
-		} else { 
-			compEle1 = elevatorOrFloorID1 - competingEle1;
-		}
-		
-		if(elevatorOrFloorID1 - competingEle2 < 0 ) {
-			compEle2 = 21;
-		} else { 
-			compEle2 = elevatorOrFloorID1 - competingEle2;
-		}
-		
-		if(elevatorOrFloorID1 - competingEle3 < 0 ) {
-			compEle3 = 21;
-		} else { 
-			compEle3 = elevatorOrFloorID1 - competingEle3;
-		}
-		
+
 		if((elevatorInQuestion - elevatorOrFloorID1 > competingEle1 - elevatorOrFloorID1) && (elevatorInQuestion - elevatorOrFloorID1 > competingEle2 - elevatorOrFloorID1) &&
 				(elevatorInQuestion - elevatorOrFloorID1 > competingEle3 - elevatorOrFloorID1)) {
 			return true;
@@ -335,43 +318,51 @@ public class Scheduler extends Thread {
 						addToUpQueue( upQueue1, 0, elevatorOrFloorID1);
 						if(direction.get(0) == HOLD) {
 							direction.add(0, (int) UP);
+							wakeUpEle = 0;
 						}
 					}else if (ele1 == elevatorOrFloorID1) {
 						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
 						if(direction.get(1) == HOLD) {
 							direction.add(1, (int) UP);
+							wakeUpEle = 1;
 						}
 					}else if (ele2 == elevatorOrFloorID1) {
 						addToUpQueue( upQueue3, 0, elevatorOrFloorID1);
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) UP);
+							wakeUpEle = 2;
 						}
 					}else if (ele3 == elevatorOrFloorID1) {
 						addToUpQueue( upQueue4, 0, elevatorOrFloorID1);
 						if(direction.get(3) == HOLD) {
 							direction.add(3, (int) UP);
+							wakeUpEle = 3;
 						}
 					} else if (ele0 < elevatorOrFloorID1 && checkClosestUpEle(elevatorOrFloorID1,ele0,ele1,ele2,ele3)) {
 						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
 						System.out.println("ADDED TO UPQUEUE 1 ----> " + upQueue1.size() );
 						if(direction.get(0) == HOLD) {
 							direction.add(0, (int) UP);
+							wakeUpEle = 0;
 						}
 					} else if (ele1 < elevatorOrFloorID1 && checkClosestUpEle(elevatorOrFloorID1,ele1,ele0,ele2,ele3)) {
 						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
 						if(direction.get(1) == HOLD) {
 							direction.add(1, (int) UP);
+							wakeUpEle = 1;
 						}
 					} else if (ele2 < elevatorOrFloorID1 && checkClosestUpEle(elevatorOrFloorID1,ele2,ele1,ele0,ele3)) {
-						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
+						addToUpQueue(upQueue3, 2, elevatorOrFloorID1);
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) UP);
+							wakeUpEle = 2;
 						}
 					} else if (ele3 < elevatorOrFloorID1 && checkClosestUpEle(elevatorOrFloorID1,ele3,ele1,ele2,ele0)) {
-						addToUpQueue(upQueue2, 1, elevatorOrFloorID1);
+						addToUpQueue(upQueue4, 3, elevatorOrFloorID1);
 						System.out.println("ADDED TO UPQUEUE 4 ----> " + upQueue4.size());
 						if(direction.get(3) == HOLD) {
 							direction.add(3, (int) UP);
+							wakeUpEle = 3;
 						}
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && ele2 > elevatorOrFloorID1  && ele3 > elevatorOrFloorID1  && !upWaitQueue.contains(elevatorOrFloorID1)) {
 						upWaitQueue.add(elevatorOrFloorID1);	
@@ -383,43 +374,51 @@ public class Scheduler extends Thread {
 						addToDownQueue(downQueue1, 0, elevatorOrFloorID1);
 						if(direction.get(0) == HOLD) {
 							direction.add(0, (int) DOWN);
+							wakeUpEle = 0;
 						}
 					}else if (ele1 == elevatorOrFloorID1) {
 						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
 						System.out.println("ADDED TO DOWNQUEUE 2 ----> " + downQueue2.size());
 						if(direction.get(1) == HOLD) {
 							direction.add(1, (int) DOWN);
+							wakeUpEle = 1;
 						}
 					}else if (ele2 == elevatorOrFloorID1) {
 						addToDownQueue(downQueue3, 2, elevatorOrFloorID1);
 						System.out.println("ADDED TO DOWNQUEUE 3 ----> " + downQueue3.size() );
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) DOWN);
+							wakeUpEle = 2;
 						}
 					}else if (ele3 == elevatorOrFloorID1) {
 						addToDownQueue(downQueue4, 3, elevatorOrFloorID1);
 						if(direction.get(3) == HOLD) {
 							direction.add(3, (int) DOWN);
+							wakeUpEle = 3;
 						}
 					} else if (ele0 > elevatorOrFloorID1 && checkClosestDownEle(elevatorOrFloorID1,ele0,ele1,ele2,ele3)) {
 						addToDownQueue(downQueue1, 0, elevatorOrFloorID1);
 						if(direction.get(0) == HOLD) {
 							direction.add(0, (int) DOWN);
+							wakeUpEle = 0;
 						}
 					} else if (ele1 > elevatorOrFloorID1 && checkClosestDownEle(elevatorOrFloorID1,ele1,ele0,ele2,ele3)) {
 						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
 						if(direction.get(1) == HOLD) {
 							direction.add(1, (int) DOWN);
+							wakeUpEle = 1;
 						}
 					} else if (ele2 > elevatorOrFloorID1 && checkClosestDownEle(elevatorOrFloorID1,ele2,ele1,ele0,ele3)) {
-						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
+						addToDownQueue(downQueue3, 2, elevatorOrFloorID1);
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) DOWN);
+							wakeUpEle = 2;
 						}
 					} else if (ele3 > elevatorOrFloorID1 && checkClosestDownEle(elevatorOrFloorID1,ele3,ele1,ele2,ele0)) {
-						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
+						addToDownQueue(downQueue4, 3, elevatorOrFloorID1);
 						if(direction.get(3) == HOLD) {
 							direction.add(3, (int) DOWN);
+							wakeUpEle = 3;
 						}
 					} else if(ele0 > elevatorOrFloorID1 && ele1 > elevatorOrFloorID1 && ele2 > elevatorOrFloorID1 && ele3 > elevatorOrFloorID1 && !downWaitQueue.contains(elevatorOrFloorID1)) {
 						downWaitQueue.add(elevatorOrFloorID1);
@@ -649,18 +648,19 @@ public class Scheduler extends Thread {
 					while (requestOrUpdate1 == 1) {
 						switch(requestOrUpdate1) {
 						case 1:
-							if(semaWAIT == true) {
-								semaWAIT = false;
-							}
 							packet.floorPacketHandler();
+							elevatorOrFloorID = wakeUpEle;
 							try {
 								packet.schedulingAlgo();
+								System.out.println("SENDING FROM FLOOR THREAD HERE ---- ");
 							} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							packet.floorReceivePacket();
 						case 2:
+							if(semaWAIT == true) {
+								semaWAIT = false;
+							}
 							//runEle = true;
 							break;
 						}
@@ -701,7 +701,7 @@ public class Scheduler extends Thread {
 			if(requestOrUpdate == 3) {
 				semaWAIT = true;
 				while(semaWAIT==true) {
-					Thread.sleep(1);
+					Thread.sleep(100);
 				}
 				
 			}else if (requestOrUpdate == 1) {

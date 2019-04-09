@@ -46,8 +46,8 @@ public class GUI extends Elevator implements Runnable {
 	private static final int UNUSED=0;// value for unused parts of data 
 
 	// Value of numOfElevators must be taken from elevator intermediate as it initializes the number of elevators
-	int numElevators = 2;	
-	int numFloors = 15;
+	int numElevators = 4;	
+	int numFloors = 22;
 	public JButton button1[];
 	public JButton button2[];
 	public JButton button3[];
@@ -185,13 +185,31 @@ public class GUI extends Elevator implements Runnable {
 
 	public void run() {
 		while(true) {
-			for(int i = 0; i < numElevators; i++) {
-				//System.out.println(sensorArray[1]);
-				button1[sensorArray[0]].setBackground(Color.red);
-				button2[sensorArray[1]].setBackground(Color.red);
-				button3[sensorArray[2]].setBackground(Color.red);
-				button4[sensorArray[3]].setBackground(Color.red);
+
+			for(int j = 0; j<numFloors; j++) {
+				if(j == sensorArray[0]) {
+					button1[sensorArray[0]].setBackground(Color.red);
+				} else {
+					button1[j].setBackground(null);
+				} 
 				
+				if(j == sensorArray[1]) {
+					button2[sensorArray[1]].setBackground(Color.red);
+				} else {
+					button2[j].setBackground(null);
+				} 
+				
+				if(j == sensorArray[2]) {
+					button3[sensorArray[2]].setBackground(Color.red);
+				} else {
+					button3[j].setBackground(null);
+				} 
+				
+				if(j == sensorArray[3]) {
+					button4[sensorArray[3]].setBackground(Color.red);
+				} else {
+					button4[j].setBackground(null);
+				} 
 			}
 			try {
 				Thread.sleep(1);
