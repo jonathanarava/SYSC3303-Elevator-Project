@@ -128,9 +128,9 @@ public class Scheduler extends Thread {
 
 	public static void elevatorSendPacket(byte[] responseByteArray) throws UnknownHostException {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		InetAddress address = InetAddress.getByName("134.117.59.108");
+		//InetAddress address = InetAddress.getByName("134.117.59.108");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				address, schedulerElevatorReceivePacket.getPort());
+				InetAddress.getLocalHost(), schedulerElevatorReceivePacket.getPort());
 
 		try {
 			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);

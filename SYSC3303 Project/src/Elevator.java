@@ -160,7 +160,7 @@ public class Elevator extends Thread {
 		return msg;
 	}
 	
-	public synchronized static void sendPacket(byte[] toSend) throws InterruptedException {
+	public synchronized void sendPacket(byte[] toSend) throws InterruptedException {
 
 		byte[] data = new byte[7];
 		data = toSend;
@@ -168,9 +168,9 @@ public class Elevator extends Thread {
 		System.out.print("Sending to scheduler: ");
 		System.out.println(Arrays.toString(data));
 		try {
-			InetAddress address = InetAddress.getByName("134.117.59.107");
+			//InetAddress address = InetAddress.getByName("134.117.59.107");
 			//System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
-			ElevatorSendPacket = new DatagramPacket(data, 7,address, 369);
+			ElevatorSendPacket = new DatagramPacket(data, 7,InetAddress.getLocalHost(), 369);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -243,7 +243,7 @@ public class Elevator extends Thread {
 							this.runElevator(instruction);
 							try {
 								Thread.sleep(10);
-								sendPacket(responsePacketRequest(UPDATE,0));
+								this.sendPacket(responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}				
@@ -251,7 +251,17 @@ public class Elevator extends Thread {
 							System.out.println();
 							System.out.printf("------------------------------ OPENING DOOR FOR ELEVATOR %d -----------------", nameOfElevator);
 							openCloseDoor((byte)DOOR_OPEN);
-							this.holdReceived = true;
+							if(toDoID == 1) {
+								try {
+									Thread.sleep(1);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								this.holdReceived = true;
+							} else {
+								this.holdReceived = true;
+							}
+							
 						} else if (instruction == 4) {
 							//System.out.println(instruction + "  ---> ELEVATOR " + nameOfElevator);
 							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
@@ -295,12 +305,12 @@ public class Elevator extends Thread {
 		Ele0.fileReader("M://hello.txt");
 		//System.out.println(fileRequests.get(0));
 		
-		sendPacket(Ele1.responsePacketRequest(UPDATE,0));
-		sendPacket(Ele0.responsePacketRequest(UPDATE,0));
-		sendPacket(Ele2.responsePacketRequest(UPDATE,0));
-		sendPacket(Ele3.responsePacketRequest(UPDATE,0));
+		Ele1.sendPacket(Ele1.responsePacketRequest(UPDATE,0));
+		Ele0.sendPacket(Ele0.responsePacketRequest(UPDATE,0));
+		Ele2.sendPacket(Ele2.responsePacketRequest(UPDATE,0));
+		Ele3.sendPacket(Ele3.responsePacketRequest(UPDATE,0));
 		
-		sendPacket(Ele1.responsePacketRequest(3,0));
+		Ele1.sendPacket(Ele1.responsePacketRequest(3,0));
 		//sendPacket(Ele1.responsePacketRequest(UPDATE,0));
 /*		Ele0.ElevatorTable.add(0,Ele0.responsePacketRequest(1, 6));
 		Ele1.ElevatorTable.add(1,Ele1.responsePacketRequest(1, 4));
@@ -315,7 +325,7 @@ public class Elevator extends Thread {
 					while(Ele0.holdReceived || Ele1.holdReceived || Ele2.holdReceived || Ele3.holdReceived) {
 						if(fileRequests.isEmpty() && Ele0.holdReceived) {
 							try {
-								sendPacket(Ele0.responsePacketRequest(UPDATE,0));
+								Ele0.sendPacket(Ele0.responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -323,7 +333,7 @@ public class Elevator extends Thread {
 							break;
 						} else if(fileRequests.isEmpty() && Ele1.holdReceived) {
 							try {
-								sendPacket(Ele1.responsePacketRequest(UPDATE,0));
+								Ele1.sendPacket(Ele1.responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -331,7 +341,7 @@ public class Elevator extends Thread {
 							break;
 						} else if(fileRequests.isEmpty() && Ele2.holdReceived) {
 							try {
-								sendPacket(Ele2.responsePacketRequest(UPDATE,0));
+								Ele2.sendPacket(Ele2.responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -339,7 +349,7 @@ public class Elevator extends Thread {
 							break;
 						} else if(fileRequests.isEmpty() && Ele3.holdReceived) {
 							try {
-								sendPacket(Ele3.responsePacketRequest(UPDATE,0));
+								Ele3.sendPacket(Ele3.responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -354,7 +364,7 @@ public class Elevator extends Thread {
 								floorRequest = Integer.parseInt(segment[3]);
 								if(floorButton == Ele0.getInitialFloor()) {								
 									try {
-										sendPacket(Ele0.responsePacketRequest(REQUEST, floorRequest));
+										Ele0.sendPacket(Ele0.responsePacketRequest(REQUEST, floorRequest));
 										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
@@ -362,7 +372,7 @@ public class Elevator extends Thread {
 									}
 								} else if(floorButton == Ele1.getInitialFloor()) {
 									try {
-										sendPacket(Ele1.responsePacketRequest(REQUEST, floorRequest));
+										Ele1.sendPacket(Ele1.responsePacketRequest(REQUEST, floorRequest));
 										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
@@ -370,7 +380,7 @@ public class Elevator extends Thread {
 									}
 								}else if(floorButton == Ele2.getInitialFloor()) {
 									try {
-										sendPacket(Ele2.responsePacketRequest(REQUEST, floorRequest));
+										Ele2.sendPacket(Ele2.responsePacketRequest(REQUEST, floorRequest));
 										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
@@ -378,7 +388,7 @@ public class Elevator extends Thread {
 									}
 								}else if(floorButton == Ele3.getInitialFloor()) {
 									try {
-										sendPacket(Ele3.responsePacketRequest(REQUEST, floorRequest));
+										Ele3.sendPacket(Ele3.responsePacketRequest(REQUEST, floorRequest));
 										fileRequests.remove(i);
 										break;
 									} catch (InterruptedException e) {
