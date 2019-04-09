@@ -668,19 +668,19 @@ public class Scheduler extends Thread {
 		}
 	}
 
-	private static void currentFloorTracker() {
+	public static void currentFloorTracker() {
 		if (elevatorOrFloorID == 0) {
 			ele0 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 0 --->" + ele0);
+			//System.out.println("CURRENT FLOOR OF ELEVATOR 0 --->" + ele0);
 		} if(elevatorOrFloorID == 1) {
 			ele1 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 1 --->" + ele1);
+			//System.out.println("CURRENT FLOOR OF ELEVATOR 1 --->" + ele1);
 		}if(elevatorOrFloorID == 2) {
 			ele2 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 2 --->" + ele2);
+			//System.out.println("CURRENT FLOOR OF ELEVATOR 2 --->" + ele2);
 		}if(elevatorOrFloorID == 3) {
 			ele3 = currentFloor;
-			System.out.println("CURRENT FLOOR OF ELEVATOR 3 --->" + ele3);
+			//System.out.println("CURRENT FLOOR OF ELEVATOR 3 --->" + ele3);
 		}
 	}
 }
