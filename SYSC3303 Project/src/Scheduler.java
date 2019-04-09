@@ -515,8 +515,8 @@ public class Scheduler extends Thread {
 		if (!(downQueue1.isEmpty()) && elevatorOrFloorID == 0 && (direction.get(0) == DOWN || direction.get(0) == HOLD)) {
 			System.out.println("DIRECTION DOWN -----> " + direction.get(0));
 			int first = downQueue1.getFirst();
-			byte[] responseByteArray = responsePacket(0, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(0, ele0, first);
+			if (ele0 == first) {
 				downQueue1.removeFirst();
 				semaphoreRemove0 = true;
 			}
@@ -525,7 +525,7 @@ public class Scheduler extends Thread {
 		}
 
 		if(upQueue1.isEmpty() && elevatorOrFloorID == 0 && downQueue1.isEmpty() && elevatorOrFloorID == 0 && !semaphoreRemove0) {
-			byte[] responseByteArray = responsePacket(0, currentFloor, -1);
+			byte[] responseByteArray = responsePacket(0, ele0, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
 		}
@@ -534,8 +534,8 @@ public class Scheduler extends Thread {
 
 		if (!(upQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == UP || direction.get(1) == HOLD)) {
 			int first = upQueue2.getFirst();
-			byte[] responseByteArray = responsePacket(1, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(1, ele1, first);
+			if (ele1 == first) {
 				upQueue2.removeFirst();
 				semaphoreRemove1 = true;
 			}
@@ -545,8 +545,8 @@ public class Scheduler extends Thread {
 
 		if (!(downQueue2.isEmpty()) && elevatorOrFloorID == 1 && (direction.get(1) == DOWN || direction.get(1) == HOLD)) {
 			int first = downQueue2.getFirst();
-			byte[] responseByteArray = responsePacket(1, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(1, ele1, first);
+			if (ele1 == first) {
 				downQueue2.removeFirst();
 				semaphoreRemove1 = true;
 			}
@@ -555,7 +555,7 @@ public class Scheduler extends Thread {
 		}
 
 		if(upQueue2.isEmpty() && downQueue2.isEmpty() && elevatorOrFloorID == 1 && elevatorOrFloorID == 1 && !semaphoreRemove1) {
-			byte[] responseByteArray = responsePacket(1, currentFloor, -1);
+			byte[] responseByteArray = responsePacket(1, ele1, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
 		}
@@ -563,8 +563,8 @@ public class Scheduler extends Thread {
 		/* ELevator 3 logic */
 		if (!(upQueue3.isEmpty()) && elevatorOrFloorID == 2 && (direction.get(2) == UP || direction.get(2) == HOLD)) {
 			int first = upQueue3.getFirst();
-			byte[] responseByteArray = responsePacket(2, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(2, ele2, first);
+			if (ele2 == first) {
 				upQueue3.removeFirst();
 				semaphoreRemove2 = true;
 			}
@@ -574,8 +574,8 @@ public class Scheduler extends Thread {
 
 		if (!(downQueue3.isEmpty()) && elevatorOrFloorID == 2 && (direction.get(2) == DOWN || direction.get(2) == HOLD)) {
 			int first = downQueue3.getFirst();
-			byte[] responseByteArray = responsePacket(2, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(2, ele2, first);
+			if (ele2 == first) {
 				downQueue3.removeFirst();
 				semaphoreRemove2 = true;
 			}
@@ -584,7 +584,7 @@ public class Scheduler extends Thread {
 		}
 
 		if(upQueue3.isEmpty() && downQueue3.isEmpty() && elevatorOrFloorID == 2) {
-			byte[] responseByteArray = responsePacket(2, currentFloor, -1);
+			byte[] responseByteArray = responsePacket(2, ele2, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
 		}
@@ -594,8 +594,8 @@ public class Scheduler extends Thread {
 
 		if (!(upQueue4.isEmpty()) && elevatorOrFloorID == 3 && (direction.get(3) == UP || direction.get(3) == HOLD)) {
 			int first = upQueue4.getFirst();
-			byte[] responseByteArray = responsePacket(3, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(3, ele3, first);
+			if (ele3 == first) {
 				upQueue4.removeFirst();
 				semaphoreRemove3 = true;
 			}
@@ -605,8 +605,8 @@ public class Scheduler extends Thread {
 
 		if (!(downQueue4.isEmpty()) && elevatorOrFloorID == 3 && (direction.get(3) == DOWN || direction.get(3) == HOLD)) {
 			int first = downQueue4.getFirst();
-			byte[] responseByteArray = responsePacket(3, currentFloor, first);
-			if (currentFloor == first) {
+			byte[] responseByteArray = responsePacket(3, ele3, first);
+			if (ele3 == first) {
 				downQueue4.removeFirst();
 				semaphoreRemove3 = true;
 			}
@@ -615,7 +615,7 @@ public class Scheduler extends Thread {
 		}
 
 		if(upQueue4.isEmpty() && downQueue4.isEmpty() && elevatorOrFloorID == 3) {
-			byte[] responseByteArray = responsePacket(3, currentFloor, -1);
+			byte[] responseByteArray = responsePacket(3, ele3, -1);
 			elevatorSendPacket(responseByteArray);
 			return;
 		}
@@ -692,6 +692,8 @@ public class Scheduler extends Thread {
 		
 		direction.add(0, (int) HOLD);
 		direction.add(1, (int) HOLD);
+		direction.add(2, (int) HOLD);
+		direction.add(3, (int) HOLD);
 
 		floor.start();
 
@@ -707,6 +709,7 @@ public class Scheduler extends Thread {
 			}else if (requestOrUpdate == 1) {
 				packet.packetDealer();
 				Direction(elevatorOrFloorID, destFloor, currentFloor);
+				currentFloorTracker();
 			} else if(requestOrUpdate == 2) {
 				currentFloorTracker();
 			}

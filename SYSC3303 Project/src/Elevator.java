@@ -165,7 +165,7 @@ public class Elevator extends Thread {
 		byte[] data = new byte[7];
 		data = toSend;
 		
-		System.out.print("Sendind to scheduler: ");
+		System.out.print("Sending to scheduler: ");
 		System.out.println(Arrays.toString(data));
 		try {
 			//InetAddress address = InetAddress.getByName("134.117.59.127");
@@ -439,12 +439,13 @@ public class Elevator extends Thread {
 					Ele2.runningStatus = true;
 				}
 				if(x[1] == 3 && Ele3.runningStatus == false) {
-					data = ElevatorTable1.remove(0);
-					Ele3.toDoID = data[1];
-					Ele3.instruction = data[6];
-					System.out.println("        ELEVATOR 4 INSTRUCTION               " + Ele3.instruction);
-					Ele3.runningStatus = true;
-				
+					data = ElevatorTable1.get(0);
+						data = ElevatorTable1.remove(0);
+						Ele3.toDoID = data[1];
+						Ele3.instruction = data[6];
+						System.out.println("        ELEVATOR 4 INSTRUCTION               " +  data[6]+ " ELEVATOR ID " + data[1]);
+						Ele3.runningStatus = true;
+					
 				} 
 				long endTime = System.nanoTime();
 				long timeElapsed = endTime - startTime;
