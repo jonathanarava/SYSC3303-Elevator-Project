@@ -62,7 +62,7 @@ public class Elevator extends Thread {
 	}
 
 	public int getInitialFloor() {
-		return sensor;
+		return this.sensor;
 	}
 
 	public void setInitialFloor(int initialFloor) {
@@ -242,6 +242,7 @@ public class Elevator extends Thread {
 							//System.out.println(instruction);
 							this.runElevator(instruction);
 							try {
+								Thread.sleep(10);
 								sendPacket(responsePacketRequest(UPDATE,0));
 							} catch (InterruptedException e) {
 								e.printStackTrace();
@@ -402,10 +403,10 @@ public class Elevator extends Thread {
 		};
 		
 
-/*		GUI gui = new GUI();
+		GUI gui = new GUI();
 		Thread guiThread = new Thread(gui);
-		guiThread.start();*/
-		
+		guiThread.start();
+
 		Ele0.start();
 		Ele1.start();
 		Ele2.start();
@@ -419,33 +420,31 @@ public class Elevator extends Thread {
 				long startTime = System.nanoTime();
 				x = Ele0.receivePacket();
 				ElevatorTable1.add(x);
-				if(x[1] == 0 && Ele0.runningStatus == false) {
-					data = ElevatorTable1.remove(0);
+				if(x[1] == 0) {
+					data = x;
 					Ele0.toDoID = data[1];
 					Ele0.instruction = data[6];
 					Ele0.runningStatus = true;
 				}
-				if(x[1] == 1 && Ele1.runningStatus == false) {
-					data = ElevatorTable1.remove(0);
+				if(x[1] == 1) {
+					data = x;
 					Ele1.toDoID = data[1];
 					Ele1.instruction = data[6];
 					Ele1.runningStatus = true;
 				
 				}
-				if (x[1] == 2 && Ele2.runningStatus == false) {
-					data = ElevatorTable1.remove(0);
+				if (x[1] == 2) {
+					data = x;
 					Ele2.toDoID = data[1];
 					Ele2.instruction = data[6];
 					Ele2.runningStatus = true;
 				}
-				if(x[1] == 3 && Ele3.runningStatus == false) {
-					data = ElevatorTable1.get(0);
-						data = ElevatorTable1.remove(0);
-						Ele3.toDoID = data[1];
-						Ele3.instruction = data[6];
-						System.out.println("        ELEVATOR 4 INSTRUCTION               " +  data[6]+ " ELEVATOR ID " + data[1]);
-						Ele3.runningStatus = true;
-					
+				if(x[1] == 3) {
+					data = x;
+					Ele3.toDoID = data[1];
+					Ele3.instruction = data[6];
+					System.out.println("        ELEVATOR 4 INSTRUCTION               " +  data[6]+ " ELEVATOR ID " + data[1]);
+					Ele3.runningStatus = true;	
 				} 
 				long endTime = System.nanoTime();
 				long timeElapsed = endTime - startTime;

@@ -346,13 +346,13 @@ public class Scheduler extends Thread {
 							wakeUpEle = 1;
 						}
 					}else if (ele2 == elevatorOrFloorID1) {
-						addToUpQueue( upQueue3, 0, elevatorOrFloorID1);
+						addToUpQueue( upQueue3, 2, elevatorOrFloorID1);
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) UP);
 							wakeUpEle = 2;
 						}
 					}else if (ele3 == elevatorOrFloorID1) {
-						addToUpQueue( upQueue4, 0, elevatorOrFloorID1);
+						addToUpQueue( upQueue4, 3, elevatorOrFloorID1);
 						if(direction.get(3) == HOLD) {
 							direction.add(3, (int) UP);
 							wakeUpEle = 3;
@@ -670,6 +670,7 @@ public class Scheduler extends Thread {
 						case 1:
 							packet.floorPacketHandler();
 							elevatorOrFloorID = wakeUpEle;
+							System.out.println("                      " + elevatorOrFloorID + upQueue4.size() );
 							try {
 								packet.schedulingAlgo();
 								System.out.println("SENDING FROM FLOOR THREAD HERE ---- ");
