@@ -178,20 +178,34 @@ public class SimpleGUI extends Scheduler implements Runnable {
 	public void UpdateElevatorGUIDirection(int elevator) {
 		switch (elevatorStatus[elevator]) {
 		case STOP:
-			DirectionButtons[elevator].setBackground(Color.red);
-			DirectionButtons[elevator + 1].setBackground(Color.red);
+			if(DirectionButtons[elevator].getBackground() != Color.red) {
+				DirectionButtons[elevator].setBackground(null);
+				DirectionButtons[elevator + 1].setBackground(null);
+				DirectionButtons[elevator].setBackground(Color.red);
+				DirectionButtons[elevator + 1].setBackground(Color.red);
+			}
 			break;
 		case UP:
-			// DirectionButtons[elevator].setBackground(null);
-			DirectionButtons[elevator + 1].setBackground(Color.green);
+			if(DirectionButtons[elevator].getBackground() != Color.green) {
+				DirectionButtons[elevator].setBackground(null);
+				DirectionButtons[elevator + 1].setBackground(null);
+				DirectionButtons[elevator + 1].setBackground(Color.green);
+			}
 			break;
 		case DOWN:
-			// DirectionButtons[elevator+1].setBackground(null);
-			DirectionButtons[elevator].setBackground(Color.green);
+			if(DirectionButtons[elevator].getBackground() != Color.green) {
+				DirectionButtons[elevator].setBackground(null);
+				DirectionButtons[elevator + 1].setBackground(null);
+				DirectionButtons[elevator].setBackground(Color.green);
+			}
 			break;
 		case HOLD:
-			DirectionButtons[elevator].setBackground(Color.yellow);
-			DirectionButtons[elevator + 1].setBackground(Color.yellow);
+			if(DirectionButtons[elevator].getBackground() != Color.yellow) {
+				DirectionButtons[elevator].setBackground(null);
+				DirectionButtons[elevator + 1].setBackground(null);
+				DirectionButtons[elevator].setBackground(Color.yellow);
+				DirectionButtons[elevator + 1].setBackground(Color.yellow);
+			}
 			break;
 		}
 	}
