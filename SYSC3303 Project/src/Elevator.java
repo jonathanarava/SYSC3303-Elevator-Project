@@ -82,7 +82,7 @@ public class Elevator extends Thread {
 		if (motorDirection == UP || motorDirection == DOWN) {
 			try {
 				System.out.println("current floor: " + sensor + " --> of Elevator "+nameOfElevator); // sensor = current floor
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 				if (motorDirection == UP) {
 					System.out.println("Elevator going up");
 					sensor++; // increment the floor
@@ -168,9 +168,9 @@ public class Elevator extends Thread {
 		System.out.print("Sending to scheduler: ");
 		System.out.println(Arrays.toString(data));
 		try {
-			//InetAddress address = InetAddress.getByName("134.117.59.127");
+			InetAddress address = InetAddress.getByName("134.117.59.107");
 			//System.out.println("\nSending to scheduler from Elevator "+ data[1] + ":" + Arrays.toString(data));
-			ElevatorSendPacket = new DatagramPacket(data, 7, InetAddress.getLocalHost(), 369);
+			ElevatorSendPacket = new DatagramPacket(data, 7,address, 369);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			System.exit(1);

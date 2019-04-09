@@ -117,7 +117,7 @@ public class GUI extends Elevator implements Runnable {
 		North.add(Elevator4);
 		////
 		JTextArea TextErrorArea1 = new JTextArea(
-				"Elevator Error"
+				"Elevator Working"
 				);
 		TextErrorArea1.setLineWrap(true);
 		TextErrorArea1.setWrapStyleWord(true);
@@ -129,7 +129,7 @@ public class GUI extends Elevator implements Runnable {
 		Elevator1Dialog.setPreferredSize(new Dimension(100, 50));
 		/////
 		JTextArea TextErrorArea2 = new JTextArea(
-				"Elevator 2 Working"
+				"Elevator Transient Fault"
 				);
 		TextErrorArea2.setLineWrap(true);
 		TextErrorArea2.setWrapStyleWord(true);
@@ -152,7 +152,7 @@ public class GUI extends Elevator implements Runnable {
 		Elevator3Dialog.setPreferredSize(new Dimension(100, 50));
 		///
 		JTextArea TextErrorArea4 = new JTextArea(
-				"Elevator 4 Working");
+				"Elevator 4 Hard Fault");
 		TextErrorArea4.setLineWrap(true);
 		TextErrorArea4.setWrapStyleWord(true);
 		TextErrorArea4.setEditable(false);
@@ -188,19 +188,19 @@ public class GUI extends Elevator implements Runnable {
 
 			for(int j = 0; j<numFloors; j++) {
 				if(j == sensorArray[0]) {
-					button1[sensorArray[0]].setBackground(Color.red);
+					button1[sensorArray[0]].setBackground(Color.green);
 				} else {
 					button1[j].setBackground(null);
 				} 
 				
 				if(j == sensorArray[1]) {
-					button2[sensorArray[1]].setBackground(Color.red);
+					button2[sensorArray[1]].setBackground(Color.yellow);
 				} else {
 					button2[j].setBackground(null);
 				} 
 				
 				if(j == sensorArray[2]) {
-					button3[sensorArray[2]].setBackground(Color.red);
+					button3[sensorArray[2]].setBackground(Color.green);
 				} else {
 					button3[j].setBackground(null);
 				} 
