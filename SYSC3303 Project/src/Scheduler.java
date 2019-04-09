@@ -299,6 +299,25 @@ public class Scheduler extends Thread {
 	
 	public boolean checkClosestDownEle(int elevatorOrFloorID1, int elevatorInQuestion, int competingEle1, int competingEle2, int competingEle3) {
 
+		int compEle1, compEle2, compEle3;
+		if(elevatorOrFloorID1 - competingEle1 < 0 ) {
+			compEle1 = 21;
+		} else { 
+			compEle1 = elevatorOrFloorID1 - competingEle1;
+		}
+		
+		if(elevatorOrFloorID1 - competingEle2 < 0 ) {
+			compEle2 = 21;
+		} else { 
+			compEle2 = elevatorOrFloorID1 - competingEle2;
+		}
+		
+		if(elevatorOrFloorID1 - competingEle3 < 0 ) {
+			compEle3 = 21;
+		} else { 
+			compEle3 = elevatorOrFloorID1 - competingEle3;
+		}
+		
 		if((elevatorInQuestion - elevatorOrFloorID1 > competingEle1 - elevatorOrFloorID1) && (elevatorInQuestion - elevatorOrFloorID1 > competingEle2 - elevatorOrFloorID1) &&
 				(elevatorInQuestion - elevatorOrFloorID1 > competingEle3 - elevatorOrFloorID1)) {
 			return true;
@@ -378,7 +397,7 @@ public class Scheduler extends Thread {
 						}
 					}else if (ele1 == elevatorOrFloorID1) {
 						addToDownQueue(downQueue2, 1, elevatorOrFloorID1);
-						System.out.println("ADDED TO DOWNQUEUE 2 ----> " + downQueue2.size());
+
 						if(direction.get(1) == HOLD) {
 							direction.add(1, (int) DOWN);
 							wakeUpEle = 1;
@@ -410,6 +429,7 @@ public class Scheduler extends Thread {
 						}
 					} else if (ele2 > elevatorOrFloorID1 && checkClosestDownEle(elevatorOrFloorID1,ele2,ele1,ele0,ele3)) {
 						addToDownQueue(downQueue3, 2, elevatorOrFloorID1);
+						System.out.println("ADDED TO DOWNQUEUE 2 ----> " + downQueue2.size());
 						if(direction.get(2) == HOLD) {
 							direction.add(2, (int) DOWN);
 							wakeUpEle = 2;
@@ -694,6 +714,9 @@ public class Scheduler extends Thread {
 		direction.add(1, (int) HOLD);
 		direction.add(2, (int) HOLD);
 		direction.add(3, (int) HOLD);
+		
+
+
 
 		floor.start();
 

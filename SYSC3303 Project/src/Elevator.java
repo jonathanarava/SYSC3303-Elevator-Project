@@ -401,10 +401,10 @@ public class Elevator extends Thread {
 			}
 		};
 		
-		GUI gui = new GUI();
+
+/*		GUI gui = new GUI();
 		Thread guiThread = new Thread(gui);
-		
-		guiThread.start();
+		guiThread.start();*/
 		
 		Ele0.start();
 		Ele1.start();
@@ -419,7 +419,7 @@ public class Elevator extends Thread {
 				long startTime = System.nanoTime();
 				x = Ele0.receivePacket();
 				ElevatorTable1.add(x);
-				if (x[1] == 0 && Ele0.runningStatus == false) {
+				if(x[1] == 0 && Ele0.runningStatus == false) {
 					data = ElevatorTable1.remove(0);
 					Ele0.toDoID = data[1];
 					Ele0.instruction = data[6];
