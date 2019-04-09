@@ -43,8 +43,8 @@ public class Scheduler extends Thread {
 	private static final byte ERROR_MOTOR = (byte) 0xE2;// invalid packet. error
 
 	// number of elevators and floors. Can change here!
-	public static int numElevators = 2;
-	public static int numFloors = 15;
+	public static int numElevators = 4;
+	public static int numFloors = 22;
 
 	// lists to keep track of what requests need to be handled
 	
@@ -128,9 +128,9 @@ public class Scheduler extends Thread {
 
 	public static void elevatorSendPacket(byte[] responseByteArray) throws UnknownHostException {
 		System.out.println("Response to elevator " + responseByteArray[1] + ": " + Arrays.toString(responseByteArray) + "\n");
-		//InetAddress address = InetAddress.getByName("134.117.59.127");
+		InetAddress address = InetAddress.getByName("134.117.59.108");
 		schedulerElevatorSendPacket = new DatagramPacket(responseByteArray, responseByteArray.length,
-				schedulerElevatorReceivePacket.getAddress(), schedulerElevatorReceivePacket.getPort());
+				address, schedulerElevatorReceivePacket.getPort());
 
 		try {
 			schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket);
@@ -257,7 +257,7 @@ public class Scheduler extends Thread {
 			} else if (elevatorOrFloorID == 3) {
 				if (requestOrUpdate == 1) {
 					if (destFloor - currentFloor > 0 && destFloor <= numFloors && destFloor >= 0) {
-						addToUpQueue(upQueue2,3, destFloor);
+						addToUpQueue(upQueue4,3, destFloor);
 					} else if (destFloor - currentFloor < 0 && destFloor <= numFloors && destFloor >= 0) {
 						addToDownQueue(downQueue4, 3, destFloor);
 					}
@@ -359,7 +359,7 @@ public class Scheduler extends Thread {
 						}
 					} else if (ele0 < elevatorOrFloorID1 && checkClosestUpEle(elevatorOrFloorID1,ele0,ele1,ele2,ele3)) {
 						addToUpQueue(upQueue1, 0, elevatorOrFloorID1);
-						System.out.println("ADDED TO UPQUEUE 1 ----> " + upQueue1.size() );
+						System.out.println("ADDED TO UPQUEUE 1 ----> " + upQueue1.size());
 						if(direction.get(0) == HOLD) {
 							direction.add(0, (int) UP);
 							wakeUpEle = 0;
@@ -670,7 +670,7 @@ public class Scheduler extends Thread {
 						case 1:
 							packet.floorPacketHandler();
 							elevatorOrFloorID = wakeUpEle;
-							System.out.println("                      " + elevatorOrFloorID + upQueue4.size() );
+							System.out.println("                      " + elevatorOrFloorID + upQueue4.size() + direction.get(3) );
 							try {
 								packet.schedulingAlgo();
 								System.out.println("SENDING FROM FLOOR THREAD HERE ---- ");
