@@ -247,15 +247,15 @@ public class Elevator extends Thread {
 							System.out.printf("------------------------------ OPENING DOOR FOR ELEVATOR %d -----------------", nameOfElevator);
 							openCloseDoor((byte)DOOR_OPEN);
 							this.holdReceived = true;
-/*							try {
-								sendPacket(responsePacketRequest(UPDATE,0));
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}*/
 						} else if (instruction == 4) {
 							//System.out.println(instruction + "  ---> ELEVATOR " + nameOfElevator);
 							System.out.printf("No requests. Elevator %d has stopped\n", nameOfElevator);
-							
+							try {
+								Thread.sleep(1);
+								sendPacket(responsePacketRequest(UPDATE,0));
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}		
 						} else if(instruction == 5) {
 							
 						}
@@ -270,10 +270,14 @@ public class Elevator extends Thread {
 		
 		int initialFloor0 = Integer.parseInt(args[0]);	// The number of Elevators in the system is passed via
 		int initialFloor1 = Integer.parseInt(args[1]);	
+		int initialFloor2 = Integer.parseInt(args[2]);	// The number of Elevators in the system is passed via
+		int initialFloor3 = Integer.parseInt(args[3]);	
 		
 		LinkedList<byte[]> ElevatorTable1 =new LinkedList<byte[]>();
 		Elevator Ele0 = new Elevator(0, initialFloor0, ElevatorTable1);
 		Elevator Ele1 = new Elevator(1, initialFloor1, ElevatorTable1);
+		Elevator Ele2 = new Elevator(2, initialFloor2, ElevatorTable1);
+		Elevator Ele3 = new Elevator(3, initialFloor3, ElevatorTable1);
 		System.out.println("Elevator number" + get1());
 		
 		try {
@@ -288,6 +292,8 @@ public class Elevator extends Thread {
 		
 		sendPacket(Ele1.responsePacketRequest(UPDATE,0));
 		sendPacket(Ele0.responsePacketRequest(UPDATE,0));
+		sendPacket(Ele2.responsePacketRequest(UPDATE,0));
+		sendPacket(Ele3.responsePacketRequest(UPDATE,0));
 		
 		sendPacket(Ele1.responsePacketRequest(3,0));
 		//sendPacket(Ele1.responsePacketRequest(UPDATE,0));
@@ -323,7 +329,6 @@ public class Elevator extends Thread {
 								String command = fileRequests.get(i);
 								String segment[] = command.split(" ");
 								floorButton = Integer.parseInt(segment[1]);
-								System.out.println("HERE" + segment[3] +".....");
 								floorRequest = Integer.parseInt(segment[3]);
 								if(floorButton == Ele0.getInitialFloor()) {								
 									try {
@@ -364,6 +369,8 @@ public class Elevator extends Thread {
 		
 		Ele0.start();
 		Ele1.start();
+		Ele2.start();
+		Ele3.start();
 		fileStuff.start();
 
 		try {
@@ -375,10 +382,12 @@ public class Elevator extends Thread {
 				x = Ele0.receivePacket();
 				ElevatorTable1.add(x);
 				if (x[1] == 0 && Ele0.runningStatus == false) {
+					
 					data = Ele0.ElevatorTable.remove(0);
 					Ele0.toDoID = data[1];
 					Ele0.instruction = data[6];
 					Ele0.runningStatus = true;
+					//System.out.println("                    HERE                   " );
 				}
 				if(x[1] == 1 && Ele1.runningStatus == false) {
 					data1 = Ele1.ElevatorTable.remove(0);
