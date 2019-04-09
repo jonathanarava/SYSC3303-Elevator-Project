@@ -656,19 +656,26 @@ public class Scheduler {
 					// above
 					if (packetElementIndex > elevatorCurrentFloor[indexOfFastestElevator]) {// the floor requesting is above the elevator's current
 						// location
-						elevatorStopsUp[indexOfFastestElevator].add(packetElementIndex);
-						// create and send sendPacket to start motor in Down direction
-						createSendingData(indexOfFastestElevator, elevatorCurrentFloor[indexOfFastestElevator], 0, UP);//Up
-						elevatorFloorSendPacket(FLOOR_ID);
-						System.out.println("the Direcation command is "+ UP);
-						System.out.println("the request floor is "+ packetElementIndex);
-						System.out.println("the floor of the elevator is "+ elevatorCurrentFloor[indexOfFastestElevator]);
-						//createSendingData(indexOfFastestElevator, 0, 0, 1);// 1: up
-						elevatorFloorSendPacket(ELEVATOR_ID);
-						//elevatorFloorSendPacket(FLOOR_ID);
+						if(elevatorStopsUp[indexOfFastestElevator].isEmpty()) {
+							elevatorStopsUp[indexOfFastestElevator].add(packetElementIndex);
+							elevatorStatus[indexOfFastestElevator] = UP;
+							// create and send sendPacket to start motor in Down direction
+							createSendingData(indexOfFastestElevator, elevatorCurrentFloor[indexOfFastestElevator], 0, UP);//Up
+							elevatorFloorSendPacket(FLOOR_ID);
+							System.out.println("the Direcation command is "+ UP);
+							System.out.println("the request floor is "+ packetElementIndex);
+							System.out.println("the floor of the elevator is "+ elevatorCurrentFloor[indexOfFastestElevator]);
+							//createSendingData(indexOfFastestElevator, 0, 0, 1);// 1: up
+							elevatorFloorSendPacket(ELEVATOR_ID);
+							//elevatorFloorSendPacket(FLOOR_ID);
+						} else {
+							// This means that fastest elevator is already on the move, so don't send another request, but add it to the stops array
+						}
+						
 					} else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
 						// elevator's current location
 						elevatorStopsDown[indexOfFastestElevator].add(packetElementIndex);
+						elevatorStatus[indexOfFastestElevator] = DOWN;
 						// create and send sendPacket to start motor in Up direction
 						createSendingData(packetElementIndex, elevatorCurrentFloor[indexOfFastestElevator], DOWN, DOWN);// 1: up
 						elevatorFloorSendPacket(FLOOR_ID);
@@ -724,52 +731,27 @@ public class Scheduler {
 
 		for (int i = 0; i < numElevators; i++) {
 			// check and set status, highest, current, and lowest floors,
-			highest = elevatorHighestRequestFloor[i];
-			lowest = elevatorLowestRequestFloor[i];
 			current = elevatorCurrentFloor[i];
 			status = elevatorStatus[i];
 			next = elevatorNextStop[i];
 			if (status == HOLD) {// elevator in hold
 				// distance=|destination-current|
-				distance = destination - elevatorCurrentFloor[i];
+				distance = destination - current;
 				stops = 0;// stops=0 since by definition hold means there were no prior requests or stops
 
 			} else if (status == UP) {// elevator going up
 				if (requestDirection == UP) {// if requesting to go up
 					// if along the way
-					if (destination >= next) {
-						distance = destination - current;
-					}
-					// distance=destination-current
-					// stops=stops between destination and current
-					else {
-						distance = (highest - current) + (highest - lowest) + (destination - lowest);
-						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
-								+ stopsBetween(elevatorRequestsUp[i], lowest, destination, UP);
-					}
+					distance = destination - current;
+					
 					// else if missed
 					// distance=(top-current)+(top-bottom)+(destination-bottom)
 					// stops=upStops+downStops+upRequests before destination
-				} else if (requestDirection == DOWN) {// if requesting to go down
-					distance = (highest - current) + (highest - destination);
-					stops = elevatorStopsUp[i].size() + stopsBetween(elevatorStopsDown[i], highest, destination, DOWN);
-					// distance=(Top-current)+(top-destination)
-					// stops=upStops+downStops between destination and top
-				}
+				} 
 			} else if (elevatorStatus[i] == DOWN) {// elevator going down
-				if (requestDirection == UP) {// if requesting to go up
-					distance = (current - lowest) + (destination - lowest);
-					stops = elevatorStopsDown[i].size() + stopsBetween(elevatorStopsUp[i], lowest, destination, UP);
-					// distance=(current-Bottom)+(destination-Bottom)
-					// stops=downStops+upStops between destination and botom
-				} else if (requestDirection == DOWN) {// if requesting to go down
-					if (destination <= elevatorNextStop[i]) {
-						distance = current - destination;
-						stops = stopsBetween(elevatorStopsDown[i], current, destination, DOWN);
-					} else {
-						distance = (current - lowest) + (highest - lowest) + (highest - destination);
-						stops = elevatorStopsUp[i].size() + elevatorStopsDown[i].size()
-								+ stopsBetween(elevatorRequestsDown[i], highest, destination, DOWN);
+				if (requestDirection == DOWN) {// if requesting to go down
+					distance = current - destination;
+					
 					}
 					// if along the way
 					// distance=current-destination
@@ -777,7 +759,6 @@ public class Scheduler {
 					// else if missed
 					// distance=(current-Bottom)+(top-bottom)+(top-destination)
 					// stops=upStops+downStops+downRequests before destination
-				}
 			} else {
 				// catastrophic error
 				System.out.println("mismatch between motor status variables, status is " + elevatorStatus[i]
@@ -824,7 +805,7 @@ public class Scheduler {
 			}
 		}
 		else if(sendTo==FLOOR_ID) {
-			System.out.println("Response to Floor " + data[1] + ": " + Arrays.toString(sendData) + "\n");
+			System.out.println("Response to Floors"  + Arrays.toString(sendData) + "\n");
 			schedulerFloorSendPacket = new DatagramPacket(sendData, sendData.length,
 					schedulerFloorReceivePacket.getAddress(), FL_SENDPORTNUM);// EL_SENDPORTNUM);
 			try {

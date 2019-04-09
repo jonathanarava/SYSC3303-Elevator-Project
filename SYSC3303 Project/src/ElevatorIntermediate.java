@@ -56,7 +56,7 @@ public class ElevatorIntermediate {
 	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
 	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
 
-	private static boolean firstRunTime = true;
+	private static boolean allHolding = true;
 	// for iteration 1 there will only be 1 elevator
 	// getting floor numbers from parameters set
 	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
@@ -70,7 +70,7 @@ public class ElevatorIntermediate {
 	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
-	
+	private static byte elevatorStates[];
 	/*
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
@@ -78,7 +78,7 @@ public class ElevatorIntermediate {
 
 	// synchronized table that all of the elevator threads will put their requests
 	// and updates upon
-	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	private static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 	
 	// ArrayList for Inputfile
 	public static List<String> fileRequests = new ArrayList<String>();
@@ -124,8 +124,11 @@ public class ElevatorIntermediate {
 		// allocate sockets, packets
 		synchronized (elevatorTable) {
 			while (elevatorTable.isEmpty()) {
+				if(allHolding) {
+					break;
+				}
 				try {
-					elevatorTable.wait(1);
+					elevatorTable.wait();
 					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -221,19 +224,34 @@ public class ElevatorIntermediate {
 			case 0:
 				elevatorArray[0].motorDirection = data[6];
 				elevatorArray[0].dealWith = true;
+				elevatorStates[0] = data[6];
+				if(!(data[6] == HOLD)) {
+					allHolding = false;
+				}
 				break;
 			case 1:
 				elevatorArray[1].motorDirection = data[6];
 				elevatorArray[1].dealWith = true;
-
+				elevatorStates[1] = data[6];
+				if(!(data[6] == HOLD)) {
+					allHolding = false;
+				}
 				break;
 			case 2:
 				elevatorArray[2].motorDirection = data[6];
 				elevatorArray[2].dealWith = true;
+				elevatorStates[2] = data[6];
+				if(!(data[6] == HOLD)) {
+					allHolding = false;
+				}
 				break;
 			case 3:
 				elevatorArray[3].motorDirection = data[6];
 				elevatorArray[3].dealWith = true;
+				elevatorStates[3] = data[6];
+				if(!(data[6] == HOLD)) {
+					allHolding = false;
+				}
 				break;
 			}
 		}
@@ -338,24 +356,30 @@ public class ElevatorIntermediate {
 		// arrays to keep track of the number of elevators, eliminates naming confusion
 		elevatorArray = new Elevator[createNumElevators];
 		elevatorThreadArray = new Thread[createNumElevators];
-
+		elevatorStates = new byte[createNumElevators];
+		
 		for (int i = 0; i < createNumElevators; i++) {
 			elevatorArray[i] = new Elevator(i, 0, elevatorTable, Integer.parseInt(args[i + 1])); // i names the
 			// elevator, 0
 			// initializes the
 			// floor it
+			if(Integer.parseInt(args[i + 1]) == 0) {
+				elevatorArray[i].holdingState = true;
+			}
 			// starts on
 			elevatorThreadArray[i] = new Thread(elevatorArray[i]);
 			elevatorThreadArray[i].start();
 		}
+		byte elevatorStates[] = new byte[createNumElevators];
 		
+		for(int i = 0; i < createNumElevators; i++) {
+			elevatorStates[i] = elevatorArray[i].motorDirection;
+		}
 		
 
 		while (true) {
 			
-			if(!elevatorTable.isEmpty()) {
-				elevatorHandler.sendPacket();
-			}
+			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
 
 			// Synchronize Intermediate send and Receive with the Scheduler's send and

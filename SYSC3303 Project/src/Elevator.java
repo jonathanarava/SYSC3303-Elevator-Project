@@ -78,6 +78,7 @@ public class Elevator extends Thread {
 	private List<byte[]> elevatorTable;
 	private boolean doorStatusOpen = false; // whether the doors are open(true) or closed (false)
 	private long doorOpenTime, doorCloseTime;// for error checking that doors are closed within time
+	public boolean holdingState;
 
 	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
@@ -309,7 +310,7 @@ public class Elevator extends Thread {
 		synchronized(elevatorTable) {
 			while (elevatorTable.size() != 0) {// wait for an opening to send the packet
 				try {
-					elevatorTable.wait(1);
+					elevatorTable.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -367,8 +368,10 @@ public class Elevator extends Thread {
 						break;
 					case HOLD:
 						motionOfMotor = HOLD;
+						this.holdingState = true;
 						System.out.println("Reached Hold state in elevator");
 						dealWith = !dealWith;
+						sendPacket(2, NO_ERROR);
 						break;
 					case SHUT_DOWN:
 						shutDown();
