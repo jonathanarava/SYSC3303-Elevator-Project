@@ -1,0 +1,143 @@
+
+
+
+
+ElevatorIntermediate's SendPacket() called
+
+Sending to scheduler: [21, 4, 8, 0, 0, 0, 0, 0]
+waiting to receive
+
+Received from scheduler: [54, 0, 0, 0, 0, 0, 8, 0]
+ElevatorIntermediate INITIALIZED
+
+Elevator: 0 On Floor: 0
+ on Hold
+Elevator: 1 On Floor: 0
+ on Hold
+Elevator: 2 On Floor: 0
+ on Hold
+Elevator: 3 On Floor: 0
+ on Hold
+Adding Arrival request at floor 1 for Elevator 0
+waiting to receive
+
+Elevator: 0 Sending to scheduler: [21, 0, 1, 0, 0, 1, 0, 0]
+Elevator: 0's Request sent
+
+Received from scheduler: [54, 0, 0, 0, 0, 0, 1, 0]
+Adding Arrival request at floor 2 for Elevator 1
+waiting to receive
+runElevator() method called
+
+Elevator: 0 Sending to scheduler: [21, 0, 2, 1, 1, 0, 0, 0]
+
+Elevator: 1 Sending to scheduler: [21, 1, 1, 0, 0, 2, 0, 0]
+Elevator: 1's Request sent
+
+Received from scheduler: [54, 0, 0, 0, 0, 0, 3, 0]
+Breaking Elevator 2 with DOOR_ERROR
+Before DOOR_ERROR sendpacket() call
+
+Elevator: 2 Sending to scheduler: [21, 2, -32, 0, 0, 0, 0, -31]
+waiting to receive
+
+Received from scheduler: [54, 0, 0, 0, 0, 0, 4, 0]
+Breaking Elevator 3 with MOTOR_ERROR
+MOTOR_ERROR/ 'floor timer fault': hard fault
+
+Elevator: 3 Sending to scheduler: [21, 3, -32, 0, 0, 0, 0, -30]
+waiting to receive
+
+Received from scheduler: [54, 3, 0, 0, 0, 0, 6, 0]
+Elevator Out of Order, Maintenance and Emergency Fire Services have been Contacted
+waiting to receive
+
+
+
+
+
+waiting
+INITIALIZE from Elevator: [21, 4, 8, 0, 0, 0, 0, 0]
+Received Elevator Initialization 
+
+waiting
+INITIALIZE from Floor: [69, 22, 8, 0, 0, 0, 0, 0]
+Received Floor Initialization
+
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 22: [54, 0, 0, 0, 0, 0, 8, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+elevatorFloorSendPacket() called, sending to: 69
+Response to Floor 22: [54, 0, 0, 0, 0, 0, 8, 0]
+
+scheduler- Floor send SUCCESSFUL
+
+Scheduler is INITIALIZED and may proceed with operations
+
+waiting
+REQUEST from Elevator: [21, 0, 1, 0, 0, 1, 0, 0]
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 0: [54, 0, 0, 0, 0, 0, 1, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+waiting
+UPDATE from Elevator: [21, 0, 2, 1, 1, 0, 0, 0]
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 0: [54, 0, 0, 0, 0, 0, 3, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 0: [54, 0, 0, 0, 0, 0, 4, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+elevatorFloorSendPacket() called, sending to: 69
+Response to Floor 0: [54, 0, 0, 1, 1, 0, 5, 0]
+
+scheduler- Floor send SUCCESSFUL
+
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 0: [54, 0, 0, 1, 1, 0, 5, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+waiting
+REQUEST from Elevator: [21, 1, 1, 0, 0, 2, 0, 0]
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 1: [54, 1, 0, 0, 0, 0, 1, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+waiting
+ERROR from Elevator: [21, 2, -32, 0, 0, 0, 0, -31]
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 2: [54, 2, 0, 0, 0, 0, 7, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+waiting
+ERROR from Elevator: [21, 3, -32, 0, 0, 0, 0, -30]
+elevatorFloorSendPacket() called, sending to: 21
+Response to Elevator 3: [54, 3, 0, 0, 0, 0, 6, 0]
+
+scheduler- Elevator send SUCCESSFUL
+
+waiting
+
+
+
+
+
+Sending to scheduler: [69, 22, 8, 0, 0, 0, 0, 0]
+waiting to receive
+Received from scheduler: [54, 0, 0, 0, 0, 0, 8, 0]
+FloorIntermediate's elevatorLocation: 0
+FloorIntermediate's elevatorDirection: 0
+FloorIntermediate INITIALIZED
+
+
+
