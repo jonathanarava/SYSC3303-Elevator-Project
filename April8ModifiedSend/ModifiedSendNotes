@@ -1,0 +1,15 @@
+Notes:
+-based on April7's code
+-modify the sendPacket() methods in elevator and elevatorIntermediate to remove confusing code and redundancy
+	-since the requests are all made within elevatorIntermediate and are sequential
+	-use sequential manual number of send-receive for elevator and elevatorIntermediate
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
