@@ -294,6 +294,7 @@ public class ElevatorIntermediate {
 		elevatorTable.add(initializationData);
 
 	}
+	
 	static String floorRequesting[] = new String[4];
 	static String floorToGoTo[] = new String[4];
 	public static void createRequests() {
@@ -314,10 +315,9 @@ public class ElevatorIntermediate {
 		// argument[0]
 		
 		fileReader("M://hello.txt");
-		System.out.println(fileRequests.size());
 		createRequests();
-		System.out.println(floorRequesting[1]);
-		System.out.println(floorToGoTo[1]);
+		//System.out.println(floorRequesting[1]);
+		//System.out.println(floorToGoTo[1]);
 		
 		// for keeping track of the port numbers, filled as they get declared
 		// since we're not strictly replying to the immediate packet we can't get the
@@ -352,7 +352,10 @@ public class ElevatorIntermediate {
 		
 
 		while (true) {
-			elevatorHandler.sendPacket();
+			
+			if(!elevatorTable.isEmpty()) {
+				elevatorHandler.sendPacket();
+			}
 			elevatorHandler.receivePacket();
 
 			// Synchronize Intermediate send and Receive with the Scheduler's send and

@@ -86,9 +86,10 @@ public class Scheduler {
 	public static final int FL_SENDPORTNUM = 1199;
 
 	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
 	private static final byte STOP = 0x03;// elevator is
-	private static final byte UP = 0x02;// elevator is going up
-	private static final byte DOWN = 0x01;// elevator is going down
+	private static final byte DOWN = 0x02;// elevator is going up
+	private static final byte UP = 0x01;// elevator is going down
 	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
 	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
 	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
@@ -374,7 +375,7 @@ public class Scheduler {
 							// send the sendPacket
 							// remove the stop from goingup linked list
 							// check if there are more stops
-							createSendingData(packetElementIndex, elevatorLocation, 0, 3);// 3: make a stop
+							createSendingData(packetElementIndex, elevatorLocation, 0, STOP);// 3: make a stop
 							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 							elevatorFloorSendPacket(FLOOR_ID);
 							
@@ -399,7 +400,7 @@ public class Scheduler {
 
 								} else {// we have stops to go up, start fulfilling those
 									// create and send SendPacket for the motor to go Up
-									createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+									createSendingData(packetElementIndex, 0, 0, UP);// up
 									elevatorFloorSendPacket(ELEVATOR_ID);
 								}
 							} 
@@ -407,7 +408,7 @@ public class Scheduler {
 
 						} else if(elevatorStopsUp[packetElementIndex].isEmpty()){ 
 							if(elevatorStopsDown[packetElementIndex].isEmpty()) { // No stop requests for this elevator so make it go to hold state
-								createSendingData(packetElementIndex, elevatorLocation, 0, 4); //Put into hold state and send a packet for holding
+								createSendingData(packetElementIndex, elevatorLocation, 0, HOLD); //Put into hold state and send a packet for holding
 								elevatorFloorSendPacket(ELEVATOR_ID);
 								elevatorFloorSendPacket(FLOOR_ID);
 							}
@@ -417,7 +418,7 @@ public class Scheduler {
 							// Look at this.
 							System.out.println(
 									"reached else of Eleavtor Update while going UP; not a floor that is contained in the stop list");
-							createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, 5);
+							createSendingData(packetElementIndex, elevatorLocation, elevatorDirection, UPDATE_DISPLAY);
 							elevatorFloorSendPacket(ELEVATOR_ID);
 							elevatorFloorSendPacket(FLOOR_ID);//STATUS UPDATES SHOULD BE SENT TO ALL FLOORS
 						}
@@ -432,7 +433,7 @@ public class Scheduler {
 							// send the sendPacket
 							// remove the stop from goingup linked list
 							// check if there are more stops
-							createSendingData(packetElementIndex, elevatorLocation, 0, 3);// 3: make a stop
+							createSendingData(packetElementIndex, elevatorLocation, 0, STOP);//
 							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 							// overwritten before being sent at the very end
 							if (elevatorStopsDown[packetElementIndex].isEmpty()) {
@@ -448,20 +449,20 @@ public class Scheduler {
 								// check if there are more stops up
 								if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
-									createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
+									createSendingData(packetElementIndex, 0, 0, HOLD);// 4: hold
 									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 									// overwritten before being sent at the very end
 									elevatorStopsDown[packetElementIndex].clear();
 								} else {// we have stops to go up, start fulfilling those
 									// create and send SendPacket for the motor to go Down
-									createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+									createSendingData(packetElementIndex, 0, 0, DOWN);// 2: down
 									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will be
 									// overwritten before being sent at the very end
 								}
 							} else {// finished stopping for a destination floor, continue fulfilling other stops
 								// create and send SendPacket to restart the motor/ have the motor in the down
 								// direction
-								createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+								createSendingData(packetElementIndex, 0, 0, DOWN);// 2: down
 								// IMPORTANT:
 								// this packet sending may not be necessary and could be what's causing the
 								// double sending at the very beginning
@@ -541,13 +542,13 @@ public class Scheduler {
 							elevatorStopsUp[packetElementIndex].add(stopRequest);
 							elevatorStatus[packetElementIndex] = UP;
 							// create and send sendPacket to start the motor
-							createSendingData(packetElementIndex, elevatorLocation, 0, 1);// 1: up
+							createSendingData(packetElementIndex, elevatorLocation, 0, UP);// 1: up
 						} else if (elevatorLocation > stopRequest) {// we are above the destination floor, we need to go
 							// down
 							elevatorStopsDown[packetElementIndex].add(stopRequest);
 							elevatorStatus[packetElementIndex] = DOWN;
 							// create and send sendPacket to start the motor
-							createSendingData(packetElementIndex, elevatorLocation, 0, 2);// 2: down
+							createSendingData(packetElementIndex, elevatorLocation, 0, DOWN);// 2: down
 						}
 						// currently in hold mode and remain in hold mode
 						else if (elevatorLocation == stopRequest) {
@@ -600,7 +601,7 @@ public class Scheduler {
 					if (elevatorStatus[indexOfFastestElevator] == UP) {// elevator is going up
 						if (floorRequestDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
 							// go up also
-							if (packetElementIndex > elevatorLocation) {// still time
+							if (packetElementIndex > elevatorCurrentFloor[indexOfFastestElevator]) {// still time
 								if (elevatorStopsUp[indexOfFastestElevator].contains(packetElementIndex)) {
 									// already have that stop requested, don't want to duplicate
 								} else {
@@ -625,7 +626,7 @@ public class Scheduler {
 					} else {// elevator is going down
 						if (floorRequestDirection == elevatorStatus[indexOfFastestElevator]) {// floor is requesting to
 							// go Down also
-							if (packetElementIndex < elevatorLocation) {// still time
+							if (packetElementIndex < elevatorCurrentFloor[indexOfFastestElevator]) {// still time
 								if (elevatorStopsDown[indexOfFastestElevator].contains(packetElementIndex)) {
 									// already have that stop requested, don't want to duplicate
 								} else {
@@ -653,18 +654,31 @@ public class Scheduler {
 				} else {// holding, can fulfill immediately
 					// can assume no stops or requests exist, don't need to check for duplicates if
 					// above
-					if (packetElementIndex > elevatorLocation) {// the floor requesting is above the elevator's current
+					if (packetElementIndex > elevatorCurrentFloor[indexOfFastestElevator]) {// the floor requesting is above the elevator's current
 						// location
-						elevatorRequestsDown[indexOfFastestElevator].add(packetElementIndex);
+						elevatorStopsUp[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Down direction
-						createSendingData(packetElementIndex, 0, 1, 5);// 2: down
+						createSendingData(indexOfFastestElevator, elevatorCurrentFloor[indexOfFastestElevator], 0, UP);//Up
+						elevatorFloorSendPacket(FLOOR_ID);
+						System.out.println("the Direcation command is "+ UP);
+						System.out.println("the request floor is "+ packetElementIndex);
+						System.out.println("the floor of the elevator is "+ elevatorCurrentFloor[indexOfFastestElevator]);
+						//createSendingData(indexOfFastestElevator, 0, 0, 1);// 1: up
+						elevatorFloorSendPacket(ELEVATOR_ID);
+						//elevatorFloorSendPacket(FLOOR_ID);
 					} else {// (packetElementIndex<elevatorLocation) {//the floor requesting is below the
 						// elevator's current location
-						elevatorRequestsUp[indexOfFastestElevator].add(packetElementIndex);
+						elevatorStopsDown[indexOfFastestElevator].add(packetElementIndex);
 						// create and send sendPacket to start motor in Up direction
-						createSendingData(packetElementIndex, 0, 2, 5);// 1: up
+						createSendingData(packetElementIndex, elevatorCurrentFloor[indexOfFastestElevator], DOWN, DOWN);// 1: up
+						elevatorFloorSendPacket(FLOOR_ID);
+						System.out.println("the request floor is "+ packetElementIndex);
+						System.out.println("the floor of the elevator is "+ elevatorCurrentFloor[indexOfFastestElevator]);
+						//createSendingData(indexOfFastestElevator, 0, 0, 1);// 1: up
+						elevatorFloorSendPacket(ELEVATOR_ID);
+						//elevatorFloorSendPacket(FLOOR_ID);
 					}
-					elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
+					//elevatorFloorSendPacket(FLOOR_ID);// send the created packet with the sendData values prescribed above
 				}
 			}
 		}

@@ -43,9 +43,6 @@ public class FloorIntermediate {
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
-	public static final int EL_RECEIVEPORTNUM = 369;
-	public static final int EL_SENDPORTNUM = 159;
-
 	/*//FROM ELEVATORINTERMEDIATE
 	private static final int SENDPORTNUM = 369;
 	private static final int RECEIVEPORTNUM = 159;
@@ -54,9 +51,10 @@ public class FloorIntermediate {
 	private static final int SENDPORTNUM = 369;
 	private static final int RECEIVEPORTNUM = 1199;
 
-	public static final int FL_RECEIVEPORTNUM = 488;
-	public static final int FL_SENDPORTNUM = 1199;
-
+	static String floorSending[] = new String[2];
+	static String movingDirecation[] = new String[2];
+	static String floorToGoTo[] = new String[2];
+	
 	private static DatagramPacket floorSendPacket, floorReceivePacket;
 	private static DatagramSocket floorReceiveSocket,floorSendSocket;
 	
@@ -246,6 +244,15 @@ public class FloorIntermediate {
 			reader.close();
 		}catch(Exception e) { e.printStackTrace(); }
 	}
+	
+	public static void createRequests() {
+		for(int i = 0; i <fileRequests.size(); i++) {
+			String command = fileRequests.get(i);
+			String segment[] = command.split(" ");
+			floorSending[i] = segment[1];
+			movingDirecation[i] = segment[2];
+		}
+	}
 
 	public static void main(String args[]) {// throws IOException {
 
@@ -255,12 +262,14 @@ public class FloorIntermediate {
 		numFloors = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via argument[0]
 		FloorIntermediate floorHandler = new FloorIntermediate();
 		//Floor floor = new Floor(createNumFloors);
-
-		//fileReader("M://hello.txt");
+		
+		fileReader("M://hello.txt");
+		createRequests();
 		//read the input file and get requests for each of the floors. We will then feed these real time info to the floors before we run out program. 
 		numFloors = Integer.parseInt(args[0]);
 		floorArray = new Floor[numFloors];
 		floorThreadArray = new Thread[numFloors];
+		
 		
 		
 		//FOR INITIATION
@@ -268,8 +277,16 @@ public class FloorIntermediate {
 		floorHandler.sendPacket();
 		floorHandler.receivePacket();
 		for (int i = 0; i < numFloors; i++) {
-			floorArray[i] = new Floor(i, floorTable);//0, floorTable, Integer.parseInt(args[i + 1])); // i names the
-			
+			boolean setFloor = false;
+			for(int j = 0; j < floorSending.length; j++) {
+				if(i == Integer.parseInt(floorSending[j])) {
+					floorArray[i] = new Floor(i, floorTable, movingDirecation[j]);//0, floorTable, Integer.parseInt(args[i + 1])); // i names the
+					setFloor = true;
+				}
+			}
+			if(!setFloor) {
+				floorArray[i] = new Floor(i, floorTable, "0");
+			}
 			// elevator, 0
 			// initializes the
 			// floor it
@@ -278,7 +295,7 @@ public class FloorIntermediate {
 //			if(i == Integer.parseInt(args[1])) {
 //				floorArray[Integer.parseInt(args[1])].setRealTimeRequest(UP);
 //			}
-			//floorThreadArray[i].start();
+			floorThreadArray[i].start();
 		}
 
 		while(true) {

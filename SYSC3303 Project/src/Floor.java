@@ -88,18 +88,28 @@ public class Floor extends Thread {
 	private int[] floorsMade;
 	private List<byte[]> floorTable;
 
-	private boolean hasRequest = false;
+	private boolean hasRequest;
 	private static byte error=NO_ERROR;//current Error, will be sent on the next send
 	/*
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
 	 * scheduler
 	 */
-	public Floor(int getName, List<byte[]> floorTable) {//int numOfFloors) {
+	public Floor(int getName, List<byte[]> floorTable, String realTimeDirectionRequest) {//int numOfFloors) {
 		//NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
 		//floorsMade = new int[numOfFloors];
 		name=getName;
 		this.floorTable=floorTable;
+		if(realTimeDirectionRequest.equals("Up")) {
+			this.realTimeDirectionRequest = UP;
+			hasRequest = true;
+		} else if(realTimeDirectionRequest.equals("Down")) {
+			this.realTimeDirectionRequest = DOWN;
+			hasRequest = true;
+		} else {
+			this.realTimeDirectionRequest = HOLD;
+			hasRequest = false;
+		}
 	}
 	
 	public synchronized void sendPacket(int requestUpdateError, byte sendErrorType) {
@@ -133,33 +143,26 @@ public class Floor extends Thread {
 		requestElevator.write(name); // identity of this particular elevator object
 
 		// request or update data
-		if (requestUpdateError == REQUEST) {
-			requestElevator.write(REQUEST); // request
-		//FLOOR SHOULD NEVER BE SENDING AN UPDATE
-		} else if (requestUpdateError == ERROR) {
-			requestElevator.write(ERROR); // update
-			requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
-			requestElevator.write(realTimeDirectionRequest); // up or down (not used, only for Floors)
-			requestElevator.write(UNUSED); // dest floor
-			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-			requestElevator.write(errorType); // error ID
-			return requestElevator.toByteArray();
-		} else {// something's gone wrong with the call to this method
-			requestElevator.write(ERROR);
-			System.out.println(name+ " Floor ERROR: called createResponsePacketData with neither REQUEST or ERROR");
-			requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
-			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-			requestElevator.write(UNUSED); // dest floor
-			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-			requestElevator.write(OTHER_ERROR); // something's gone wrong
-			return requestElevator.toByteArray();
+		switch(requestUpdateError) {
+			case REQUEST:
+				requestElevator.write(REQUEST);
+				break;
+			case ERROR:
+				requestElevator.write(ERROR); // update
+				requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
+				requestElevator.write(realTimeDirectionRequest); // up or down (not used, only for Floors)
+				requestElevator.write(UNUSED); // dest floor
+				requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
+				requestElevator.write(errorType); // error ID
+				return requestElevator.toByteArray();
 		}
+		
 		requestElevator.write(UNUSED);// setSensor(sensor)); // current floor
 		requestElevator.write(realTimeDirectionRequest); // up or down (not used, only for Floors)
 		requestElevator.write(UNUSED); // dest floor
 		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
-		return requestElevator.toByteArray();
+		return requestElevator.toByteArray();	
 	}
 
 	public void setRealTimeRequest(int upOrDown) {
@@ -232,36 +235,15 @@ public class Floor extends Thread {
 	 * inputs as a string. For now This section will be commented. Will be
 	 * implemented for other iterations
 	 */
-	public void fileReader(String fullFile) { 
-		String text = "";
-		int i=0;
-		try { 
-			FileReader input = new FileReader(fullFile);
-			Scanner reader = new Scanner(input);
-			reader.useDelimiter("[\n]");
-
-			while (reader.hasNext()){
-				text = reader.next();
-				if (i<=1) {
-					i++;
-				} else if(i>=2) {
-					fileRequests.add(text);
-					i++;
-				}
-			}
-			reader.close();
-		}catch(Exception e) { e.printStackTrace(); }
-	}
-	
-
 	
 	public void run() {
-		while (hasRequest) {
+		while (true) {
 			// while(true) to activate all elevator threads in this system
 			if (hasRequest) {// send request
 				sendPacket(1, error);
-				// hasRequest = !hasRequest;
-				hasRequest = false;
+				hasRequest = !hasRequest;
+			}
+			else if (!hasRequest) {
 			}
 		}
 	}
