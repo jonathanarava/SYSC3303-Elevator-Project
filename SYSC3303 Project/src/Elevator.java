@@ -51,7 +51,7 @@ public class Elevator extends Thread {
 
 	private boolean holdReceived;
 
-	public static int sensorArray[] = new int[2];
+	public static int sensorArray[] = new int[4];
 	
 	public Elevator() {};
 	
@@ -71,6 +71,10 @@ public class Elevator extends Thread {
 			sensorArray[0] = sensor;
 		} else if(nameOfElevator == 1) {
 			sensorArray[1] = sensor;
+		}else if(nameOfElevator == 2) {
+			sensorArray[2] = sensor;
+		} else if(nameOfElevator == 3) {
+			sensorArray[3] = sensor;
 		}
 	}
 	
@@ -377,7 +381,6 @@ public class Elevator extends Thread {
 			while(true) {
 				byte[] x = new byte[7];
 				byte[] data = new byte[7];
-				byte[] data1 = new byte[7];
 				long startTime = System.nanoTime();
 				x = Ele0.receivePacket();
 				ElevatorTable1.add(x);
@@ -390,9 +393,9 @@ public class Elevator extends Thread {
 					//System.out.println("                    HERE                   " );
 				}
 				if(x[1] == 1 && Ele1.runningStatus == false) {
-					data1 = Ele1.ElevatorTable.remove(0);
-					Ele1.toDoID = data1[1];
-					Ele1.instruction = data1[6];
+					data = Ele1.ElevatorTable.remove(0);
+					Ele1.toDoID = data[1];
+					Ele1.instruction = data[6];
 					Ele1.runningStatus = true;
 				
 				} 

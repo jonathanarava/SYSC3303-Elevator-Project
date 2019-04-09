@@ -187,7 +187,11 @@ public class GUI extends Elevator implements Runnable {
 		while(true) {
 			for(int i = 0; i < numElevators; i++) {
 				//System.out.println(sensorArray[1]);
-				button1[get1()].setBackground(Color.red);
+				button1[sensorArray[0]].setBackground(Color.red);
+				button2[sensorArray[1]].setBackground(Color.red);
+				button3[sensorArray[2]].setBackground(Color.red);
+				button4[sensorArray[3]].setBackground(Color.red);
+				
 			}
 			try {
 				Thread.sleep(1);

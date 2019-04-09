@@ -1,4 +1,5 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterAll;
@@ -25,13 +26,14 @@ class SchedulerTest {
 	void tearDown() throws Exception {
 	}
 
+	@Test
 	void testCurrentFloorTracker() {
-		Scheduler s = new Scheduler();
-		s.currentFloor = 5;
-		s.elevatorOrFloorID = 1;
-		s.currentFloorTracker();
-		System.out.println(s.ele0);
-		assertEquals(s.ele0,5);
+		//Scheduler s = new Scheduler();
+		Scheduler.currentFloor = 5;
+		Scheduler.elevatorOrFloorID = 1;
+		Scheduler.currentFloorTracker();
+		System.out.println(Scheduler.ele1);
+		assertTrue(Scheduler.ele0 == 5);
 	}
 	@Test
 	void test() {
