@@ -249,9 +249,6 @@ public class ElevatorIntermediate {
 		else if(schedulerInstruction==UPDATE_DISPLAYS) {
 			System.out.println("Update Displays");
 			updateDisplay();
-			/*for (int i=0;i<createNumElevators;i++) {
-				elevatorArray[i].updateDisplay();
-			}*/
 		}
 		else if(schedulerInstruction==SHUT_DOWN) {
 			elevatorArray[packetElement].shutDown();
@@ -265,14 +262,12 @@ public class ElevatorIntermediate {
 		else {
 			System.out.println("Elevator: "+packetElement +"; Unknown Instruction from Scheduler: "+schedulerInstruction);
 		}
-
 	}
 	public static void updateDisplay() {
 		for (int i=0;i<createNumElevators;i++) {
 			elevatorArray[i].updateDisplay();
 		}
 	}
-
 	public static void delay(int delayValue) {
 		for (int i = 0; i < delayValue;) {
 			i++;

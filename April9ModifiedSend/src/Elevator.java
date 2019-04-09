@@ -118,7 +118,7 @@ public class Elevator extends Thread {
 	public void fixElevator() {
 		elevatorBroken=false;
 		System.out.println("Elevator: "+elevatorNumber+" has been fixed\n");
-		elevatorState=previousState;
+		//elevatorState=previousState;
 		dealWith=true;
 	}
 	public void breakElevator(byte errorType) {
@@ -342,16 +342,21 @@ public class Elevator extends Thread {
 						}*/
 						runElevator();//UP);
 						//dealWith=false;
+//						try {// wait for 1000
+//						Thread.sleep(50);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
 					} 
 					else if(elevatorState==DOWN) {
 						/*System.out.println("Elevator: "+elevatorNumber+" going down, at floor: "+sensor);
 						setSensor(sensor-1);
 						 */
 						runElevator();//DOWN);
-						//dealWith =false;// !dealWith;
+						dealWith =false;// !dealWith;
 						//sendPacket(UPDATE,UNUSED, NO_ERROR);
 					}
-					else if (elevatorState == UPDATE_DISPLAY) {//else if (motorDirection == UPDATE_DISPLAY) {
+					/*else if (elevatorState == UPDATE_DISPLAY) {//else if (motorDirection == UPDATE_DISPLAY) {
 						System.out.println("Elevator: "+elevatorNumber+"'s run() while(!hasRequest)'s while (dealWith): UPDATE_DISPLAY");
 						updateDisplay();
 						
@@ -359,7 +364,7 @@ public class Elevator extends Thread {
 						dealWith = false;//!dealWith;
 						// set the lights sensors and stuff to proper value
 						//isUpdate = false;
-					} 
+					} */
 					else if (elevatorState == STOP) {//else if (motorDirection == STOP) {
 						//System.out.println("Elevator: "+elevatorNumber+"'s run() while(!hasRequest)'s while (dealWith): STOP");
 						System.out.println("Elevator: "+elevatorNumber+" making a STOP");
@@ -440,7 +445,7 @@ public class Elevator extends Thread {
 		}
 		//sendPacket(UPDATE,UNUSED,NO_ERROR);
 		try {// wait for 1000
-			Thread.sleep(50);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
