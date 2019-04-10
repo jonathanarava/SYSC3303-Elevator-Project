@@ -14,7 +14,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.lang.*;
 import java.util.concurrent.TimeUnit;//for measuring time to respond
-
+/**
+ * Scheduler Class that is in charge of responding to the Elevator and Floor subsystems when elevator system information is sent.
+ * This class responds to the Requests for an action by the elevators by a User by calling the scheduling algorithm that finds the most efficient manor to address that request.
+ * This class also keeps track of the current locations of the elevators, and their states(UP, DOWN, HOLD, SHUT_DOWN) as the elevators would not know what they are "up to"
+ * User will not access the Scheduler Class directly, they will only feed requests in through the elevator and floor class. 
+ * Elevator and Floor class also do not have direct access to the Scheduler. They will only send UDP data packets of said requests to the scheduler, which will respond to them through commands. 
+ * @author Group 5
+ *
+ */
 public class SchedulerSeperateAlgorithm {
 //elevator
 	public static final int EL_RECEIVEPORTNUM = 369;
@@ -125,6 +133,9 @@ public class SchedulerSeperateAlgorithm {
 	public SchedulerSeperateAlgorithm(boolean a) {
 		// Constructor for Junit Testing
 	}
+	/**
+	 * Constructor of Scheduler
+	 */
 	public SchedulerSeperateAlgorithm() {
 		try {
 			schedulerReceiveSocket=new DatagramSocket(RECEIVEPORTNUM);
@@ -136,6 +147,9 @@ public class SchedulerSeperateAlgorithm {
 		}
 	}
 	//INITIALIZATION METHODS
+	/**
+	 * Initializes the linkedLists that will store the up/down requests and up/down stops elevator. 
+	 */
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
 		elevatorStopsUp= new LinkedList[numElevators];
@@ -150,6 +164,10 @@ public class SchedulerSeperateAlgorithm {
 			elevatorStatus[i]=HOLD;
 		}
 	}
+	/**
+	 * Initializes the arrays that will be present in scheduler subsystem. They are for Current location, Status of elevator, Next stop, Number of stops, and highest/lowest requests of floors.
+	 * Responds to the initialization requests that was sent by the elevator and floors subsystems by creating a packet.
+	 */
 	private static void schedulerInitilization() {
 		elevatorCurrentFloor = new int[numElevators];
 		elevatorStatus = new int[numElevators];
@@ -171,6 +189,9 @@ public class SchedulerSeperateAlgorithm {
 		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n");
 		
 	}
+	/**
+	 * checks the status of initialization requests from elevator. If both elevator have requested for initialization, then proceed with it. 
+	 */
 	private static void scheduleElevatorInitialize() {
 		if (packetType==INITIALIZE) {
 			elevatorInitialized=true;
@@ -182,6 +203,9 @@ public class SchedulerSeperateAlgorithm {
 			}
 		}
 	}
+	/**
+	 * checks the status of initialization requests from floor. If both floor have requested for initialization, then proceed with it. 
+	 */
 	private static void scheduleFloorInitialize() {
 		floorInitialized=true;
 		System.out.println("Received Floor Initialization\n");
@@ -193,6 +217,9 @@ public class SchedulerSeperateAlgorithm {
 		}
 	}
 	//SCHEDULING ALGORITHMS FOR ELEVATOR
+	/**
+	 * Scheduling Algorithm when the elevator Sends a request
+	 */
 	private static void scheduleElevatorRequest() {
 		// CHECK IF THE REQUEST IS A DUPLICATE, if so then ignore
 		if (elevatorStatus[packetElement] != HOLD) {// elevator is not in hold mode, currently moving
@@ -245,7 +272,9 @@ public class SchedulerSeperateAlgorithm {
 			elevatorFloorSendPacket(ELEVATOR_ID);// originally the only send in the method
 		}
 	}
-	
+	/**
+	 * Scheduling algorithm when the elevator sends an Update
+	 */
 	private static void scheduleElevatorUpdate() {
 		if (elevatorStatus[packetElement] == UP) {// direction that the elevator is going is up
 			if (elevatorStopsUp[packetElement].contains(packetCurrentFloor)) {// we have reached a
@@ -366,6 +395,9 @@ public class SchedulerSeperateAlgorithm {
 	}
 	
 	//SCHEDULING ALGORITHMS FOR FLOOR
+	/**
+	 * Scheduling algorithm when the floor sends a request. Floor does not send update packets as the floor does not move. 
+	 */
 	private static void scheduleFloorRequest() {
 		//responseTime = calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
 		calculateResponseTimes(packetElement, packetDirection);//response times of the elevators to reach the floor in the requested direction
@@ -447,6 +479,11 @@ public class SchedulerSeperateAlgorithm {
 	}
 	
 	//RESPONSE TIME METHODS (FOR SERVING FLOOR REQUESTS)
+	/**
+	 * calculates the response times for the four elevators in the system for the destination in the parameters going in the direction in the parameters. 
+	 * @param destination: Destination floor that the elevator would need to go to.
+	 * @param requestDirection: Direction that the floor which sent the request needs the elevator to head to
+	 */
 	public static void calculateResponseTimes(int destination, int requestDirection) {
 		System.out.println("calculateResponseTimes() method called");
 		//int[] responseTime = new int[numElevators];
@@ -527,10 +564,15 @@ public class SchedulerSeperateAlgorithm {
 			responseTime[i] = distance * TRAVEL_TIME_PER_FLOOR + stops * DOOR_DURATION;
 		}
 	}
-
+	/**
+	 * calculates how many stops are between the destination and current floor for use in responseTime calculation
+	 * @param floors: Linked list of the floors
+	 * @param current: current location 
+	 * @param destination: destination location
+	 * @param direction: what direction the elevator heads in
+	 * @return the number of stops in between that the elevator would take
+	 */
 	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {
-		// calculates how many stops are between the destination and current floor for
-		// use in responseTime calculation
 		System.out.println("stopsBetween() method called");
 		int stops = 0;
 		if (direction == UP) {
@@ -548,6 +590,9 @@ public class SchedulerSeperateAlgorithm {
 		}
 		return stops;
 	}
+	/**
+	 * finds which elevator has the fastest response time after the response time was calculated by calculateResponseTime()
+	 */
 	public static void fastestElevator() {
 		System.out.println("fastestElevator() method called");
 		int temp;
@@ -561,6 +606,10 @@ public class SchedulerSeperateAlgorithm {
 		System.out.println("The Fastest Elevator to respond is: "+indexOfFastestElevator+"\n");
 	}
 //SEND & RECEIVE METHODS
+	/**
+	 * 
+	 * @param sendTo: ELEVATOR_ID or FLOOR_ID which will determine if the packet goes to the elevator or floor
+	 */
 	public static void elevatorFloorSendPacket(int sendTo) {//SENDING ELEVATOR PACKET HERE
 		System.out.println("elevatorFloorSendPacket() called, sending to: "+sendTo);
 		if (sendTo==ELEVATOR_ID) {
@@ -593,7 +642,13 @@ public class SchedulerSeperateAlgorithm {
 			System.out.println("elevatorFloorSendPacket() Error; given argument is neither ELEVATOR_ID nor FLOOR_ID but: "+sendTo);
 		}
 	}
-	//public static byte[] createSendingData(int target, int currentFloor, int direction, int instruction) {
+	/**
+	 * 
+	 * @param target: Target location 
+	 * @param currentFloor
+	 * @param direction
+	 * @param instruction
+	 */
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 
 		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
