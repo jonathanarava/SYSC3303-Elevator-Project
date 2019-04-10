@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -715,9 +714,6 @@ public class Scheduler extends Thread {
 		direction.add(1, (int) HOLD);
 		direction.add(2, (int) HOLD);
 		direction.add(3, (int) HOLD);
-		
-
-
 
 		floor.start();
 
@@ -737,7 +733,6 @@ public class Scheduler extends Thread {
 			} else if(requestOrUpdate == 2) {
 				currentFloorTracker();
 			}
-			
 			packet.schedulingAlgo();
 		}
 	}
