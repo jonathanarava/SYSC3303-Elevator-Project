@@ -179,8 +179,6 @@ public class SimpleGUI extends Scheduler implements Runnable {
 		switch (elevatorStatus[elevator]) {
 		case STOP:
 			if(DirectionButtons[elevator].getBackground() != Color.red) {
-				DirectionButtons[elevator].setBackground(null);
-				DirectionButtons[elevator + 1].setBackground(null);
 				DirectionButtons[elevator].setBackground(Color.red);
 				DirectionButtons[elevator + 1].setBackground(Color.red);
 			}
@@ -188,21 +186,17 @@ public class SimpleGUI extends Scheduler implements Runnable {
 		case UP:
 			if(DirectionButtons[elevator].getBackground() != Color.green) {
 				DirectionButtons[elevator].setBackground(null);
-				DirectionButtons[elevator + 1].setBackground(null);
 				DirectionButtons[elevator + 1].setBackground(Color.green);
 			}
 			break;
 		case DOWN:
 			if(DirectionButtons[elevator].getBackground() != Color.green) {
-				DirectionButtons[elevator].setBackground(null);
 				DirectionButtons[elevator + 1].setBackground(null);
 				DirectionButtons[elevator].setBackground(Color.green);
 			}
 			break;
 		case HOLD:
 			if(DirectionButtons[elevator].getBackground() != Color.yellow) {
-				DirectionButtons[elevator].setBackground(null);
-				DirectionButtons[elevator + 1].setBackground(null);
 				DirectionButtons[elevator].setBackground(Color.yellow);
 				DirectionButtons[elevator + 1].setBackground(Color.yellow);
 			}
@@ -239,6 +233,11 @@ public class SimpleGUI extends Scheduler implements Runnable {
 					// UpdateGUIErrorMsg("ELevator 4");
 					break;
 				}
+			}
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
