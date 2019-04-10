@@ -269,9 +269,7 @@ public class ElevatorIntermediate {
 		elevatorHandler.sendPacket();
 	}
 	/**
-	 * 
-	 * @param args
-	 * @throws IOException
+	 * Main execution code of the Elevator Subsystem
 	 */
 	public static void main(String args[]) throws IOException {
 		// 2 arguments: args[0] is the number of Elevators in the system
