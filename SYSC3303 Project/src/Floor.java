@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/*
- * class Floor:has direction buttons and Floor display
+/**
+ * class Floor: Each floor thread acts as one of the 22 floors. Has direction buttons and Floor display
  */
 public class Floor extends Thread {
 	/*
@@ -27,37 +27,37 @@ public class Floor extends Thread {
 
 
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-		//States
-		private static final byte UP = 0x01;// elevator is going up
-		private static final byte DOWN = 0x02;// elevator is going down
-		private static final byte STOP = 0x03;
-		private static final byte HOLD = 0x04;// elevator is in hold state
-		private static final byte UPDATE_DISPLAY = 0x05;
-		private static final byte ERROR=(byte)0xE0;//an error has occured
-		//Errors
-		private static final byte DOOR_ERROR=(byte)0xE1;
-		private static final byte MOTOR_ERROR=(byte)0xE2;
-		//still error states between 0xE3 to 0xEE for use
-		private static final byte OTHER_ERROR=(byte)0xEF; 
-		private static final byte NO_ERROR=(byte)0x00;
-		//Object ID
-		private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
-		private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
-		private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-		//Values for Running
-		private static final int DOOR_OPEN = 1;// the door is open when == 1
-		private static final int DOOR_CLOSE = 3; // the door is closed when == 3 
-		private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
-		private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
-		private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
-		private static final int MAKE_STOP=3;//
-		private static final int PLACE_ON_HOLD=4;
-		private static final int UPDATE_DISPLAYS=5;
-		private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
-		private static final int FIX_ELEVATOR=7;//
-		private static final int INITIALIZE=8;//for first communication with the scheduler
-		private static final int UNUSED=0;// value for unused parts of data 
-		private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
+	//States
+	private static final byte UP = 0x01;// elevator is going up
+	private static final byte DOWN = 0x02;// elevator is going down
+	private static final byte STOP = 0x03;
+	private static final byte HOLD = 0x04;// elevator is in hold state
+	private static final byte UPDATE_DISPLAY = 0x05;
+	private static final byte ERROR=(byte)0xE0;//an error has occured
+	//Errors
+	private static final byte DOOR_ERROR=(byte)0xE1;
+	private static final byte MOTOR_ERROR=(byte)0xE2;
+	//still error states between 0xE3 to 0xEE for use
+	private static final byte OTHER_ERROR=(byte)0xEF; 
+	private static final byte NO_ERROR=(byte)0x00;
+	//Object ID
+	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
+	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
+	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
+	//Values for Running
+	private static final int DOOR_OPEN = 1;// the door is open when == 1
+	private static final int DOOR_CLOSE = 3; // the door is closed when == 3 
+	private static final int DOOR_DURATION = 4;// duration (in seconds) that doors stay open for
+	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
+	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
+	private static final int MAKE_STOP=3;//
+	private static final int PLACE_ON_HOLD=4;
+	private static final int UPDATE_DISPLAYS=5;
+	private static final int SHUT_DOWN=6;//for shutting down a hard fault problem elevator
+	private static final int FIX_ELEVATOR=7;//
+	private static final int INITIALIZE=8;//for first communication with the scheduler
+	private static final int UNUSED=0;// value for unused parts of data 
+	private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
 
 	List<String> fileRequests = new ArrayList<String>();
 	public boolean update; //an update has been set
