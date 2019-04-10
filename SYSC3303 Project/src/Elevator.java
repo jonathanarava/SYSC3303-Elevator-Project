@@ -72,7 +72,7 @@ public class Elevator extends Thread {
 
 	DatagramPacket elevatorSendPacket, elevatorReceivePacket;// Datagram packet for sending and receiving
 	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;// Datagram socket for sending and receiving
-
+	
 	private static byte[] sendData = new byte[8];
 
 	private List<byte[]> elevatorTable;
@@ -108,7 +108,7 @@ public class Elevator extends Thread {
 	/**
 	 * 
 	 * @param int floorSensor will be set as the current location of the elevator
-	 * @return returns that set location
+	 * @return returns sensor(current location of the elevator)
 	 */
 	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
@@ -443,25 +443,6 @@ public class Elevator extends Thread {
 	 */
 	public void runElevator() {//int direction) {
 		System.out.println("runElevator() method called");
-		//while (true) {
-			
-			// for
-			/*switch(elevatorState) {
-			case UP:
-				System.out.println("Elevator: "+elevatorNumber+" is going up...");
-				//isGoingUp = true;
-				sensor++; // increment the floor
-				setSensor(sensor); // updates the current floor
-				sendPacket(UPDATE,UNUSED, NO_ERROR);
-				//break;
-			case DOWN:
-				System.out.println("Elevator: "+elevatorNumber+" is going down...");
-				//isGoingUp = false;
-				sensor--; // decrements the floor
-				setSensor(sensor); // updates the current floor
-				sendPacket(UPDATE,UNUSED, NO_ERROR);
-				//break;
-			}*/
 		if(elevatorState==UP) {
 			sensor++;
 			
