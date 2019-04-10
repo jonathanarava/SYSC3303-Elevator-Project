@@ -14,8 +14,7 @@ import java.lang.Object;
 /**
  * Intermediate/Communication member of the elevator Subsystem.
  * Will send UDP packets created by elevators to the scheduler.
- * The instructions provided by the scheduler will go be provided to the elevators by this Class.
- * Has Arguments to pass on the number of elevators to be implemented in the system and what floors their initial request will go to. 
+ * The instructions provided by the scheduler will go be provided to the elevators by this Class. 
  * @author Group 5
  */
 public class ElevatorIntermediate {

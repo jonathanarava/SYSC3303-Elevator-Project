@@ -9,23 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * Intermediate/Communication member of the floor Subsystem.
+ * Will send UDP packets created by floors to the scheduler.
+ * The instructions provided by the scheduler will go be provided to the floors by this Class.
+ * @author Group 5
+ */
 public class FloorIntermediate {
 
-	/*
-	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
-	private static final byte HOLD = 0x00;// elevator is in hold state
-	private static final byte UP = 0x01;// elevator is going up
-	private static final byte DOWN = 0x02;// elevator is going down
-	private static final int ELEVATOR_ID = 21;// for identifying the packet's source as elevator
-	private static final int FLOOR_ID = 69;// for identifying the packet's source as floor
-	private static final int SCHEDULER_ID = 54;// for identifying the packet's source as scheduler
-	private static final int DOOR_OPEN = 1;// the door is open when ==1
-	private static final int DOOR_DURATION = 4;// duration that doors stay open for
-	private static final int REQUEST = 1;// for identifying the packet sent to scheduler as a request
-	private static final int UPDATE = 2;// for identifying the packet sent to scheduler as a status update
-	//*/
-	
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	//States
 	private static final byte UP = 0x01;// elevator is going up
@@ -59,32 +50,17 @@ public class FloorIntermediate {
 	private static final int UNUSED=0;// value for unused parts of data 
 	private static final int DOOR_CLOSE_BY=6;//door shouldn't be open for longer than 6 seconds
 
-	public static final int EL_RECEIVEPORTNUM = 369;
-	public static final int EL_SENDPORTNUM = 159;
-
-	/*//FROM ELEVATORINTERMEDIATE
-	private static final int SENDPORTNUM = 369;
-	private static final int RECEIVEPORTNUM = 159;
-	 */
-
-	private static final int SENDPORTNUM = 369;
+	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 1199;
-
-	public static final int FL_RECEIVEPORTNUM = 488;
-	public static final int FL_SENDPORTNUM = 1199;
 
 	private static DatagramPacket floorSendPacket, floorReceivePacket;
 	private static DatagramSocket floorReceiveSocket,floorSendSocket;
-
-	public static List<byte[]> floorTable = Collections.synchronizedList(new ArrayList<byte[]>());
+	
+	public static List<byte[]> floorTable = Collections.synchronizedList(new ArrayList<byte[]>());// Syncronized table that the Floor threads will put created packets in to be sent. 
 	private static Floor floorArray[];
 	private static Thread floorThreadArray[];
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
-//	private static int name;
-//	private static boolean hasRequest;
-//	private static int up_or_down;
-	//private boolean intialized=false;
 	private static int numFloors;
 	private static byte initializationData[];
 	private static byte receiveData[]=new byte[8];
@@ -92,8 +68,9 @@ public class FloorIntermediate {
 	 * send sockets should be allocated dynamically since the ports would be
 	 * variable to the elevator or floor we have chosen
 	 */
-	//public static final int SENDPORTNUM = 488;
-
+	/**
+	 * Constructor Of FloorIntermediate
+	 */
 	public FloorIntermediate() {
 		try {
 			floorSendSocket = new DatagramSocket();//FL_RECEIVEPORTNUM);
@@ -103,7 +80,9 @@ public class FloorIntermediate {
 		}
 	}
 
-
+	/**
+	 * Sends a packet of Information through the synchronized Table for the Floor threads
+	 */
 	public synchronized void sendPacket() {
 		// byte[] requestElevator = new byte[7];
 
@@ -158,8 +137,11 @@ public class FloorIntermediate {
 		}
 
 	}
-
-	public synchronized void receivePacket() {
+	
+	/**
+	 * method for Receiving Datagram Packets from the scheduler
+	 */
+	public void receivePacket() {
 		//byte data[] = new byte[8];
 		int elevatorElement;
 		int elevatorDirection;//which direction the elevator is going or holding (data[__])
@@ -218,7 +200,9 @@ public class FloorIntermediate {
 			System.out.println("Floor: "+ elevatorLocation+" error in receivePacket(), not an UPDATE but: "+schedulerInstruction);
 		}
 	}
-
+	/**
+	 * FloorIntermediate class is initialized with the scheduler using this method
+	 */
 	private static void floorInitialization() {
 		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
 		initializationOutputStream.write(FLOOR_ID); // Identifying as the scheduler
@@ -233,7 +217,9 @@ public class FloorIntermediate {
 		floorTable.add(initializationData);
 
 	}
-
+	/**
+	 * Main execution code of the Floor Subsystem
+	 */
 	public static void main(String args[]) {// throws IOException {
 
 		//FOR ITERATION 5, hard coding number of elevators, floors, requests, errors
