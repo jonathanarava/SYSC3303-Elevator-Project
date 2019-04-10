@@ -2,12 +2,14 @@
 //no main method
 //Output: floor request, 
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
-import java.io.*;
-import java.net.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;//for measuring time to respond
 /**
  * Each elevator thread acts as one of the 4 elevators. Takes requests from the user to go the floors.
  * There is display that shows movement of the elevators and opening and closing of doors. 

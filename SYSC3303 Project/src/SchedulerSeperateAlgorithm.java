@@ -3,17 +3,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.List;
-import java.lang.*;
-import java.util.concurrent.TimeUnit;//for measuring time to respond
 /**
  * Scheduler Class that is in charge of responding to the Elevator and Floor subsystems when elevator system information is sent.
  * This class responds to the Requests for an action by the elevators by a User by calling the scheduling algorithm that finds the most efficient manor to address that request.
@@ -645,9 +637,9 @@ public class SchedulerSeperateAlgorithm {
 	/**
 	 * 
 	 * @param target: Target location 
-	 * @param currentFloor
-	 * @param direction
-	 * @param instruction
+	 * @param currentFloor: Current location of the elevator
+	 * @param direction: The direction the elevator is heading in currently
+	 * @param instruction: The instruction from the Scheduler to the Elevator or the Floor
 	 */
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 
@@ -668,6 +660,9 @@ public class SchedulerSeperateAlgorithm {
 		sendingOutputStream.write(UNUSED); // error's only received by scheduler and not sent
 		sendData = sendingOutputStream.toByteArray();
 	}
+	/**
+	 * This method Receives Packets from the elevator and floor
+	 */
 	public static void elevatorFloorReceivePacket() {
 		//public static byte[] elevatorFloorReceivePacket() {
 	
@@ -753,38 +748,46 @@ public class SchedulerSeperateAlgorithm {
 		}
 	}
 	//DEALING WITH ERRORS
-		private static void errorResponse(){
-			if (packetError==DOOR_ERROR) {
-				//Transient Fault: handle gracefully
-				//fix the elevator: how that is done is handled in elevator
-				createSendingData(packetElement, UNUSED, UNUSED, FIX_ELEVATOR);
-				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-				
-			}
-			else if (packetError==MOTOR_ERROR) {
-				//Hard Fault
-				//"shut down the corresponding elevator": stop the elevator (instruction 3), then place it on hold (instruction 4)
-				//call for help?
-				//re-call the stop for that elevator: reopens and closes the problem door, will resume prior function automatically after
-				createSendingData(packetElement, UNUSED, UNUSED, SHUT_DOWN);// shuts down the problem elevator and notifies maintenance and emergency fire services for help
-				elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
-			}
-			else if (packetError==OTHER_ERROR) {
-				//tell the problem elevator to make a stop, possibly "fixing" anythiing that's wrong
-				createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);
-				elevatorFloorSendPacket(ELEVATOR_ID);
-			}
-			else if (packetError==NO_ERROR) {
-				System.out.println("Scheduler was notified of an error but NO_ERROR was shown for elevator: "+ packetType);
-				//still need to reply in order for everything to continue on
-				createSendingData(packetElement, UNUSED, UNUSED, UNUSED);
-				elevatorFloorSendPacket(ELEVATOR_ID);
-				//continue as normal
-			}
-			else{
-				System.out.println("Scheduler received an unknown error");
-			}
+	/**
+	 * Responds to the Error bytes that are sent by the Elevator class in case of a hard fault or a transient fault
+	 */
+	private static void errorResponse() {
+		if (packetError == DOOR_ERROR) {
+			// Transient Fault: handle gracefully
+			// fix the elevator: how that is done is handled in elevator
+			createSendingData(packetElement, UNUSED, UNUSED, FIX_ELEVATOR);
+			elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
+
+		} else if (packetError == MOTOR_ERROR) {
+			// Hard Fault
+			// "shut down the corresponding elevator": stop the elevator (instruction 3),
+			// then place it on hold (instruction 4)
+			// call for help?
+			// re-call the stop for that elevator: reopens and closes the problem door, will
+			// resume prior function automatically after
+			createSendingData(packetElement, UNUSED, UNUSED, SHUT_DOWN);// shuts down the problem elevator and notifies
+																		// maintenance and emergency fire services for
+																		// help
+			elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet with the sendData values prescribed above
+		} else if (packetError == OTHER_ERROR) {
+			// tell the problem elevator to make a stop, possibly "fixing" anythiing that's
+			// wrong
+			createSendingData(packetElement, UNUSED, UNUSED, MAKE_STOP);
+			elevatorFloorSendPacket(ELEVATOR_ID);
+		} else if (packetError == NO_ERROR) {
+			System.out.println("Scheduler was notified of an error but NO_ERROR was shown for elevator: " + packetType);
+			// still need to reply in order for everything to continue on
+			createSendingData(packetElement, UNUSED, UNUSED, UNUSED);
+			elevatorFloorSendPacket(ELEVATOR_ID);
+			// continue as normal
+		} else {
+			System.out.println("Scheduler received an unknown error");
 		}
+	}
+	/**
+	 * 
+	 * Main method for the Scheduling subsystem
+	 */
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
 		
