@@ -10,7 +10,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.lang.Object;
-
+/**
+ * Intermediate/Communication member of the elevator Subsystem.
+ * Will send UDP packets created by elevators to the scheduler.
+ * The instructions provided by the scheduler will go be provided to the elevators by this Class.
+ * Has Arguments to pass on the number of elevators to be implemented in the system and what floors their initial request will go to. 
+ * @author shaviyomarasinghe
+ *
+ */
 public class ElevatorIntermediate {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
@@ -35,12 +42,6 @@ public class ElevatorIntermediate {
 	private static final int UNUSED = 0;// value for unused parts of data
 
 	private static long respondStart, respondEnd;
-	/*
-	 * private static final byte[]
-	 * ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	 * private static final byte[]
-	 * FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	 */
 
 	/*
 	 * //FROM SCHEDULE public static final int EL_RECEIVEPORTNUM = 369; public
@@ -50,23 +51,21 @@ public class ElevatorIntermediate {
 	 * FL_SENDPORTNUM = 1199;
 	 */
 
-	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
-	private static final int RECEIVEPORTNUM = 159;
+	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler 
+	private static final int RECEIVEPORTNUM = 159;// port number for receiving from the scheduler
 
-	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
+	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;// DatagramPacket initialization for sending and receiving 
+	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;// DatagramSocket initialization for sending and receiving
 
-	private static boolean firstRunTime = true;
-	// for iteration 1 there will only be 1 elevator
-	// getting floor numbers from parameters set
+	// getting number of elevators in the system from parameters set
 	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
-	// arrays to keep track of the number of elevators, eliminates naming confusion
+	// arrays to keep track of the number of elevators, eliminates naming confusion. Same from the elevator threads
 	protected static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
 
 	private byte[] requestElevator = new byte[3];
-	private boolean intialized = false;
+	private static boolean intialized = false;
 	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
@@ -79,6 +78,9 @@ public class ElevatorIntermediate {
 	// and updates upon
 	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 
+	/**
+	 * 
+	 */
 	public ElevatorIntermediate() {
 		try {
 			elevatorSendSocket = new DatagramSocket();
@@ -267,10 +269,11 @@ public class ElevatorIntermediate {
 		initializationOutputStream.write(UNUSED); // not needed (destination request)
 		initializationOutputStream.write(UNUSED); // scheduler instruction
 		initializationOutputStream.write(UNUSED); // error's only received by scheduler and not sent
-
+		
 		initializationData = initializationOutputStream.toByteArray();
 		elevatorTable.add(initializationData);
-
+		intialized = true;
+		
 	}
 
 	public static void main(String args[]) throws IOException {
