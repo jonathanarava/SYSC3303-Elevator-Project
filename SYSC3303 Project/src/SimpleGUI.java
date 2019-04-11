@@ -185,7 +185,7 @@ public class SimpleGUI extends Scheduler{
 
 	public void UpdateGUIErrorMsg(String errorMsg) {
 		ErrorMsgTextArea.append(Integer.toString(currentFloor));
-		// textArea = new JTextArea(Integer.toString(currentFloor));
+		 //textArea = new JTextArea(Integer.toString(currentFloor));
 	}
 	
 	public void setFloor(int elevator, int direction) {
