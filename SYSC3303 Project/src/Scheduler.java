@@ -7,7 +7,15 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.LinkedList;
-
+/**
+ * Scheduler Class that is in charge of responding to the Elevator and Floor subsystems when elevator system information is sent.
+ * This class responds to the Requests for an action by the elevators by a User by calling the scheduling algorithm that finds the most efficient manor to address that request.
+ * This class also keeps track of the current locations of the elevators, and their states(UP, DOWN, HOLD, SHUT_DOWN) as the elevators would not know what they are "up to"
+ * User will not access the Scheduler Class directly, they will only feed requests in through the elevator and floor class. 
+ * Elevator and Floor class also do not have direct access to the Scheduler. They will only send UDP data packets of said requests to the scheduler, which will respond to them through commands. 
+ * @author Group 5
+ *
+ */
 public class Scheduler {
 
 	// Packets and sockets required to connect with the Elevator and Floor class
@@ -120,7 +128,9 @@ public class Scheduler {
 
 	public static SimpleGUI simpleGUI;
 	public static Thread SimpleGUIThread;
-
+	/**
+	 * Initializes the linkedLists that will store the up/down requests and up/down stops elevator. 
+	 */
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
 		elevatorStopsUp = new LinkedList[numElevators];
@@ -138,7 +148,9 @@ public class Scheduler {
 	public Scheduler(boolean a) {
 		// Constructor for Junit Testing
 	}
-
+	/**
+	 * Constructor of Scheduler
+	 */
 	public Scheduler() {
 		try {
 			schedulerSocketSendReceiveElevator = new DatagramSocket(EL_RECEIVEPORTNUM);
@@ -152,7 +164,11 @@ public class Scheduler {
 			System.exit(1);
 		}
 	}
-
+/**
+ * Called upon by the Scheduling algorithm in case of a Socket Timeout Exception. 
+ * During a Socket Timeout, this method will be called to resend the latest two packets to 
+ * elevator and floor subsystems
+ */
 	public static void resendPacket() {
 		System.out.println("Response to Elevator " + data[1] + ": " + Arrays.toString(sendData) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(sendData, sendData.length,
