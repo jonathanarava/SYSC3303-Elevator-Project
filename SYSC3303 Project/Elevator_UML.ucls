@@ -3,8 +3,8 @@
   realizations="true" associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
   <class id="1" language="java" name="ElevatorIntermediate" project="SYSC3303 Project" 
     file="/SYSC3303 Project/src/ElevatorIntermediate.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="837" width="229" x="481" y="-162"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="801" width="312" x="214" y="-216"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -12,8 +12,8 @@
   </class>  
   <class id="2" language="java" name="Elevator" project="SYSC3303 Project" file="/SYSC3303 Project/src/Elevator.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="1107" width="244" x="818" y="-292"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="1071" width="383" x="674" y="-345"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    

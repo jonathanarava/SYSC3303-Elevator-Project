@@ -3,17 +3,17 @@
   realizations="true" associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
   <class id="1" language="java" name="Scheduler" project="SYSC3303 Project" file="/SYSC3303 Project/src/Scheduler.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="1503" width="295" x="247" y="-590"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="1485" width="349" x="296" y="-453"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="GUI" project="SYSC3303 Project" file="/SYSC3303 Project/src/GUI.java" 
+  <class id="2" language="java" name="SimpleGUI" project="SYSC3303 Project" file="/SYSC3303 Project/src/SimpleGUI.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="826" y="181"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="405" width="280" x="755" y="97"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -25,7 +25,7 @@
   </generalization>  
   <association id="4">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="5" name="gui"/>      
+      <attribute id="5" name="simpleGUI"/>      
       <multiplicity id="6" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    

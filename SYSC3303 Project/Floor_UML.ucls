@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.2.3" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
-  <class id="1" language="java" name="Floor" project="SYSC3303 Project" file="/SYSC3303 Project/src/Floor.java" 
-    binary="false" corner="BOTTOM_RIGHT">    
-    <position height="927" width="244" x="330" y="-201"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+  <class id="1" language="java" name="FloorIntermediate" project="SYSC3303 Project" 
+    file="/SYSC3303 Project/src/FloorIntermediate.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="819" width="327" x="444" y="-157"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="FloorIntermediate" project="SYSC3303 Project" 
-    file="/SYSC3303 Project/src/FloorIntermediate.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="819" width="205" x="769" y="-184"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+  <class id="2" language="java" name="Floor" project="SYSC3303 Project" file="/SYSC3303 Project/src/Floor.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="927" width="343" x="927" y="-225"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
   <association id="3">    
-    <end type="SOURCE" refId="2" navigable="false">      
+    <end type="SOURCE" refId="1" navigable="false">      
       <attribute id="4" name="floorArray"/>      
       <multiplicity id="5" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
