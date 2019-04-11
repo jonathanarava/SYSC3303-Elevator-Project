@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-public class SimpleGUI extends Scheduler{
+public class SimpleGUI extends Scheduler {
 	int numElevators = 4;
 	int numFloors = 22;
 	public JButton DirectionButtons[] = new JButton[8];
@@ -185,20 +185,20 @@ public class SimpleGUI extends Scheduler{
 
 	public void UpdateGUIErrorMsg(String errorMsg) {
 		ErrorMsgTextArea.append(Integer.toString(currentFloor));
-		 //textArea = new JTextArea(Integer.toString(currentFloor));
+		// textArea = new JTextArea(Integer.toString(currentFloor));
 	}
-	
+
 	public void setFloor(int elevator, int direction) {
-		if(elevator == 3) {
+		if (elevator == 3) {
 			DirectionButtons[6].setBackground(Color.cyan);
 			DirectionButtons[7].setBackground(Color.cyan);
 		}
-		
+
 	}
 
 	public void UpdateElevatorGUIDirection(int elevator, int direction) {
-		
-		switch(elevator) {
+
+		switch (elevator) {
 		case 0:
 			break;
 		case 1:
@@ -213,25 +213,25 @@ public class SimpleGUI extends Scheduler{
 		}
 		switch (direction) {
 		case STOP:
-			if(DirectionButtons[elevator].getBackground() != Color.red) {
+			if (DirectionButtons[elevator].getBackground() != Color.red) {
 				DirectionButtons[elevator].setBackground(Color.red);
 				DirectionButtons[elevator + 1].setBackground(Color.red);
 			}
 			break;
 		case UP:
-			if(DirectionButtons[elevator].getBackground() != Color.green) {
+			if (DirectionButtons[elevator].getBackground() != Color.green) {
 				DirectionButtons[elevator].setBackground(null);
 				DirectionButtons[elevator + 1].setBackground(Color.green);
 			}
 			break;
 		case DOWN:
-			if(DirectionButtons[elevator].getBackground() != Color.green) {
+			if (DirectionButtons[elevator].getBackground() != Color.green) {
 				DirectionButtons[elevator + 1].setBackground(null);
 				DirectionButtons[elevator].setBackground(Color.green);
 			}
 			break;
 		case HOLD:
-			if(DirectionButtons[elevator].getBackground() != Color.yellow) {
+			if (DirectionButtons[elevator].getBackground() != Color.yellow) {
 				DirectionButtons[elevator].setBackground(Color.yellow);
 				DirectionButtons[elevator + 1].setBackground(Color.yellow);
 			}

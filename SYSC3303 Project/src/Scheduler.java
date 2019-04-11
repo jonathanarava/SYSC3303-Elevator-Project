@@ -7,12 +7,20 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.LinkedList;
+
 /**
- * Scheduler Class that is in charge of responding to the Elevator and Floor subsystems when elevator system information is sent.
- * This class responds to the Requests for an action by the elevators by a User by calling the scheduling algorithm that finds the most efficient manor to address that request.
- * This class also keeps track of the current locations of the elevators, and their states(UP, DOWN, HOLD, SHUT_DOWN) as the elevators would not know what they are "up to"
- * User will not access the Scheduler Class directly, they will only feed requests in through the elevator and floor class. 
- * Elevator and Floor class also do not have direct access to the Scheduler. They will only send UDP data packets of said requests to the scheduler, which will respond to them through commands. 
+ * Scheduler Class that is in charge of responding to the Elevator and Floor
+ * subsystems when elevator system information is sent. This class responds to
+ * the Requests for an action by the elevators by a User by calling the
+ * scheduling algorithm that finds the most efficient manor to address that
+ * request. This class also keeps track of the current locations of the
+ * elevators, and their states(UP, DOWN, HOLD, SHUT_DOWN) as the elevators would
+ * not know what they are "up to" User will not access the Scheduler Class
+ * directly, they will only feed requests in through the elevator and floor
+ * class. Elevator and Floor class also do not have direct access to the
+ * Scheduler. They will only send UDP data packets of said requests to the
+ * scheduler, which will respond to them through commands.
+ * 
  * @author Group 5
  *
  */
@@ -128,8 +136,10 @@ public class Scheduler {
 
 	public static SimpleGUI simpleGUI;
 	public static Thread SimpleGUIThread;
+
 	/**
-	 * Initializes the linkedLists that will store the up/down requests and up/down stops elevator. 
+	 * Initializes the linkedLists that will store the up/down requests and up/down
+	 * stops elevator.
 	 */
 	private static void linkedListInitialization() {
 		elevatorRequestsUp = new LinkedList[numElevators];
@@ -148,6 +158,7 @@ public class Scheduler {
 	public Scheduler(boolean a) {
 		// Constructor for Junit Testing
 	}
+
 	/**
 	 * Constructor of Scheduler
 	 */
@@ -164,11 +175,12 @@ public class Scheduler {
 			System.exit(1);
 		}
 	}
-/**
- * Called upon by the Scheduling algorithm in case of a Socket Timeout Exception. 
- * During a Socket Timeout, this method will be called to resend the latest two packets to 
- * elevator and floor subsystems
- */
+
+	/**
+	 * Called upon by the Scheduling algorithm in case of a Socket Timeout
+	 * Exception. During a Socket Timeout, this method will be called to resend the
+	 * latest two packets to elevator and floor subsystems
+	 */
 	public static void resendPacket() {
 		System.out.println("Response to Elevator " + data[1] + ": " + Arrays.toString(sendData) + "\n");
 		schedulerElevatorSendPacket = new DatagramPacket(sendData, sendData.length,
@@ -187,6 +199,7 @@ public class Scheduler {
 			e1.printStackTrace();
 		}
 	}
+
 	/**
 	 * This method Receives Packets from the elevator and floor
 	 */
@@ -253,9 +266,11 @@ public class Scheduler {
 		}
 
 	}
+
 //DEALING WITH ERRORS
 	/**
-	 * Responds to the Error bytes that are sent by the Elevator class in case of a hard fault or a transient fault
+	 * Responds to the Error bytes that are sent by the Elevator class in case of a
+	 * hard fault or a transient fault
 	 */
 	private static void errorResponse(DatagramPacket temporaryReceivePacket) {
 		if (errorType == DOOR_ERROR) {
@@ -274,9 +289,12 @@ public class Scheduler {
 			System.out.println("Scheduler received an unknown error");
 		}
 	}
+
 	/**
-	 * Initializes the arrays that will be present in scheduler subsystem. They are for Current location, Status of elevator, Next stop, Number of stops, and highest/lowest requests of floors.
-	 * Responds to the initialization requests that was sent by the elevator and floors subsystems by creating a packet.
+	 * Initializes the arrays that will be present in scheduler subsystem. They are
+	 * for Current location, Status of elevator, Next stop, Number of stops, and
+	 * highest/lowest requests of floors. Responds to the initialization requests
+	 * that was sent by the elevator and floors subsystems by creating a packet.
 	 */
 	private static void schedulerInitilization() {
 		elevatorCurrentFloor = new int[numElevators];
@@ -292,7 +310,7 @@ public class Scheduler {
 		}
 
 		/* guiThread.start(); */
-	//	SimpleGUIThread.start();
+		// SimpleGUIThread.start();
 
 		createSendingData(0, 0, 0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -304,9 +322,10 @@ public class Scheduler {
 	/**
 	 * 
 	 * @param packetData: The most recent packet that was received by the scheduler
-	 * This method takes the most recent received packet and uses the algorithm to
-	 * create an appropriate response and sends it to the packet creater and sender methods
-	 * GUI also gets it's updates through the SchedulingAlgorithm
+	 *        This method takes the most recent received packet and uses the
+	 *        algorithm to create an appropriate response and sends it to the packet
+	 *        creater and sender methods GUI also gets it's updates through the
+	 *        SchedulingAlgorithm
 	 */
 	private static void SchedulingAlgorithm(byte[] packetData) {// should be private and shouldn't needa return a global
 																// variable
@@ -430,7 +449,7 @@ public class Scheduler {
 																					// so make it go to hold state
 								createSendingData(packetElementIndex, elevatorLocation, 0, 4); // Put into hold state
 																								// and send a packet for
-								simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, HOLD);																// holding
+								simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, HOLD); // holding
 								elevatorFloorSendPacket(ELEVATOR_ID);
 								elevatorFloorSendPacket(FLOOR_ID);
 							}
@@ -714,10 +733,11 @@ public class Scheduler {
 
 	/**
 	 * 
-	 * @param target: Target location 
+	 * @param target: Target location
 	 * @param currentFloor: Current location of the elevator
 	 * @param direction: The direction the elevator is heading in currently
-	 * @param instruction: The instruction from the Scheduler to the Elevator or the Floor
+	 * @param instruction: The instruction from the Scheduler to the Elevator or the
+	 *        Floor
 	 */
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 
@@ -735,10 +755,14 @@ public class Scheduler {
 		sendData = sendingOutputStream.toByteArray();
 		// return sendData;
 	}
+
 	/**
-	 * calculates the response times for the four elevators in the system for the destination in the parameters going in the direction in the parameters. 
+	 * calculates the response times for the four elevators in the system for the
+	 * destination in the parameters going in the direction in the parameters.
+	 * 
 	 * @param destination: Destination floor that the elevator would need to go to.
-	 * @param requestDirection: Direction that the floor which sent the request needs the elevator to head to
+	 * @param requestDirection: Direction that the floor which sent the request
+	 *        needs the elevator to head to
 	 */
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {
 		// destination is the floor that is making the request
@@ -824,10 +848,13 @@ public class Scheduler {
 		}
 		return responseTime;
 	}
+
 	/**
-	 * calculates how many stops are between the destination and current floor for use in responseTime calculation
+	 * calculates how many stops are between the destination and current floor for
+	 * use in responseTime calculation
+	 * 
 	 * @param floors: Linked list of the floors
-	 * @param current: current location 
+	 * @param current: current location
 	 * @param destination: destination location
 	 * @param direction: what direction the elevator heads in
 	 * @return the number of stops in between that the elevator would take
@@ -851,9 +878,11 @@ public class Scheduler {
 		}
 		return stops;
 	}
+
 	/**
 	 * 
-	 * @param sendTo: ELEVATOR_ID or FLOOR_ID which will determine if the packet goes to the elevator or floor
+	 * @param sendTo: ELEVATOR_ID or FLOOR_ID which will determine if the packet
+	 *        goes to the elevator or floor
 	 */
 	public static void elevatorFloorSendPacket(int sendTo) {//// SENDING ELEVATOR PACKET HERE
 
