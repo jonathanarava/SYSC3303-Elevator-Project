@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * class Floor: Each floor thread acts as one of the 22 floors. Has direction buttons and Floor display
- * takes Arguments for how many floors you would like in Floor Subsystem(max 22)
+ * class Floor: Each floor thread acts as one of the 22 floors. Has direction
+ * buttons and Floor display takes Arguments for how many floors you would like
+ * in Floor Subsystem(max 22)
  */
 public class Floor extends Thread {
 
@@ -77,11 +78,11 @@ public class Floor extends Thread {
 
 	private boolean hasRequest = false;
 	private static byte error = NO_ERROR;// current Error, will be sent on the next send
-	
-/**
- * Constructor so Floors can be initialized in a way that can be runnable in the
- * scheduler
- */
+
+	/**
+	 * Constructor so Floors can be initialized in a way that can be runnable in the
+	 * scheduler
+	 */
 	public Floor(int getName, List<byte[]> floorTable) {// int numOfFloors) {
 		// NAMING = name;// mandatory for having it actually declared as a thread object
 		// use a numbering scheme for the naming
@@ -89,12 +90,14 @@ public class Floor extends Thread {
 		name = getName;
 		this.floorTable = floorTable;
 	}
-/**
- * 
- * @param requestUpdateError: Weather this is an Error, or a request to be sent to the scheduler
- * @param sendErrorType: if error, what type of error
- * Sends a packet to the scheduler from the Synchronized table that the floor threads use
- */
+
+	/**
+	 * 
+	 * @param requestUpdateError: Weather this is an Error, or a request to be sent
+	 *        to the scheduler
+	 * @param sendErrorType: if error, what type of error Sends a packet to the
+	 *        scheduler from the Synchronized table that the floor threads use
+	 */
 	public synchronized void sendPacket(int requestUpdateError, byte sendErrorType) {
 		synchronized (floorTable) {
 			while (floorTable.size() != 0) {// there is another packet waiting to be sent, wait for an opening to send
@@ -110,12 +113,15 @@ public class Floor extends Thread {
 			floorTable.notifyAll();
 		}
 	}
-/**
- * 
- * @param requestUpdateError: Weather this is an Error, or a request to be sent to the scheduler
- * @param errorType: if error, what type of error
- * @return returns a byte array of the responsePacket that sendPacket() method will use
- */
+
+	/**
+	 * 
+	 * @param requestUpdateError: Weather this is an Error, or a request to be sent
+	 *        to the scheduler
+	 * @param errorType: if error, what type of error
+	 * @return returns a byte array of the responsePacket that sendPacket() method
+	 *         will use
+	 */
 	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
 		// the response packet to be
 		// sent to the scheduler
@@ -160,21 +166,22 @@ public class Floor extends Thread {
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
 	}
-/**
- * 
- * @param upOrDown: Sets a realTime request on the specified floor Up or Down 
- */
+
+	/**
+	 * 
+	 * @param upOrDown: Sets a realTime request on the specified floor Up or Down
+	 */
 	public void setRealTimeRequest(int upOrDown) {
 		hasRequest = true;
 		realTimeDirectionRequest = upOrDown;
 	}
 
-/**
- * 
- * @param whichElevator: Which elevator is arriving
- * @param onFloor: On which floor is this message to be updated 
- * @param schedularInstruction: What instruction was given to the elevator
- */
+	/**
+	 * 
+	 * @param whichElevator: Which elevator is arriving
+	 * @param onFloor: On which floor is this message to be updated
+	 * @param schedularInstruction: What instruction was given to the elevator
+	 */
 	public void updateDisplay(int whichElevator, int onFloor, int schedularInstruction) {
 		System.out.println("Floor " + name + ": Elevator " + whichElevator + " is Currently on Floor  " + onFloor);
 		if (schedularInstruction == UP || schedularInstruction == DOWN) {
@@ -201,9 +208,11 @@ public class Floor extends Thread {
 			System.out.println("floor given is: " + onFloor);
 		}
 	}
-/**
- * Thread will wait indefinitely for a real time request from the floorIntermediate
- */
+
+	/**
+	 * Thread will wait indefinitely for a real time request from the
+	 * floorIntermediate
+	 */
 	public synchronized void waitForRequest() {
 		while (!hasRequest) {
 			try {
@@ -215,13 +224,11 @@ public class Floor extends Thread {
 		}
 	}
 
-
-
-/**
- * 
- * @param fullFile: Takes in .txt file which contains the realTime information that the system can
- * use to feed in Requests
- */
+	/**
+	 * 
+	 * @param fullFile: Takes in .txt file which contains the realTime information
+	 *        that the system can use to feed in Requests
+	 */
 	public void fileReader(String fullFile) {
 		String text = "";
 		int i = 0;
@@ -244,9 +251,10 @@ public class Floor extends Thread {
 			e.printStackTrace();
 		}
 	}
-/**
- * Run method for the thread
- */
+
+	/**
+	 * Run method for the thread
+	 */
 	public void run() {
 		while (hasRequest) {
 			// while(true) to activate all elevator threads in this system

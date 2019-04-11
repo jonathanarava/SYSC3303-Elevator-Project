@@ -63,7 +63,6 @@ public class FloorIntermediate {
 
 	static List<String> fileRequests = new ArrayList<String>();
 
-	
 	public FloorIntermediate() {
 		try {
 			floorSendSocket = new DatagramSocket();// FL_RECEIVEPORTNUM);
@@ -87,7 +86,7 @@ public class FloorIntermediate {
 				try {
 					System.out.println("Sending to scheduler: " + Arrays.toString(floorTable.get(0)));
 					floorSendPacket = new DatagramPacket(floorTable.get(0), floorTable.get(0).length,
-							/*InetAddress.getLocalHost()*/ InetAddress.getByName("134.117.59.128") , SENDPORTNUM);
+							/* InetAddress.getLocalHost() */ InetAddress.getByName("134.117.59.128"), SENDPORTNUM);
 
 				} catch (UnknownHostException e) {
 					e.printStackTrace();

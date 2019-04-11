@@ -2,16 +2,19 @@
 //no main method
 //Output: floor request, 
 //Input: Motor control (up, down, stop), door (open, close), Floor number (for display), direction (display)
-import java.io.*;
-import java.net.*;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.List;
-import java.util.Scanner;
+
 /**
- * Each elevator thread acts as one of the 4 elevators. Takes requests from the user to go the floors.
- * There is display that shows movement of the elevators and opening and closing of doors.
- * Takes Arguments at Initialization; How many elevators on the system(max 4), and where those 
- *    what floors those elevators will have requests to. (if request is 0, that elevator will imediately go into holding state) 
+ * Each elevator thread acts as one of the 4 elevators. Takes requests from the
+ * user to go the floors. There is display that shows movement of the elevators
+ * and opening and closing of doors. Takes Arguments at Initialization; How many
+ * elevators on the system(max 4), and where those what floors those elevators
+ * will have requests to. (if request is 0, that elevator will imediately go
+ * into holding state)
+ * 
  * @author Group 5
  *
  */
@@ -132,7 +135,8 @@ public class Elevator extends Thread {
 
 	/**
 	 * 
-	 * @param doorOpenCloseError: Instruction to Open or Close the door of the elevator 
+	 * @param doorOpenCloseError: Instruction to Open or Close the door of the
+	 *        elevator
 	 */
 	public void openCloseDoor(int doorOpenCloseError) {
 		// String msg;
@@ -181,8 +185,10 @@ public class Elevator extends Thread {
 		}
 		// return msg;
 	}
+
 	/**
-	 * Puts the elevator into out of order mode during a hard fault. "Emergency services" are automatically contacted
+	 * Puts the elevator into out of order mode during a hard fault. "Emergency
+	 * services" are automatically contacted
 	 */
 	public void shutDown() {
 		motionOfMotor = STOP;
@@ -196,13 +202,16 @@ public class Elevator extends Thread {
 		}
 
 	}
+
 	/**
-	 * fixes the broekn elevator, lets know in the console that the elevator has been marked "fixed"
+	 * fixes the broekn elevator, lets know in the console that the elevator has
+	 * been marked "fixed"
 	 */
 	public void fixElevator() {
 		elevatorBroken = false;
 		System.out.println("Elevator has been fixed");
 	}
+
 	/**
 	 * 
 	 * @param int floorSensor will be set as the current location of the elevator
@@ -212,8 +221,10 @@ public class Elevator extends Thread {
 		sensor = floorSensor;
 		return sensor;
 	}
+
 	/**
-	 * Updates the display(Console) of the elevator depending on the current state of the elevator
+	 * Updates the display(Console) of the elevator depending on the current state
+	 * of the elevator
 	 */
 	public void updateDisplay() {
 		System.out.println("On Floor: " + sensor);
@@ -223,8 +234,9 @@ public class Elevator extends Thread {
 			System.out.println("Going Down");
 		}
 	}
+
 	/**
-	 * Turns the elevator Motor up or down floors when instructed by the scheduler. 
+	 * Turns the elevator Motor up or down floors when instructed by the scheduler.
 	 */
 	public void runElevator() {
 		// for testing
@@ -265,8 +277,10 @@ public class Elevator extends Thread {
 			elevatorTable.notifyAll();
 		}
 	}
+
 	/**
-	 * Run method for the Elevator thread that will take care of the elevator states, instructions, and real time requests when the system is in use
+	 * Run method for the Elevator thread that will take care of the elevator
+	 * states, instructions, and real time requests when the system is in use
 	 */
 	public void run() {
 		while (true) {
