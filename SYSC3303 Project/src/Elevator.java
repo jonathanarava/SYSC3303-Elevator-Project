@@ -78,8 +78,8 @@ public class Elevator extends Thread {
 	public boolean isGoingUp;
 	private boolean elevatorBroken = false; // whether the elevator is broken or not
 
-	private int elevatorNumber;
-	private int RealTimefloorRequest;
+	protected int elevatorNumber;
+	protected int RealTimefloorRequest;
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
@@ -90,6 +90,14 @@ public class Elevator extends Thread {
 	private boolean doorStatusOpen = false; // whether the doors are open(true) or closed (false)
 	private long doorOpenTime, doorCloseTime;// for error checking that doors are closed within time
 
+	/**
+	 * Constructor Of Elevator for JUnit testing
+	 */
+	public Elevator() {}
+	
+	/**
+	 * Constructor Of Elevator
+	 */
 	public Elevator(int name, int initiateFloor, List<byte[]> elevatorTable, int RealTimefloorRequest) {
 		this.elevatorNumber = name; // mandatory for having it actually declared as a thread object
 		this.elevatorTable = elevatorTable;
@@ -107,8 +115,8 @@ public class Elevator extends Thread {
 																					// sent to the scheduler
 
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
-		requestElevator.write(ELEVATOR_ID); // identification as an elevator, instead of floor, or scheduler
-		requestElevator.write(elevatorNumber); // identity of this particular elevator object
+		requestElevator.write(ELEVATOR_ID); // identification as an elevator, instead of floor, or scheduler //BYTE 0
+		requestElevator.write(elevatorNumber); // identity of this particular elevator object				//BYTE 1
 
 		// request or update data
 		switch (requestUpdateError) {
@@ -117,19 +125,20 @@ public class Elevator extends Thread {
 		case UPDATE:
 			break;
 		case ERROR:
+			requestElevator.write(requestUpdateError);	
 			requestElevator.write((byte) setSensor(sensor)); // current floor
 			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
 			requestElevator.write(RealTimefloorRequest); // dest floor
-			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
+			requestElevator.write(UNUSED); // no errors	
 			requestElevator.write(errorType); // error ID
 			return requestElevator.toByteArray();
 		}
-		requestElevator.write(requestUpdateError);
-		requestElevator.write((byte) setSensor(sensor)); // current floor
-		requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-		requestElevator.write(RealTimefloorRequest); // dest floor
-		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-		requestElevator.write(UNUSED); // no errors
+		requestElevator.write(requestUpdateError);									//BYTE 2
+		requestElevator.write((byte) setSensor(sensor)); // current floor			//BYTE 3
+		requestElevator.write(UNUSED); // up or down (not used, only for Floors)	//BYTE 4
+		requestElevator.write(RealTimefloorRequest); // dest floor					//BYTE 5
+		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler) //BYTE 6
+		requestElevator.write(UNUSED); // no errors									//BYTE 7
 		return requestElevator.toByteArray();
 	}
 
@@ -217,7 +226,7 @@ public class Elevator extends Thread {
 	 * @param int floorSensor will be set as the current location of the elevator
 	 * @return returns sensor(current location of the elevator)
 	 */
-	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
+	protected int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
 		return sensor;
 	}
