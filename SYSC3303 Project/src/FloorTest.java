@@ -1,42 +1,17 @@
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.Assert.assertArrayEquals;
 import org.junit.jupiter.api.Test;
 
 class FloorTest {
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-	}
-
 	@Test
-	void test() {
-		fail("Not yet implemented.");
-	}
+	public void testCreateResponsePacket() throws Exception {
+		Floor floor = new Floor();
+		floor.name = 0;
+		floor.realTimeDirectionRequest = 1;
+		byte[] testarrayRequest = new byte[] { 69, 0, 1, 0, 1, 0, 0, 0 };
 
-	@Test
-	public void testRun() throws Exception {
-		throw new RuntimeException("not yet implemented");
-	}
+		assertArrayEquals(testarrayRequest, floor.createResponsePacketData(1, (byte) 0));
 
-	@Test
-	public void testResponsePacket() throws Exception {
-		throw new RuntimeException("not yet implemented");
 	}
 
 }

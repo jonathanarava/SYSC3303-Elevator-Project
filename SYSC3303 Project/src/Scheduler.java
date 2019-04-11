@@ -327,7 +327,7 @@ public class Scheduler {
 	 *        creater and sender methods GUI also gets it's updates through the
 	 *        SchedulingAlgorithm
 	 */
-	private static void SchedulingAlgorithm(byte[] packetData) {// should be private and shouldn't needa return a global
+	protected static void SchedulingAlgorithm(byte[] packetData) {// should be private and shouldn't needa return a global
 																// variable
 
 		// byte[] packetData = schedulerElevatorReceivePacket.getData();

@@ -46,7 +46,7 @@ public class Floor extends Thread {
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
-	private int realTimeDirectionRequest;
+	protected int realTimeDirectionRequest;
 	private int goingDirection;
 	// Variables for displaying what is happening with the elevators
 
@@ -67,7 +67,7 @@ public class Floor extends Thread {
 	private int sendPort_num;
 	private int elevatorLocation;
 	// private static int NAMING;
-	private int name;
+	protected int name;
 	DatagramPacket floorSendPacket, floorReceivePacket;
 	DatagramSocket floorSendReceiveSocket;
 
@@ -79,6 +79,7 @@ public class Floor extends Thread {
 	private boolean hasRequest = false;
 	private static byte error = NO_ERROR;// current Error, will be sent on the next send
 
+	public Floor() {}
 	/**
 	 * Constructor so Floors can be initialized in a way that can be runnable in the
 	 * scheduler
