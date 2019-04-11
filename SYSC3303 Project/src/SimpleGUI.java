@@ -3,9 +3,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-public class SimpleGUI extends Scheduler implements Runnable {
+public class SimpleGUI extends Scheduler{
 	int numElevators = 4;
 	int numFloors = 22;
 	public JButton DirectionButtons[] = new JButton[8];
@@ -166,17 +164,54 @@ public class SimpleGUI extends Scheduler implements Runnable {
 		frame.setVisible(true);
 	}
 
-	public void UpdateGUICurrentFloor(JTextArea textArea, int currentFloor) {
-		textArea.setText(Integer.toString(currentFloor));
+	public void UpdateGUICurrentFloor(int elevator, int currentFloor) {
+		switch (elevator) {
+		case 0:
+			// System.out.println(" Elevator 1 " + elevatorCurrentFloor[i]);
+			textArea1.setText(Integer.toString(currentFloor));
+			// UpdateGUIErrorMsg("ELevator 1");
+			break;
+		case 1:
+			textArea2.setText(Integer.toString(currentFloor));
+			break;
+		case 2:
+			textArea3.setText(Integer.toString(currentFloor));
+			break;
+		case 3:
+			textArea4.setText(Integer.toString(currentFloor));
+			break;
+		}
 	}
 
 	public void UpdateGUIErrorMsg(String errorMsg) {
 		ErrorMsgTextArea.append(Integer.toString(currentFloor));
 		// textArea = new JTextArea(Integer.toString(currentFloor));
 	}
+	
+	public void setFloor(int elevator, int direction) {
+		if(elevator == 3) {
+			DirectionButtons[6].setBackground(Color.cyan);
+			DirectionButtons[7].setBackground(Color.cyan);
+		}
+		
+	}
 
-	public void UpdateElevatorGUIDirection(int elevator) {
-		switch (elevatorStatus[elevator]) {
+	public void UpdateElevatorGUIDirection(int elevator, int direction) {
+		
+		switch(elevator) {
+		case 0:
+			break;
+		case 1:
+			elevator = 2;
+			break;
+		case 2:
+			elevator = 4;
+			break;
+		case 3:
+			elevator = 6;
+			break;
+		}
+		switch (direction) {
 		case STOP:
 			if(DirectionButtons[elevator].getBackground() != Color.red) {
 				DirectionButtons[elevator].setBackground(Color.red);
@@ -204,43 +239,43 @@ public class SimpleGUI extends Scheduler implements Runnable {
 		}
 	}
 
-	public void run() {
-		while (true) {
-			for (int i = 0; i < numElevators; i++) {
-				switch (i) {
-				case 0:
-					// System.out.println(" Elevator 1 " + elevatorCurrentFloor[i]);
-					UpdateElevatorGUIDirection(i);
-					UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
-					// UpdateGUIErrorMsg("ELevator 1");
-					break;
-				case 1:
-					UpdateElevatorGUIDirection(i);
-					// System.out.println(" Elevator 2 " + elevatorCurrentFloor[i]);
-					UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
-					// UpdateGUIErrorMsg("ELevator 2");
-					break;
-				case 2:
-					UpdateElevatorGUIDirection(i);
-					// System.out.println(" Elevator 3 " + elevatorCurrentFloor[i]);
-					UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
-					// UpdateGUIErrorMsg("ELevator 3");
-					break;
-				case 3:
-					UpdateElevatorGUIDirection(i);
-					// System.out.println(" Elevator 4 " + elevatorCurrentFloor[i]);
-					UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
-					// UpdateGUIErrorMsg("ELevator 4");
-					break;
-				}
-			}
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	public void run() {
+//		while (true) {
+//			for (int i = 0; i < numElevators; i++) {
+//				switch (i) {
+//				case 0:
+//					// System.out.println(" Elevator 1 " + elevatorCurrentFloor[i]);
+//					UpdateElevatorGUIDirection(i);
+//					UpdateGUICurrentFloor(textArea1, elevatorCurrentFloor[i]);
+//					// UpdateGUIErrorMsg("ELevator 1");
+//					break;
+//				case 1:
+//					UpdateElevatorGUIDirection(i);
+//					// System.out.println(" Elevator 2 " + elevatorCurrentFloor[i]);
+//					UpdateGUICurrentFloor(textArea2, elevatorCurrentFloor[i]);
+//					// UpdateGUIErrorMsg("ELevator 2");
+//					break;
+//				case 2:
+//					UpdateElevatorGUIDirection(i);
+//					// System.out.println(" Elevator 3 " + elevatorCurrentFloor[i]);
+//					UpdateGUICurrentFloor(textArea3, elevatorCurrentFloor[i]);
+//					// UpdateGUIErrorMsg("ELevator 3");
+//					break;
+//				case 3:
+//					UpdateElevatorGUIDirection(i);
+//					// System.out.println(" Elevator 4 " + elevatorCurrentFloor[i]);
+//					UpdateGUICurrentFloor(textArea4, elevatorCurrentFloor[i]);
+//					// UpdateGUIErrorMsg("ELevator 4");
+//					break;
+//				}
+//			}
+//			try {
+//				Thread.sleep(1);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	/*
 	 * public static void main(String args[]) { SimpleGUI gui = new SimpleGUI(); }

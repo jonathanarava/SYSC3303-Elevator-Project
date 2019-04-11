@@ -275,7 +275,7 @@ public class Scheduler {
 		}
 
 		/* guiThread.start(); */
-		SimpleGUIThread.start();
+	//	SimpleGUIThread.start();
 
 		createSendingData(0, 0, 0, INITIALIZE);
 		elevatorFloorSendPacket(ELEVATOR_ID);
@@ -357,6 +357,7 @@ public class Scheduler {
 					// compare floor number with next stop of the elevator (==nextStop variable)
 					// if (floorStatus==nextStop[packetElementIndex])
 					elevatorCurrentFloor[packetElementIndex] = elevatorLocation;
+					simpleGUI.UpdateGUICurrentFloor(packetElementIndex, elevatorLocation);
 					if (elevatorStatus[packetElementIndex] == UP) {// direction that the elevator is going is up
 						if (elevatorStopsUp[packetElementIndex].contains(elevatorLocation)) {// we have reached a
 							// destination stop and
@@ -368,6 +369,7 @@ public class Scheduler {
 							// remove the stop from goingup linked list
 							// check if there are more stops
 							createSendingData(packetElementIndex, elevatorLocation, 0, 3);// 3: make a stop
+							simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, STOP);
 							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will
 																	// be
 							elevatorFloorSendPacket(FLOOR_ID);
@@ -394,6 +396,7 @@ public class Scheduler {
 								} else {// we have stops to go up, start fulfilling those
 									// create and send SendPacket for the motor to go Up
 									createSendingData(packetElementIndex, 0, 0, 1);// 1: up
+									simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, UP);
 									elevatorFloorSendPacket(ELEVATOR_ID);
 								}
 							}
@@ -404,7 +407,7 @@ public class Scheduler {
 																					// so make it go to hold state
 								createSendingData(packetElementIndex, elevatorLocation, 0, 4); // Put into hold state
 																								// and send a packet for
-																								// holding
+								simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, HOLD);																// holding
 								elevatorFloorSendPacket(ELEVATOR_ID);
 								elevatorFloorSendPacket(FLOOR_ID);
 							}
@@ -429,6 +432,7 @@ public class Scheduler {
 							// remove the stop from goingup linked list
 							// check if there are more stops
 							createSendingData(packetElementIndex, elevatorLocation, 0, 3);// 3: make a stop
+							simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, STOP);
 							elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise will
 																	// be
 							// overwritten before being sent at the very end
@@ -446,6 +450,7 @@ public class Scheduler {
 								if (elevatorStopsUp[packetElementIndex].isEmpty()) {// no more stops
 									// create and send sendPacket to hold the motor
 									createSendingData(packetElementIndex, 0, 0, 4);// 4: hold
+									simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, HOLD);
 									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately,
 																			// otherwise will be
 									// overwritten before being sent at the very end
@@ -453,6 +458,7 @@ public class Scheduler {
 								} else {// we have stops to go up, start fulfilling those
 									// create and send SendPacket for the motor to go Down
 									createSendingData(packetElementIndex, 0, 0, 2);// 2: down
+									simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, DOWN);
 									elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately,
 																			// otherwise will be
 									// overwritten before being sent at the very end
@@ -464,6 +470,7 @@ public class Scheduler {
 								// IMPORTANT:
 								// this packet sending may not be necessary and could be what's causing the
 								// double sending at the very beginning
+								simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, DOWN);
 								elevatorFloorSendPacket(ELEVATOR_ID);// send the created packet immediately, otherwise
 																		// will be
 								// overwritten before being sent at the very end
@@ -543,11 +550,13 @@ public class Scheduler {
 							elevatorStopsUp[packetElementIndex].add(stopRequest);
 							elevatorStatus[packetElementIndex] = UP;
 							// create and send sendPacket to start the motor
+							simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, UP);
 							createSendingData(packetElementIndex, elevatorLocation, 0, 1);// 1: up
 						} else if (elevatorLocation > stopRequest) {// we are above the destination floor, we need to go
 							// down
 							elevatorStopsDown[packetElementIndex].add(stopRequest);
 							elevatorStatus[packetElementIndex] = DOWN;
+							simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, DOWN);
 							// create and send sendPacket to start the motor
 							createSendingData(packetElementIndex, elevatorLocation, 0, 2);// 2: down
 						}
@@ -567,6 +576,7 @@ public class Scheduler {
 							// elevatorSendPacket(sendData);//send the created packet immediately, otherwise
 							// will be overwritten before being sent at the very end
 							elevatorStatus[packetElementIndex] = HOLD;// place back into hold state
+							simpleGUI.UpdateElevatorGUIDirection(packetElementIndex, HOLD);
 							createSendingData(packetElementIndex, elevatorLocation, 0, 4);// doesn't need an immediate
 																							// send
 							// since there is nothing below to
@@ -867,7 +877,7 @@ public class Scheduler {
 		 */
 
 		simpleGUI = new SimpleGUI();
-		SimpleGUIThread = new Thread(simpleGUI);
+		//SimpleGUIThread = new Thread(simpleGUI);
 
 		// Scheduler schedulerHandler = new Scheduler();
 
