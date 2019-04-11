@@ -187,7 +187,9 @@ public class Scheduler {
 			e1.printStackTrace();
 		}
 	}
-
+	/**
+	 * This method Receives Packets from the elevator and floor
+	 */
 	public static void elevatorFloorReceivePacket() {
 		// public static byte[] elevatorFloorReceivePacket() {
 
@@ -251,7 +253,10 @@ public class Scheduler {
 		}
 
 	}
-
+//DEALING WITH ERRORS
+	/**
+	 * Responds to the Error bytes that are sent by the Elevator class in case of a hard fault or a transient fault
+	 */
 	private static void errorResponse(DatagramPacket temporaryReceivePacket) {
 		if (errorType == DOOR_ERROR) {
 			System.out.println("Door Error Update from floor: " + Arrays.toString(data));
@@ -269,7 +274,10 @@ public class Scheduler {
 			System.out.println("Scheduler received an unknown error");
 		}
 	}
-
+	/**
+	 * Initializes the arrays that will be present in scheduler subsystem. They are for Current location, Status of elevator, Next stop, Number of stops, and highest/lowest requests of floors.
+	 * Responds to the initialization requests that was sent by the elevator and floors subsystems by creating a packet.
+	 */
 	private static void schedulerInitilization() {
 		elevatorCurrentFloor = new int[numElevators];
 		elevatorStatus = new int[numElevators];
@@ -293,7 +301,13 @@ public class Scheduler {
 		System.out.println("Scheduler is INITIALIZED and may proceed with operations\n\n\n\n");
 	}
 
-	// public byte[] SchedulingAlgorithm(byte[] packetData) {
+	/**
+	 * 
+	 * @param packetData: The most recent packet that was received by the scheduler
+	 * This method takes the most recent received packet and uses the algorithm to
+	 * create an appropriate response and sends it to the packet creater and sender methods
+	 * GUI also gets it's updates through the SchedulingAlgorithm
+	 */
 	private static void SchedulingAlgorithm(byte[] packetData) {// should be private and shouldn't needa return a global
 																// variable
 
@@ -698,8 +712,13 @@ public class Scheduler {
 		// return sendData;
 	}
 
-	// public static byte[] createSendingData(int target, int currentFloor, int
-	// direction, int instruction) {
+	/**
+	 * 
+	 * @param target: Target location 
+	 * @param currentFloor: Current location of the elevator
+	 * @param direction: The direction the elevator is heading in currently
+	 * @param instruction: The instruction from the Scheduler to the Elevator or the Floor
+	 */
 	public static void createSendingData(int target, int currentFloor, int direction, int instruction) {
 
 		ByteArrayOutputStream sendingOutputStream = new ByteArrayOutputStream();
@@ -716,7 +735,11 @@ public class Scheduler {
 		sendData = sendingOutputStream.toByteArray();
 		// return sendData;
 	}
-
+	/**
+	 * calculates the response times for the four elevators in the system for the destination in the parameters going in the direction in the parameters. 
+	 * @param destination: Destination floor that the elevator would need to go to.
+	 * @param requestDirection: Direction that the floor which sent the request needs the elevator to head to
+	 */
 	public static int[] calculateResponseTimes(int destination, int requestDirection) {
 		// destination is the floor that is making the request
 		// elevatorLowestRequestFloor
@@ -801,7 +824,14 @@ public class Scheduler {
 		}
 		return responseTime;
 	}
-
+	/**
+	 * calculates how many stops are between the destination and current floor for use in responseTime calculation
+	 * @param floors: Linked list of the floors
+	 * @param current: current location 
+	 * @param destination: destination location
+	 * @param direction: what direction the elevator heads in
+	 * @return the number of stops in between that the elevator would take
+	 */
 	public static int stopsBetween(LinkedList<Integer> floors, int current, int destination, int direction) {
 		// calculates how many stops are between the destination and current floor for
 		// use in responseTime calculation
@@ -821,7 +851,10 @@ public class Scheduler {
 		}
 		return stops;
 	}
-
+	/**
+	 * 
+	 * @param sendTo: ELEVATOR_ID or FLOOR_ID which will determine if the packet goes to the elevator or floor
+	 */
 	public static void elevatorFloorSendPacket(int sendTo) {//// SENDING ELEVATOR PACKET HERE
 
 		// byte[] responseByteArray = new byte[7];
@@ -850,70 +883,15 @@ public class Scheduler {
 		}
 
 	}
-	/*
-	 * public static void elevatorSendPacket(byte[] sendData) {//SENDING ELEVATOR
-	 * PACKET HERE
-	 * 
-	 * byte[] responseByteArray = new byte[7]; responseByteArray = sendData;
-	 * 
-	 * // responseByteArray = createSendingData(elevatorOrFloor, currentFloor, //
-	 * upOrDown, instruction); System.out.println("Response to elevator " + data[1]
-	 * + ": " + Arrays.toString(responseByteArray) + "\n");
-	 * schedulerElevatorSendPacket = new DatagramPacket(responseByteArray,
-	 * responseByteArray.length, schedulerElevatorReceivePacket.getAddress(),
-	 * EL_SENDPORTNUM); try {
-	 * schedulerSocketSendReceiveElevator.send(schedulerElevatorSendPacket); } catch
-	 * (IOException e1) { e1.printStackTrace(); } }
-	 * 
-	 * public static void floorSendPacket() {//FLOOR SENDING PACKET HERE
-	 * 
-	 * byte[] responseByteArray = new byte[5]; responseByteArray =
-	 * createSendingData(elevatorOrFloor, currentFloor, upOrDown, instruction);
-	 * System.out.println("Response to Floor " + data[1] + ": " +
-	 * Arrays.toString(responseByteArray) + "\n"); try { schedulerFloorSendPacket =
-	 * new DatagramPacket(responseByteArray, responseByteArray.length,
-	 * InetAddress.getLocalHost(), PORTNUM); } catch (UnknownHostException e) {
-	 * e.printStackTrace(); }
-	 * 
-	 * try { schedulerSocketSendReceiveFloor.send(schedulerFloorSendPacket); } catch
-	 * (IOException e1) { e1.printStackTrace(); } }
-	 */
 
+	/**
+	 * 
+	 * Main method for the Scheduling subsystem
+	 */
 	/*---------------------------MAIN----------------------------------*/
 	public static void main(String args[]) throws InterruptedException {
-		/*
-		 * gui = new GUI(); guiThread = new Thread(gui);
-		 */
 
 		simpleGUI = new SimpleGUI();
-		//SimpleGUIThread = new Thread(simpleGUI);
-
-		// Scheduler schedulerHandler = new Scheduler();
-
-		// Scheduler.linkedListInitialization();
-
-		/*
-		 * //elevatorStopsUp[0].add(3); //elevatorStopsDown[1].add(2);
-		 * 
-		 * 
-		 * //create temporary testing packets to simulate "Requests" sent to the
-		 * schedulingAlrogirthm because it needs a parameter
-		 * 
-		 * byte tempTestData[] = new byte[7]; tempTestData[0]= ELEVATOR_ID;//pretending
-		 * to be an elevator tempTestData[1]= 0;//pretending to be elevator #1
-		 * tempTestData[2]= REQUEST;//simulating a request tempTestData[3]= 0;//ground
-		 * floor tempTestData[4]= 0;//up or down tempTestData[5]= 2;//destination floor,
-		 * request for floor 2 tempTestData[6]= 0;//scheduler instruction- not used now
-		 * 
-		 * DatagramPacket testingPacket=new DatagramPacket
-		 * (tempTestData,tempTestData.length); Scheduler.SchedulingAlgorithm(
-		 * schedulerElevatorReceivePacket);//call method with simulated packet for
-		 * elevator #1 tempTestData[1]=1;//for elevator number 2
-		 * tempTestData[5]=3;//destination floor, request for floor 3 DatagramPacket
-		 * testingPacket2=new DatagramPacket (tempTestData,tempTestData.length);
-		 * Scheduler.SchedulingAlgorithm(schedulerElevatorReceivePacket);//call method
-		 * with simulated packet for elevator #2
-		 */
 		for (;;) {
 
 			// Receives the Packet
