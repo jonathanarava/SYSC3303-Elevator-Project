@@ -65,7 +65,7 @@ Scheduler Instructions:
 3:make a stop
 4:put on hold
 -sending to floor
-5:update floor's displays (current floor of the elvator, and direction of the elevator)
+5:update floor's displays (current floor of the elevator, and direction of the elevator)
 	-should automatically update all the floors
 6:shut down elevator (in case of hard fault) shuts down the problem elevator and notifies maintenance and emergency fire services for help
 8: Initialized; has received the initialization packets from both elevatorIntermediate and floorIntermediate and may now proceed with operations
