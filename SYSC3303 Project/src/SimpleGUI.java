@@ -11,23 +11,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-public class SimpleGUI extends Scheduler {
+public class SimpleGUI extends Scheduler{
+	// Project specification: Dunton Tower ELevator System Simulator ( 4 elevaltors, 22 floors)
 	int numElevators = 4;
 	int numFloors = 22;
-	public JButton DirectionButtons[] = new JButton[8];
+	public JButton DirectionButtons[] = new JButton[8]; // UP and DOWN buttons for the elevators
 
+	//String Initialization
 	String elevator1msg = "Elevator 1";
 	String elevator1 = "Elevator 1";
 
+	// Elevator Status declaration used for elevator direction
+	// Consistent with the Scheduler class
 	private static final byte UP = 0x02;// elevator is going up
 	private static final byte DOWN = 0x01;// elevator is going down
 	private static final byte STOP = 0x03;
 	private static final byte HOLD = 0x04;// elevator is in hold state
+	
+	// JTextarea to display current floor of each elevator and to display error msg
 	public JTextArea textArea1, textArea2, textArea3, textArea4, ErrorMsgTextArea;
 
 	SimpleGUI() {
 		JFrame frame = new JFrame("SimpleElevator GUI");
-
+		
 		JPanel Elevator1 = new JPanel();
 		JPanel ButtonPannel1 = new JPanel();
 		JPanel Elevator2 = new JPanel();
@@ -41,14 +47,10 @@ public class SimpleGUI extends Scheduler {
 		JPanel ElevatorStatus = new JPanel();
 		JPanel ErrorMsg = new JPanel();
 
-		/*
-		 * // Testing Values; int currentFloor1 = 10, currentFloor2 = 0, currentFloor3 =
-		 * 4, currentFloor4 = 6; int direction1 = 1;
-		 */
-
+		// UP and DOWN button initialization
 		DirectionButtons = new JButton[8];
 
-		//
+		//Elevator Status Panel that holds 4 panels: Elevator1 - Elevator4
 		ElevatorStatus.setLayout(new GridLayout(2, 2));
 		ElevatorStatus.setBorder(new TitledBorder("Elevator Status"));
 
@@ -58,7 +60,8 @@ public class SimpleGUI extends Scheduler {
 		// Elevator 1
 		Elevator1.setLayout(new FlowLayout());
 		Elevator1.setBorder(new TitledBorder("Elevator 1"));
-
+		// textArea1 is initialized to set current floor of elevator 1 to 0
+		// which is later updated by the run method
 		textArea1 = new JTextArea("0"/* Integer.toString(elevatorCurrentFloor[0]) */);
 		textArea1.setLineWrap(true);
 		textArea1.setWrapStyleWord(true);
@@ -78,7 +81,8 @@ public class SimpleGUI extends Scheduler {
 		// Elevator 2
 		Elevator2.setLayout(new FlowLayout());
 		Elevator2.setBorder(new TitledBorder("Elevator 2"));
-
+		// textArea2 is initialized to set current floor of elevator 1 to 0
+		// which is later updated by the run method
 		textArea2 = new JTextArea("0"/* Integer.toString(elevatorCurrentFloor[1]) */);
 		textArea2.setLineWrap(true);
 		textArea2.setWrapStyleWord(true);
@@ -98,7 +102,8 @@ public class SimpleGUI extends Scheduler {
 		// Elevator 3
 		Elevator3.setLayout(new FlowLayout());
 		Elevator3.setBorder(new TitledBorder("Elevator 3"));
-
+		// textArea3 is initialized to set current floor of elevator 1 to 0
+		// which is later updated by the run method
 		textArea3 = new JTextArea("0"/* Integer.toString(elevatorCurrentFloor[2]) */);
 		textArea3.setLineWrap(true);
 		textArea3.setWrapStyleWord(true);
@@ -118,7 +123,8 @@ public class SimpleGUI extends Scheduler {
 		// Elevator 4
 		Elevator4.setLayout(new FlowLayout());
 		Elevator4.setBorder(new TitledBorder("Elevator 4"));
-
+		// textArea4 is initialized to set current floor of elevator 1 to 0
+		// which is later updated by the run method
 		textArea4 = new JTextArea("0"/* Integer.toString(elevatorCurrentFloor[3]) */);
 		textArea4.setLineWrap(true);
 		textArea4.setWrapStyleWord(true);
@@ -140,103 +146,114 @@ public class SimpleGUI extends Scheduler {
 		ErrorMsgTextArea.setLineWrap(true);
 		ErrorMsgTextArea.setWrapStyleWord(true);
 		ErrorMsgTextArea.setEditable(false);
-
 		JScrollPane ErrorMsgScrollPlane = new JScrollPane(ErrorMsgTextArea);
 		ErrorMsgScrollPlane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		ErrorMsgScrollPlane.setPreferredSize(new Dimension(390, 100));
 		ErrorMsg.add(ErrorMsgScrollPlane);
 		// ErrorMsg End
 
-		// Add Panel to frame
+		// Add Elevator1, Elevator2, Elevator3, Elevator4 panels to ElevatorStatus Panel 
 		ElevatorStatus.add(Elevator1);
 		ElevatorStatus.add(Elevator2);
 		ElevatorStatus.add(Elevator3);
 		ElevatorStatus.add(Elevator4);
 
-		// full.add(Elevator2);
+		// Add ElevatorStatus an ErrorMsg Panel to FullPanel
 		FullPanel.add(ElevatorStatus, BorderLayout.NORTH);
 		FullPanel.add(ErrorMsg, BorderLayout.SOUTH);
-
+		
+		// Add FullPanel to the frame
 		frame.add(FullPanel);
 
-		// Frame dimensions
+		// Set frame dimesnions and set the frame visible
 		frame.setSize(425, 380);
 		frame.setVisible(true);
 	}
 
+	//UpdateGUICurrentFloor method updates the current floor of each elevator
 	public void UpdateGUICurrentFloor(int elevator, int currentFloor) {
 		switch (elevator) {
-		case 0:
-			// System.out.println(" Elevator 1 " + elevatorCurrentFloor[i]);
-			textArea1.setText(Integer.toString(currentFloor));
-			// UpdateGUIErrorMsg("ELevator 1");
-			break;
-		case 1:
-			textArea2.setText(Integer.toString(currentFloor));
-			break;
-		case 2:
-			textArea3.setText(Integer.toString(currentFloor));
-			break;
-		case 3:
-			textArea4.setText(Integer.toString(currentFloor));
-			break;
+			case 0:	// Elevator 1
+				//sets the current floor to diplay on the GUI
+				textArea1.setText(Integer.toString(currentFloor));
+				break;
+			case 1: // Elevator 2
+				textArea2.setText(Integer.toString(currentFloor));
+				break;
+			case 2: // Elevator 3
+				textArea3.setText(Integer.toString(currentFloor));
+				break;
+			case 3: // Elevator 4
+				textArea4.setText(Integer.toString(currentFloor));
+				break;
 		}
 	}
 
+	// UpdateGUIErrorMsg takes in an errorMsg sent from the Scheduler to display on
+	// the errorMsg scrollplane
 	public void UpdateGUIErrorMsg(String errorMsg) {
 		ErrorMsgTextArea.append(Integer.toString(currentFloor));
-		// textArea = new JTextArea(Integer.toString(currentFloor));
+		 //textArea = new JTextArea(Integer.toString(currentFloor));
 	}
-
+	
+	// setFloor method updates the colour of the DirectionButton
+	// of a specific elevator ( passed as a parameter) to cyan
 	public void setFloor(int elevator, int direction) {
-		if (elevator == 3) {
+		if(elevator == 3) {
 			DirectionButtons[6].setBackground(Color.cyan);
 			DirectionButtons[7].setBackground(Color.cyan);
 		}
-
+		
 	}
 
+	// UpdateElevatorGUIDirection sets the direction button of the elevators, 
+	// by taking the status of each elevator from the scheduler
 	public void UpdateElevatorGUIDirection(int elevator, int direction) {
-
-		switch (elevator) {
-		case 0:
-			break;
-		case 1:
-			elevator = 2;
-			break;
-		case 2:
-			elevator = 4;
-			break;
-		case 3:
-			elevator = 6;
-			break;
+		// Polls through each elevator to update the direction buttons
+		switch(elevator) {
+			case 0:
+				break;
+			case 1:
+				elevator = 2;
+				break;
+			case 2:
+				elevator = 4;
+				break;
+			case 3:
+				elevator = 6;
+				break;
 		}
+		// Direction of elevator can be: UP, DOWN, STOP or HOLD
 		switch (direction) {
-		case STOP:
-			if (DirectionButtons[elevator].getBackground() != Color.red) {
-				DirectionButtons[elevator].setBackground(Color.red);
-				DirectionButtons[elevator + 1].setBackground(Color.red);
+			case STOP:
+				// Only udates the GUI if the status of the elevator has changed from STOP
+				if(DirectionButtons[elevator].getBackground() != Color.red) {
+					DirectionButtons[elevator].setBackground(Color.red);
+					DirectionButtons[elevator + 1].setBackground(Color.red);
+				}
+				break;
+			case UP:
+				// Only udates the GUI if the status of the elevator has changed from UP
+				if(DirectionButtons[elevator].getBackground() != Color.green) {
+					DirectionButtons[elevator].setBackground(null);
+					DirectionButtons[elevator + 1].setBackground(Color.green);
+				}
+				break;
+			case DOWN:
+				// Only udates the GUI if the status of the elevator has changed from DOWN
+				if(DirectionButtons[elevator].getBackground() != Color.green) {
+					DirectionButtons[elevator + 1].setBackground(null);
+					DirectionButtons[elevator].setBackground(Color.green);
+				}
+				break;
+			case HOLD:
+				// Only udates the GUI if the status of the elevator has changed from HOLD
+				if(DirectionButtons[elevator].getBackground() != Color.yellow) {
+					DirectionButtons[elevator].setBackground(Color.yellow);
+					DirectionButtons[elevator + 1].setBackground(Color.yellow);
+				}
+				break;
 			}
-			break;
-		case UP:
-			if (DirectionButtons[elevator].getBackground() != Color.green) {
-				DirectionButtons[elevator].setBackground(null);
-				DirectionButtons[elevator + 1].setBackground(Color.green);
-			}
-			break;
-		case DOWN:
-			if (DirectionButtons[elevator].getBackground() != Color.green) {
-				DirectionButtons[elevator + 1].setBackground(null);
-				DirectionButtons[elevator].setBackground(Color.green);
-			}
-			break;
-		case HOLD:
-			if (DirectionButtons[elevator].getBackground() != Color.yellow) {
-				DirectionButtons[elevator].setBackground(Color.yellow);
-				DirectionButtons[elevator + 1].setBackground(Color.yellow);
-			}
-			break;
-		}
 	}
 
 //	public void run() {
