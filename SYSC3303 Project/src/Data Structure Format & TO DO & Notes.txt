@@ -6,6 +6,7 @@ Data Structure:
 -[4]floor request: up or down
 -[5]elevator request: which floor 
 -[6]command: sent from the scheduler
+-[7]Error: Error Scenario
 
 	//UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	//States
