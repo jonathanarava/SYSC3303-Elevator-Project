@@ -7,7 +7,14 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * Each elevator thread acts as one of the 4 elevators. Takes requests from the user to go the floors.
+ * There is display that shows movement of the elevators and opening and closing of doors.
+ * Takes Arguments at Initialization; How many elevators on the system(max 4), and where those 
+ *    what floors those elevators will have requests to. (if request is 0, that elevator will imediately go into holding state) 
+ * @author Group 5
+ *
+ */
 public class Elevator extends Thread {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
@@ -47,8 +54,6 @@ public class Elevator extends Thread {
 	private static final byte[] FLOOR_INITIALIZE_PACKET_DATA = { FLOOR_ID, 0, INITIALIZE, 0, 0, 0, 0, 0 };
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
-	protected boolean GUI_LIGHT;
-
 	public byte motorDirection; // make getters and setters:
 	public boolean hasRequest = true; // make getters and setters: This Boolean will be set to true when the Elevator
 	// Intermediate wants a specific elevator thread to do something.
@@ -75,8 +80,8 @@ public class Elevator extends Thread {
 
 	protected int sensor; // this variable keeps track of the current floor of the elevator
 
-	DatagramPacket elevatorSendPacket, elevatorReceivePacket;
-	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;
+	DatagramPacket elevatorSendPacket, elevatorReceivePacket;// Datagram packet for sending and receiving
+	DatagramSocket elevatorSendSocket, elevatorReceiveSocket;// Datagram socket for sending and receiving
 
 	private List<byte[]> elevatorTable;
 	private boolean doorStatusOpen = false; // whether the doors are open(true) or closed (false)
@@ -87,20 +92,6 @@ public class Elevator extends Thread {
 		this.elevatorTable = elevatorTable;
 		sensor = initiateFloor;
 		this.RealTimefloorRequest = RealTimefloorRequest;
-		// arbitrary usage of 23 for port number of Scheduler's receive
-		// use a numbering scheme for the naming
-
-		// allocate sockets, packets
-		/*
-		 * try { //ClientRWSocket = new DatagramSocket(23);//initialize ClientRWSocket
-		 * for reading and writing to the Intermediate server //port 23 is the
-		 * well-known port number of Intermediate } catch (SocketException se) {//if
-		 * DatagramSocket creation fails an exception is thrown se.printStackTrace();
-		 * System.exit(1); } //run checking loop indefinitely //status of elevator floor
-		 * number, input of floor requests, direction of elevator, motor input, door
-		 * input //only waits for packet reception? check data of packet and change
-		 * accordingly
-		 */
 	}
 
 	/**
@@ -111,13 +102,6 @@ public class Elevator extends Thread {
 	public byte[] createResponsePacketData(int requestUpdateError, byte errorType) {// create the Data byte[] for
 																					// the response packet to be
 																					// sent to the scheduler
-
-		/*
-		 * ELEVATOR --> SCHEDULER (elevator or floor (elevator-21), elevator id(which
-		 * elevator), FloorRequest/update, curentFloor, up or down, destFloor,
-		 * instruction) (
-		 */
-		// creates the byte array according to the required format
 
 		ByteArrayOutputStream requestElevator = new ByteArrayOutputStream();
 		requestElevator.write(ELEVATOR_ID); // identification as an elevator, instead of floor, or scheduler
@@ -144,45 +128,12 @@ public class Elevator extends Thread {
 		requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
 		requestElevator.write(UNUSED); // no errors
 		return requestElevator.toByteArray();
-
-//		if (requestUpdateError == REQUEST) {
-//			//requestElevator.write(REQUEST); // request
-//			// requestElevator.write((byte) setSensor(sensor)); // current floor
-//			// requestElevator.write(0); // up or down (not used, only for Floors)
-//			// requestElevator.write(RealTimefloorRequest); // dest floor
-//			// requestElevator.write(0); // instruction (not used, only from the scheduler)
-//			// (not used, only from the scheduler)
-//			// added error to data structure, not included here
-//		} else if (requestUpdateError == UPDATE) {
-//			//requestElevator.write(UPDATE); // update
-//			// requestElevator.write((byte) setSensor(sensor)); // current floor
-//			// requestElevator.write(0); // up or down (not used, only for Floors)
-//			// requestElevator.write(RealTimefloorRequest); // dest floor
-//			// requestElevator.write(0); // instruction
-//			// added error to data structure, not included here
-//		} else if (requestUpdateError == ERROR) {
-//			//requestElevator.write(ERROR); // update
-//			requestElevator.write((byte) setSensor(sensor)); // current floor
-//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-//			requestElevator.write(RealTimefloorRequest); // dest floor
-//			requestElevator.write(requestUpdateError); // instruction (not used, only from the scheduler)
-//			requestElevator.write(errorType); // error ID
-//			return requestElevator.toByteArray();
-//		} else {// something's gone wrong with the call to this method
-//			//requestElevator.write(ERROR);
-//			System.out.println(elevatorNumber
-//					+ " Elevator ERROR: called createResponsePacketData with neither REQUEST, UPDATE, or ERROR");
-//			requestElevator.write((byte) setSensor(sensor)); // current floor
-//			requestElevator.write(UNUSED); // up or down (not used, only for Floors)
-//			requestElevator.write(RealTimefloorRequest); // dest floor
-//			requestElevator.write(UNUSED); // instruction (not used, only from the scheduler)
-//			requestElevator.write(OTHER_ERROR); // something's gone wrong
-//			return requestElevator.toByteArray();
-//		}
-
 	}
 
-	// COMENTING OUT FOR TESTING REASONS, DO NOT DELETE
+	/**
+	 * 
+	 * @param doorOpenCloseError: Instruction to Open or Close the door of the elevator 
+	 */
 	public void openCloseDoor(int doorOpenCloseError) {
 		// String msg;
 
@@ -230,7 +181,9 @@ public class Elevator extends Thread {
 		}
 		// return msg;
 	}
-
+	/**
+	 * Puts the elevator into out of order mode during a hard fault. "Emergency services" are automatically contacted
+	 */
 	public void shutDown() {
 		motionOfMotor = STOP;
 		System.out.println("Elevator Out of Order, Maintenance and Emergency Fire Services have been Contacted");
@@ -243,21 +196,25 @@ public class Elevator extends Thread {
 		}
 
 	}
-
+	/**
+	 * fixes the broekn elevator, lets know in the console that the elevator has been marked "fixed"
+	 */
 	public void fixElevator() {
 		elevatorBroken = false;
 		System.out.println("Elevator has been fixed");
 	}
-
+	/**
+	 * 
+	 * @param int floorSensor will be set as the current location of the elevator
+	 * @return returns sensor(current location of the elevator)
+	 */
 	private int setSensor(int floorSensor) { // method to initialize where the elevator starts
 		sensor = floorSensor;
 		return sensor;
 	}
-
-	public int getSensor() {
-		return sensor;
-	}
-
+	/**
+	 * Updates the display(Console) of the elevator depending on the current state of the elevator
+	 */
 	public void updateDisplay() {
 		System.out.println("On Floor: " + sensor);
 		if (isGoingUp) {
@@ -266,7 +223,9 @@ public class Elevator extends Thread {
 			System.out.println("Going Down");
 		}
 	}
-
+	/**
+	 * Turns the elevator Motor up or down floors when instructed by the scheduler. 
+	 */
 	public void runElevator() {
 		// for testing
 		try {// wait for 1000
@@ -306,7 +265,9 @@ public class Elevator extends Thread {
 			elevatorTable.notifyAll();
 		}
 	}
-
+	/**
+	 * Run method for the Elevator thread that will take care of the elevator states, instructions, and real time requests when the system is in use
+	 */
 	public void run() {
 		while (true) {
 			// while(true) to activate all elevator threads in this system
