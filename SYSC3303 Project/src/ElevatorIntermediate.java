@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.lang.Object;
+
 /**
- * Intermediate/Communication member of the elevator Subsystem.
- * Will send UDP packets created by elevators to the scheduler.
- * The instructions provided by the scheduler will go be provided to the elevators by this Class.
- * Has Arguments to pass on the number of elevators to be implemented in the system and what floors their initial request will go to. 
- * @author shaviyomarasinghe
- *
+ * Intermediate/Communication member of the elevator Subsystem. Will send UDP
+ * packets created by elevators to the scheduler. The instructions provided by
+ * the scheduler will go be provided to the elevators by this Class.
+ * 
+ * @author Group 5
  */
+
 public class ElevatorIntermediate {
 
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
@@ -43,24 +43,19 @@ public class ElevatorIntermediate {
 
 	private static long respondStart, respondEnd;
 
-	/*
-	 * //FROM SCHEDULE public static final int EL_RECEIVEPORTNUM = 369; public
-	 * static final int EL_SENDPORTNUM = 159;
-	 * 
-	 * public static final int FL_RECEIVEPORTNUM = 488; public static final int
-	 * FL_SENDPORTNUM = 1199;
-	 */
-
-	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler 
+	private static final int SENDPORTNUM = 369;// port number for sending to the scheduler
 	private static final int RECEIVEPORTNUM = 159;// port number for receiving from the scheduler
 
-	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;// DatagramPacket initialization for sending and receiving 
-	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;// DatagramSocket initialization for sending and receiving
+	private static DatagramPacket elevatorSendPacket, elevatorReceivePacket;// DatagramPacket initialization for sending
+																			// and receiving
+	private static DatagramSocket elevatorSendSocket, elevatorReceiveSocket;// DatagramSocket initialization for sending
+																			// and receiving
 
 	// getting number of elevators in the system from parameters set
 	protected static int createNumElevators;// The number of Elevators in the system is passed via argument[0]
 
-	// arrays to keep track of the number of elevators, eliminates naming confusion. Same from the elevator threads
+	// arrays to keep track of the number of elevators, eliminates naming confusion.
+	// Same from the elevator threads
 	protected static Elevator elevatorArray[];
 	private static Thread elevatorThreadArray[];
 
@@ -69,27 +64,17 @@ public class ElevatorIntermediate {
 	private byte[] recentlySent;
 	private static DatagramPacket schedulerSendPacket, schedulerReceivePacket;
 	private static byte initializationData[];
-	/*
-	 * send sockets should be allocated dynamically since the ports would be
-	 * variable to the elevator or floor we have chosen
-	 */
 
 	// synchronized table that all of the elevator threads will put their requests
 	// and updates upon
 	public static List<byte[]> elevatorTable = Collections.synchronizedList(new ArrayList<byte[]>());
 
 	/**
-	 * 
+	 * Constructor Of ElevatorIntermediate
 	 */
 	public ElevatorIntermediate() {
 		try {
-			elevatorSendSocket = new DatagramSocket();
-			// elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
-			// elevatorReceiveSocket.setSoTimeout(8000);// sets the maximum time for the
-			// receive function to self block
-			// elevatorReceiveSocket = new DatagramSocket();// can be any available port,
-			// Scheduler will reply to the port
-			// that's been received
+			elevatorSendSocket = new DatagramSocket(); // creates datagramSocket here
 		} catch (SocketException se) {// if DatagramSocket creation fails an exception is thrown
 			se.printStackTrace();
 			System.exit(1);
@@ -97,30 +82,12 @@ public class ElevatorIntermediate {
 
 	}
 
+	/**
+	 * Sends a packet of Information through the synchronized socket for the
+	 * elevators
+	 */
 	public synchronized void sendPacket() {
 		respondStart = System.nanoTime();
-		// byte[] requestElevator = new byte[7];
-
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
-		// requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes
-		// into the first index of elevatorArray list, and tells that elevator to return
-		// a byte array that
-		// will be the packet that is being sent to the Scheduler. This needs to be done
-		// in a dynamic manner so all
-		// elevators can acquire a lock to send a packet one at a time.
-
-		// allocate sockets, packets
 		synchronized (elevatorTable) {
 			while (elevatorTable.isEmpty()) {
 				try {
@@ -135,7 +102,7 @@ public class ElevatorIntermediate {
 				try {
 					System.out.println("\nSending to scheduler: " + Arrays.toString(elevatorTable.get(0)));
 					elevatorSendPacket = new DatagramPacket(elevatorTable.get(0), elevatorTable.get(0).length,
-							/*InetAddress.getLocalHost()*/ InetAddress.getByName("134.117.59.128"), SENDPORTNUM);
+							/* InetAddress.getLocalHost() */ InetAddress.getByName("134.117.59.128"), SENDPORTNUM);
 					recentlySent = elevatorTable.get(0);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -154,22 +121,20 @@ public class ElevatorIntermediate {
 
 	}
 
+	/**
+	 * method for Receiving Datagram Packets from the scheduler
+	 */
 	public synchronized void receivePacket() {
-		// SCHEDULER --> ELEVATOR (0, motorDirection, motorSpinTime, open OR close door,
-		// 0)
+
 		byte data[] = new byte[8];
 		byte schedulerInstruction;
 		byte elevatorElement;
 		try {
 			elevatorReceiveSocket = new DatagramSocket(RECEIVEPORTNUM);
-			// elevatorReceiveSocket.setSoTimeout(2500);
-			// send and receive with Scheduler.
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
 		elevatorReceivePacket = new DatagramPacket(data, data.length);
-
-		// System.out.println("elevator_subsystem: Waiting for Packet.\n");
 
 		try {
 			// Block until a datagram packet is received from receiveSocket.
@@ -201,20 +166,9 @@ public class ElevatorIntermediate {
 			intialized = true;
 		} else if (schedulerInstruction == UPDATE) {
 			elevatorArray[elevatorElement].updateDisplay();
-			/*
-			 * for (int i = 0; i < numFloors; i++) {
-			 * floorArray[i].updateDisplay(elevatorLocation, elevatorDirection); }
-			 */
 		} else if (schedulerInstruction == SHUT_DOWN) {
 			elevatorArray[elevatorElement].shutDown();
 		}
-		// else if(schedulerInstruction)
-
-		// System.out.println("elevatorArray.length: "+elevatorArray.length);
-		// System.out.println("elevatorArray[0]:
-		// "+elevatorArray[0]);//elevatorArray.length);
-		// System.out.println("elevatorArray[1]:
-		// "+elevatorArray[1]);//elevatorArray.length);
 
 		// FOR TESTING: ADDS REQUESTS
 		if (elevatorArray != null) {
@@ -238,14 +192,6 @@ public class ElevatorIntermediate {
 				break;
 			}
 		}
-
-		// elevatorArray[0].openCloseDoor(data[2]);
-
-		// send packet for scheduler to know the port this elevator is allocated
-		// sendPacket = new DatagramPacket(data,
-		// receivePacket.getLength(),receivePacket.getAddress(),
-		// receivePacket.getPort());
-		// }
 	}
 
 	public static void delay(int delayValue) {
@@ -253,6 +199,12 @@ public class ElevatorIntermediate {
 			i++;
 		}
 	}
+
+	/**
+	 * 
+	 * @param elevatorHandler: ElevatorIntermediate class that's pointed to
+	 *        ElevatorIntermediate class is initialized with the Scheduler
+	 */
 
 	private static void elevatorInitialization() {
 		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
@@ -269,18 +221,22 @@ public class ElevatorIntermediate {
 		initializationOutputStream.write(UNUSED); // not needed (destination request)
 		initializationOutputStream.write(UNUSED); // scheduler instruction
 		initializationOutputStream.write(UNUSED); // error's only received by scheduler and not sent
-		
+
 		initializationData = initializationOutputStream.toByteArray();
 		elevatorTable.add(initializationData);
 		intialized = true;
-		
+
 	}
 
+	/**
+	 * Main execution code of the Elevator Subsystem
+	 */
+
 	public static void main(String args[]) throws IOException {
-		// 2 arguments: args[0] is the number of Elevators in the system
+
 		ElevatorIntermediate elevatorHandler = new ElevatorIntermediate();
-		// for iteration 1 there will only be 1 elevator
-		// getting floor numbers from parameters set
+		// arguments: args[0] is the number of Elevators in the system. Every number
+		// after that is the request to the desired floor for each elevator
 		createNumElevators = Integer.parseInt(args[0]);// The number of Elevators in the system is passed via
 		// argument[0]
 
@@ -316,23 +272,7 @@ public class ElevatorIntermediate {
 			elevatorHandler.sendPacket();
 			elevatorHandler.receivePacket();
 
-			// Synchronize Intermediate send and Receive with the Scheduler's send and
-			// receive.
-
-			// delay(1000);
 		}
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
 
 	}
 }

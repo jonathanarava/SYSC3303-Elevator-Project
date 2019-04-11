@@ -1,5 +1,4 @@
 import java.io.ByteArrayOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 public class FloorIntermediate {
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
@@ -38,20 +36,12 @@ public class FloorIntermediate {
 	private static final int REQUEST = 1;// for identifying the packet type sent to scheduler as a request
 	private static final int UPDATE = 2;// for identifying the packet type sent to scheduler as a status update
 	private static final int INITIALIZE = 8;// for first communication with the scheduler
-	// private static final byte[]
-	// ELEVATOR_INITIALIZE_PACKET_DATA={ELEVATOR_ID,0,INITIALIZE, 0,0,0,0,0};
-	// private static final byte[]
-	// FLOOR_INITIALIZE_PACKET_DATA={FLOOR_ID,0,INITIALIZE, 0,0,0,0,0};
+
 	private static final int UNUSED = 0;// value for unused parts of data
 	private static final int DOOR_CLOSE_BY = 6;// door shouldn't be open for longer than 6 seconds
 
 	public static final int EL_RECEIVEPORTNUM = 369;
 	public static final int EL_SENDPORTNUM = 159;
-
-	/*
-	 * //FROM ELEVATORINTERMEDIATE private static final int SENDPORTNUM = 369;
-	 * private static final int RECEIVEPORTNUM = 159;
-	 */
 
 	private static final int SENDPORTNUM = 369;
 	private static final int RECEIVEPORTNUM = 1199;
@@ -67,20 +57,13 @@ public class FloorIntermediate {
 	private static Thread floorThreadArray[];
 
 	// arrays to keep track of the number of elevators, eliminates naming confusion
-//	private static int name;
-//	private static boolean hasRequest;
-//	private static int up_or_down;
 	private boolean intialized = false;
 	private static int numFloors;
 	private static byte initializationData[];
 
 	static List<String> fileRequests = new ArrayList<String>();
-	/*
-	 * send sockets should be allocated dynamically since the ports would be
-	 * variable to the elevator or floor we have chosen
-	 */
-	// public static final int SENDPORTNUM = 488;
 
+	
 	public FloorIntermediate() {
 		try {
 			floorSendSocket = new DatagramSocket();// FL_RECEIVEPORTNUM);
@@ -91,28 +74,6 @@ public class FloorIntermediate {
 	}
 
 	public synchronized void sendPacket() {
-		// byte[] requestElevator = new byte[7];
-
-		/* ELEVATOR --> SCHEDULER (0, FloorRequest, cuurentFloor, 0) */
-
-		// System.out.println("Enter floor number: ");
-
-		// Scanner destination = new Scanner(System.in);
-		// int floorRequest;
-		// if (destination.nextInt() != 0) {
-		// floorRequest = destination.nextInt();
-		// } else {
-
-		// }
-		// destination.close();
-		// requestElevator = elevatorArray[0].responsePacketRequest(1); // this goes
-		// into the first index of elevatorArray list, and tells that elevator to return
-		// a byte array that
-		// will be the packet that is being sent to the Scheduler. This needs to be done
-		// in a dynamic manner so all
-		// elevators can acquire a lock to send a packet one at a time.
-
-		// allocate sockets, packets
 		synchronized (floorTable) {
 			while (floorTable.isEmpty()) {
 				try {
@@ -157,18 +118,7 @@ public class FloorIntermediate {
 			e1.printStackTrace();
 		}
 		floorReceivePacket = new DatagramPacket(data, data.length);
-//		try {
-//			System.out.println("Waiting...\n"); // so we know we're waiting
-//			floorReceiveSocket.receive(floorReceivePacket);
-//			System.out.println("Got it");
-//		}
-//
-//		catch (IOException e) {
-//			System.out.print("IO Exception: likely:");
-//			System.out.println("Receive Socket Timed Out.\n" + e);
-//			e.printStackTrace();
-//			System.exit(1);
-//		}
+
 		try {
 			// Block until a datagram packet is received from receiveSocket.
 			System.out.println("waiting to receive");
