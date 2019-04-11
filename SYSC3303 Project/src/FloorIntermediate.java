@@ -9,7 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * Intermediate/Communication member of the Floor Subsystem. Will send UDP
+ * packets created by floors to the scheduler. The instructions provided by
+ * the scheduler will go be provided to the floors by this Class.
+ * 
+ * @author Group 5
+ */
 public class FloorIntermediate {
 	// UNIFIED CONSTANTS DECLARATION FOR ALL CLASSES
 	// States
@@ -63,7 +69,9 @@ public class FloorIntermediate {
 
 	static List<String> fileRequests = new ArrayList<String>();
 
-	
+	/**
+	 * Constructor Of FloorIntermediate
+	 */
 	public FloorIntermediate() {
 		try {
 			floorSendSocket = new DatagramSocket();// FL_RECEIVEPORTNUM);
@@ -72,7 +80,9 @@ public class FloorIntermediate {
 			System.exit(1);
 		}
 	}
-
+	/**
+	 * Sends a packet of Information through the synchronized Table for the Floor threads
+	 */
 	public synchronized void sendPacket() {
 		synchronized (floorTable) {
 			while (floorTable.isEmpty()) {
@@ -105,7 +115,9 @@ public class FloorIntermediate {
 		}
 
 	}
-
+	/**
+	 * method for Receiving Datagram Packets from the scheduler
+	 */
 	public synchronized void receivePacket() {
 		byte data[] = new byte[8];
 		int elevatorOnTheMove; // which elevator the update packet regarding
@@ -148,7 +160,9 @@ public class FloorIntermediate {
 			}
 		}
 	}
-
+	/**
+	 * FloorIntermediate class is initialized with the scheduler using this method
+	 */
 	private static void floorInitialization() {
 		ByteArrayOutputStream initializationOutputStream = new ByteArrayOutputStream();
 		initializationOutputStream.write(FLOOR_ID); // Identifying as the scheduler
@@ -186,7 +200,9 @@ public class FloorIntermediate {
 	 * if(i>=2) { fileRequests.add(text); i++; } } }catch(Exception e) {
 	 * e.printStackTrace(); } }
 	 */
-
+	/**
+	 * Main execution code of the Floor Subsystem
+	 */
 	public static void main(String args[]) {// throws IOException {
 
 		// for iteration 1 there will only be 1 elevator
